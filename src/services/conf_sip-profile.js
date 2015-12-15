@@ -2,24 +2,39 @@
  * Created by zppro on 15-12-9.
  */
 
-module.exports = function (app,options){
+module.exports = {
+    init : function()
+    {
+        var self = this;
+        this.file = __filename;
+        this.filename = this.file.substr(this.file.lastIndexOf('/') + 1);
+        this.module_name = this.filename.substr(0, this.filename.lastIndexOf('.'));
+        this.service_url_prefix = '/services/' + this.module_name.split('_').join('/');
 
-    var logger = require('log4js').getLogger(__filename.substr(__filename.lastIndexOf('/')+1));
-    if(!logger){
-        console.log('logger not loaded in '+__filename);
+        this.logger = require('log4js').getLogger(this.filename);
+        if (!this.logger) {
+            console.error('logger not loaded in ' + this.file);
+        }
+        else {
+            this.logger.info(this.file+" loaded!");
+        }
+        this.actions = [
+            {
+                method:'create',
+                verb:'post',
+                url: this.service_url_prefix,
+                handler: function (app, options) {
+                    return function * (next) {
+                        self.logger.info(JSON.stringify(this.request.body));
+
+
+                        this.body = 'ok';
+                        yield next;
+                    };
+                }
+            }
+        ];
+
+        return this;
     }
-    else{
-        logger.info(__filename);
-    }
-
-    return function * (next) {
-        ///body {"caller":"主叫号码","callee":"被叫号码"}
-        //日志
-        logger.info(JSON.stringify(this.request.body));
-        console.log(__filename);
-        this.body = 'ok';
-        //return;
-
-        yield next;
-    };
-};
+}.init();

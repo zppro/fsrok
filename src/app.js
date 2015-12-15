@@ -7,7 +7,8 @@
 var _ = require('underscore');
 var log4js = require('log4js');
 var koa = require('koa');
-var router = require('koa-router')();
+var Router = require('koa-router');
+var router = Router();
 var koaBody = require('koa-body')();
 var statelessauth = require('koa-statelessauth');
 var jwt = require('jsonwebtoken');
@@ -16,8 +17,9 @@ var fs = require('fs-extra');
 var co = require('co');
 var thunkify = require('thunkify');
 var rfcore = require('rfcore');
+var monoogse = require('mongoose');
 
-var auth = require('./libs/auth-mongo.js');
+var auth = require('./middlewares/auth-mongo.js');
 //console.log(conf);
 
 var app = koa();
@@ -53,7 +55,7 @@ app.conf = {
     }
 };
 
-
+console.log('config...');
 // conf
 rfcore.config(app.conf,process.argv);
 //console.log(JSON.stringify(app.conf.db.mongodb));
@@ -64,7 +66,30 @@ _.each(app.conf.dir,function(v){
     fs.ensureDir(v);
 });
 
+//load wrapper
+app.wrapper = {
+    cb: thunkify,
+    res: {
+        default: function () {
+            return {success: true, code: 0, msg: null};
+        },
+        error: function (err) {
+            return {success: false, code: err.code, msg: err.message};
+        },
+        ret: function (ret) {
+            return {success: true, code: 0, msg: null, ret: ret};
+        },
+        rows: function (rows) {
+            return {success: true, code: 0, msg: null, rows: rows};
+        }
+    }
+};
 
+//load dictionary
+app.dictionary = rfcore.dictionary;
+
+//init database object
+app.db = {};
 
 
 // logger
@@ -80,15 +105,29 @@ _.each(app.conf.dir,function(v){
 //app.use(session(app));
 
 
-app.data = rfcore.dataP;
-app.dictionary = rfcore.dictionary;
-console.log('co...')
+//app.data = rfcore.dataP;
+
+console.log('co...');
 
 co(function*(){
     //app.conf.serviceFiles = yield thunkify(fs.readdir)(app.conf.dir.service);
     //console.log('serviceFiles:'+JSON.stringify(app.conf.serviceFiles));
+    console.log('load dictionary...');
+    yield app.wrapper.cb(app.dictionary.readJSON)('pre-defined/dictionary.json');
 
-    app.conf.serviceNames = _.map((yield thunkify(fs.readdir)(app.conf.dir.service)),function(o){ return o.substr(0,o.indexOf('.'))});
+    //配置数据库
+    console.log('configure mongoose...');
+    //app.db.mongoose = monoogse;
+    var connectStr = 'mongodb://{0}:{1}@{2}:{3}/{4}'.format(app.conf.db.mongodb.user,app.conf.db.mongodb.password,app.conf.db.mongodb.server,app.conf.db.mongodb.port,app.conf.db.mongodb.database)
+    monoogse.connect(connectStr);
+    app.db = monoogse.connection.on('error',function(err){
+        console.log('mongodb error:');
+        console.error(err);
+    });
+    app.modelFactory = require('./libs/ModelFactory');
+
+    console.log('configure logs...');
+    app.conf.serviceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.service)),function(o){ return o.substr(0,o.indexOf('.'))});
 
     //配置日志
     log4js.configure({ appenders: _.map(app.conf.serviceNames,function(o){
@@ -101,31 +140,15 @@ co(function*(){
       };
     })});
 
+    console.log('register router...');
     //注册服务路由
-    _.each(app.conf.serviceNames,function(o){
-        router.post('/services/'+o.split('_').join('/'), koaBody, require('./services/' + o+'.js')(app));
+    _.each(app.conf.serviceNames,function(o) {
+        var service_module = require('./services/' + o);
+        _.each(service_module.actions, function (action) {
+            Router.prototype[action.verb].apply(router,[service_module.name + "_" + action.method, action.url, action.handler(app)]);
+        });
     });
 
-
-
-    //需要登录访问控制
-    app.use(statelessauth({
-            validate: function (token) {
-                //This should go to a DB etc to get your user based on token
-                //token to user
-                try{
-                    this.user = jwt.verify(token, app.conf.secure.authSecret);
-
-                }catch(e){
-                    this.status = 401;
-                }
-
-                return this.user;
-            }},
-        {
-            ignorePaths: _.union(app.conf.auth.ignorePaths,_.map(app.conf.serviceNames,function(o){ return '/services/'+o.split('_').join('/');}))
-        }
-    ));
 
     //注册其他路由
     router
@@ -133,25 +156,53 @@ co(function*(){
             this.body = 'hello guest';
             yield next;
         })
-        .post('/auth', koaBody, auth(app));
+        .post('/auth',auth(app));
+
+    //注意router.use的middleware有顺序
+    router.use(koaBody);
+    router.use('/services',require('./middlewares/t1.js')(app),require('./middlewares/t2.js')(app));
+
+    //需要登录访问控制
+    //app.use(statelessauth({
+    //        validate: function (token) {
+    //            //This should go to a DB etc to get your user based on token
+    //            //token to user
+    //            try{
+    //                this.user = jwt.verify(token, app.conf.secure.authSecret);
+    //
+    //            }catch(e){
+    //                this.status = 401;
+    //            }
+    //
+    //            return this.user;
+    //        }},
+    //    {
+    //        ignorePaths: _.union(app.conf.auth.ignorePaths,_.map(app.conf.serviceNames,function(o){ return '/services/'+o.split('_').join('/');}))
+    //    }
+    //));
+
+
 
     app.use(router.routes())
         .use(router.allowedMethods());
 
-    app.data.init(app.conf.dir.data,{items:app.conf.serviceNames.concat()}).then(function(){
-        //设置data service 远程
-        //var options = {getPath:'/data/get',setPath:'data/set',writePath:'data/write'};
-        //注册地址
-        app.data.remote.init(router);//注册
-        app.conf.auth.ignorePaths.push(app.data.remote.settings.getPath);
-        app.conf.auth.ignorePaths.push(app.data.remote.settings.setPath);
-        app.conf.auth.ignorePaths.push(app.data.remote.settings.writePath);
-
-
-
-        // listen
-        app.listen(3000);
-    });
+    app.listen(3000);
+    console.log('listening...');
+    //注释掉数据服务
+    //app.data.init(app.conf.dir.data,{items:app.conf.serviceNames.concat()}).then(function(){
+    //    //设置data service 远程
+    //    //var options = {getPath:'/data/get',setPath:'data/set',writePath:'data/write'};
+    //    //注册地址
+    //    app.data.remote.init(router);//注册
+    //    app.conf.auth.ignorePaths.push(app.data.remote.settings.getPath);
+    //    app.conf.auth.ignorePaths.push(app.data.remote.settings.setPath);
+    //    app.conf.auth.ignorePaths.push(app.data.remote.settings.writePath);
+    //
+    //
+    //
+    //    // listen
+    //
+    //});
 
 });
 

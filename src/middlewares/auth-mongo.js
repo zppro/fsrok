@@ -10,7 +10,7 @@ var jwt = require('jsonwebtoken');
 module.exports = function auth(app){
     return function * () {
 
-
+        console.log(JSON.stringify(this.request.body));
         var passwordHash = crypto.createHash('md5').update(this.request.body.Password).digest('hex');
         var sqlStr = 'select * from Pub_User where UserCode=\'' + this.request.body.UserCode + '\' and PasswordHash=\'' + passwordHash + '\'';
 
