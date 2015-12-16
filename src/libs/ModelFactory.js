@@ -23,6 +23,9 @@ var ModelFactory = function(conn) {
         },
         query: function (name, path, data) {
             return ModelFactory._query(ModelFactory.getModel(conn, name, path), data);
+        },
+        one: function (name, path, data) {
+            return ModelFactory._one(ModelFactory.getModel(conn, name, path), data);
         }
     };
 };
@@ -69,6 +72,15 @@ ModelFactory._query =function (model,data) {
     }
     else {
         return model.find();
+    }
+};
+
+ModelFactory._one =function (model,data) {
+    if (data) {
+        return model.findOne(data.where, data.select, data.options);
+    }
+    else {
+        return model.findOne();
     }
 };
 
