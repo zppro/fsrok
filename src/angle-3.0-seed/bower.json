@@ -1,0 +1,56 @@
+{
+  "name": "fsrokwba",
+  "homepage": "https://github.com/zppro/fsrok",
+  "authors": [
+    "zppro <zpprozppro@gmail.com>"
+  ],
+  "description": "fsrok web backend admin",
+  "main": "index.html",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "fsrok",
+    "admin"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-loading-bar": "0.7.0",
+    "angular-translate": "2.6.0",
+    "angular-ui-router": "0.2.13",
+    "angular": "1.4.2",
+    "angular-route": "1.4.2",
+    "angular-bootstrap": "0.12.1",
+    "angular-cookies": "1.4.2",
+    "angular-translate-loader-url": "2.6.0",
+    "angular-translate-loader-static-files": "2.6.0",
+    "angular-translate-storage-local": "2.6.0",
+    "angular-translate-storage-cookie": "2.6.0",
+    "angular-animate": "1.4.2",
+    "angular-ui-utils": "0.2.2",
+    "fontawesome": "4.3.0",
+    "oclazyload": "0.6.3",
+    "ngstorage": "0.3.0",
+    "jquery": "2.1.3",
+    "modernizr": "2.8.3",
+    "angular-sanitize": "1.4.2",
+    "angular-resource": "1.4.2",
+    "simple-line-icons": "0.1.1",
+    "angular-touch": "1.4.2",
+    "jquery.browser": "master"
+  },
+  "resolutions": {
+    "angular": "1.4.2",
+    "angular-translate": "2.6.0",
+    "angular-translate-storage-cookie": "2.6.0",
+    "angular-cookies": "1.4.2"
+  }
+}

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="app, responsive, angular, bootstrap, dashboard, admin">
+    <title>fsrok admin portal</title>
+  </head>
+  <body>
+    <p>indexpage</p>
+    <div class="aaa">this is a index page      is reloaded what amazing fuckcuckf!!!!</div>
+    <div class="smd">hYou can start editing your code, LiveReload will update your browser after any cha</div>
+  </body>
+</html>

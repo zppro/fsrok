@@ -10,6 +10,7 @@ var koa = require('koa');
 var Router = require('koa-router');
 var router = Router();
 var koaBody = require('koa-body')();
+var koaStatic = require('koa-static');
 var statelessauth = require('koa-statelessauth');
 var jwt = require('jsonwebtoken');
 var path = require('path');
@@ -19,16 +20,20 @@ var thunkify = require('thunkify');
 var rfcore = require('rfcore');
 var monoogse = require('mongoose');
 
+
 var auth = require('./middlewares/auth.js');
 //console.log(conf);
 
 var app = koa();
 app.conf = {
+    isProduction: true,
     dir: {
         root: __dirname,
         log: path.join(__dirname, 'logs'),
         data: path.join(__dirname, 'data'),
-        service: path.join(__dirname, 'services')
+        service: path.join(__dirname, 'services'),
+        static_develop: '../pub-client-develop/',
+        static_production: '../pub-client-production/'
     },
     auth: {
         ignorePaths: ['/services/share/login']
@@ -42,7 +47,7 @@ app.conf = {
             port: '服务器端口',
             database: '数据库名'
         },
-        mongodb:{
+        mongodb: {
             user: '数据库用户',
             password: '密码',
             server: '服务器IP',
@@ -50,8 +55,11 @@ app.conf = {
             database: '数据库名'
         }
     },
-    secure:{
-        authSecret:'认证密钥'
+    secure: {
+        authSecret: '认证密钥'
+    },
+    client: {
+        bulidtarget: 'default'
     }
 };
 
@@ -153,17 +161,26 @@ co(function*() {
         });
     });
 
+    console.log(app.conf.client.bulidtarget);
+    //注册静态文件（客户端文件）
+    if (app.conf.isProduction == true || app.conf.isProduction === 'true') {
+        app.use(koaStatic(app.conf.dir.static_production + app.conf.client.bulidtarget));
+    }
+    else {
+        app.use(koaStatic(app.conf.dir.static_develop + app.conf.client.bulidtarget));
+        app.use(require('koa-livereload')());
+    }
 
     //注册其他路由
-    router
-        .get('/', function *(next) {
-            this.body = 'hello guest';
-            yield next;
-        });
+    //router
+    //    .get('/', function *(next) {
+    //        this.body = 'hello guest';
+    //        yield next;
+    //    });
 
     //注意router.use的middleware有顺序
     router.use(koaBody);
-    router.use('/services', auth(app,_.union(app.conf.auth.ignorePaths,[])),require('./middlewares/t1.js')(app));
+    router.use('/services', auth(app, _.union(app.conf.auth.ignorePaths, [])), require('./middlewares/t1.js')(app));
 
     //需要登录访问控制
     //app.use();
@@ -190,6 +207,7 @@ co(function*() {
         .use(router.allowedMethods());
 
     app.listen(3000);
+
     console.log('listening...');
     //注释掉数据服务
     //app.data.init(app.conf.dir.data,{items:app.conf.serviceNames.concat()}).then(function(){
