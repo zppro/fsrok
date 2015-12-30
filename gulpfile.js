@@ -28,14 +28,14 @@ var paths = {
 
 var bower = {
     // scripts required to start the app
-    source_base_js: _.map(require(paths.build + 'gulp-bower-base-js.json'), function (o) {
+    source_base_js: _.map(require(paths.build + 'gulp-' + target + '-bower-base-js.json'), function (o) {
         return o.replace(/\{\{(.+?)\}\}/g, target)
     }),
     name_concat_js: 'base.js',
     dest_base_develop: paths.pub_client_app_develop + 'js/',
     dest_base_production: paths.pub_client_app_production + 'js/',
     // vendor scripts to make the app work. Usually via lazy loading
-    source_app: _.map(require(paths.build + 'gulp-bower.json'), function (o) {
+    source_app: _.map(require(paths.build + 'gulp-' + target + '-bower.json'), function (o) {
         return o.replace(/\{\{(.+?)\}\}/g, target)
     }),
     dest_develop: paths.pub_client_develop + 'vendor/',
@@ -50,6 +50,15 @@ var vendor = {
     }),
     dest_develop: paths.pub_client_develop + 'vendor/',
     dest_production: paths.pub_client_production + 'vendor/'
+};
+
+// server data config
+var serverdata = {
+    // server data required to start the app
+    watch: paths.src_client + 'server/**/*',
+    source: paths.src_client + 'server/**/*',
+    dest_develop: paths.pub_client_develop + 'server/',
+    dest_production: paths.pub_client_production + 'server/'
 };
 
 // SOURCES CONFIG
@@ -83,7 +92,9 @@ var source = {
     jade: {
         watch: paths.src_client + 'jade/**/*.jade',
         index: paths.src_client + 'jade/index.jade',
-        views: [paths.src_client + 'jade/**/*.*', '!' + paths.src_client + 'jade/index.jade'],
+        pages: [paths.src_client + 'jade/pages/**/*.*'],
+        pages_root: paths.src_client + 'jade/pages',
+        views: [paths.src_client + 'jade/views/**/*.*'],
         views_root: paths.src_client + 'jade/views'
     }
 };
@@ -97,6 +108,7 @@ var build = {
         scripts: paths.pub_client_app_develop + 'js/',
         jade: {
             index: paths.pub_client_develop,
+            pages: paths.pub_client_app_develop + 'pages/',
             views: paths.pub_client_app_develop + 'views/'
         }
     },
@@ -107,6 +119,7 @@ var build = {
         scripts: paths.pub_client_app_production + 'js/',
         jade: {
             index: paths.pub_client_production,
+            pages: paths.pub_client_app_develop + 'pages/',
             views: paths.pub_client_app_production + 'views/'
         }
     }
@@ -173,7 +186,17 @@ gulp.task('vendor:base:css', function() {
 
 gulp.task('vendor',['vendor:base:css']);
 
+// Build the server data to start the application
+gulp.task('server:data', function() {
+    log('Copying serverdata ..');
+    return gulp.src(serverdata.source)
+        .pipe(gulp.dest(isProduction ? serverdata.dest_production : serverdata.dest_develop))
+        .pipe($plugins.livereload())
+        ;
+});
 
+
+gulp.task('server',['server:data']);
 
 // Images:app
 gulp.task('images:app',function() {
@@ -289,6 +312,17 @@ gulp.task('jade:index',function() {
         ;
 });
 
+gulp.task('jade:pages', function() {
+    log('Building jade pages.. ');
+
+    return gulp.src(source.jade.pages, {base: source.jade.pages_root})
+        .pipe($plugins.if(!isProduction, $plugins.changed(build.develop.jade.pages, {extension: '.html'})))
+        .pipe($plugins.jade({pretty: true}))
+        .on('error', handleError)
+        .pipe(gulp.dest(isProduction ? build.production.jade.pages : build.develop.jade.pages))
+        ;
+});
+
 gulp.task('jade:views', function() {
     log('Building jade views.. ');
 
@@ -302,6 +336,7 @@ gulp.task('jade:views', function() {
 
 gulp.task('jade',[
     'jade:index',
+    'jade:pages',
     'jade:views'
 ]);
 
@@ -316,7 +351,7 @@ gulp.task('watch', function() {
     log('Starting watch and LiveReload..');
 
     $plugins.livereload.listen();
-
+    gulp.watch(serverdata.watch,['server']);
     gulp.watch(source.jade.watch, ['jade']);
     gulp.watch(source.less.watch, ['styles:less:app', 'styles:less:app-rtl']);
     gulp.watch(source.scripts.watch, ['scripts:app']);
@@ -366,6 +401,7 @@ gulp.task('production', gulpsync.sync([
     'prod',
     'bower',
     'vendor',
+    'server',
     'images',
     'i18n',
     'styles',
@@ -388,6 +424,7 @@ gulp.task('prod', function() {
 gulp.task('develop', gulpsync.sync([
     'bower',
     'vendor',
+    'server',
     'images',
     'i18n',
     'styles',
