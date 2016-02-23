@@ -352,6 +352,7 @@ gulp.task('watch', function() {
 
     $plugins.livereload.listen();
     gulp.watch(serverdata.watch,['server']);
+    gulp.watch(source.i18n.watch, ['i18n']);
     gulp.watch(source.jade.watch, ['jade']);
     gulp.watch(source.less.watch, ['styles:less:app', 'styles:less:app-rtl']);
     gulp.watch(source.scripts.watch, ['scripts:app']);

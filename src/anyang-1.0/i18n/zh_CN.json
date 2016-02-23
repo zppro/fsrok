@@ -1,0 +1,74 @@
+{
+  "dashboard": {
+    "WELCOME": "欢迎来到{{appName}}"
+  },
+  "topbar": {
+    "aside": {
+      "COLLAPSE-TITLE": "折叠边栏",
+      "EXPAND-TITLE": "展开边栏"
+    },
+    "user-block": {
+      "TITLE": "用户信息"
+    },
+    "lock": {
+      "TITLE": "锁定屏幕"
+    },
+    "logout": {
+      "TITLE": "退出系统"
+    },
+    "search": {
+      "PLACEHOLDER": "输入查询内容.."
+    }
+  },
+  "sidebar": {
+    "subsystem":{
+      "ORGANIZATION-PFTA":"机构养老云-标准版",
+      "COMMUNITY-PFTA":"社区养老云-待定",
+      "MANAGE-CENTER":"管理中心"
+    },
+    "WELCOME": "欢迎",
+    "menu-organization-pfta":{
+      "OLDMAN-MANAGE":"老人管理",
+      "ENTER-MANAGE":"入院管理",
+      "IN-MANAGE":"在院管理",
+      "EXIT-MANAGE":"出院管理",
+      "RECEPTION-MANAGE":"接待管理",
+      "LEAVE-MANAGE":"请假管理",
+      "------------":"",
+      "FINANCIAL-MANAGE":"财务管理",
+      "ENTER-PAYMENT":"入院缴费",
+      "RECHARGE":"账户充值",
+      "ARREARAGE-MANAGE":"欠费管理",
+      "PAYMENT-DETAILS":"交费明细",
+      "EXIT-SETTLEMENT":"出院结算",
+      "------------":"",
+      "MATERIAL-MANAGE":"物资管理",
+      "INVENTORY-MANAGE":"库存管理",
+      "DONATION-MANAGE":"捐赠管理",
+      "------------":"",
+      "KNOWLEDGE-BASE-MANAGE":"知识库管理",
+      "------------":"",
+      "SYSTEM-MANAGE":"系统管理",
+      "USER-MANAGE":"用户管理",
+      "DEPARTMENT-MANAGE":"部门管理",
+      "DISTRICT-MANAGE":"片区管理",
+      "BED-MANAGE":"床位管理",
+      "LOG":"系统日志"
+    },
+    "menu-manage-center":{
+      "METADATA-MANAGE":"元数据管理",
+      "DICTIONARY-MANAGE":"字典管理",
+      "PARAM":"系统参数",
+      "CUSTOMER-MANAGE":"客户管理",
+      "ACCOUNT-MANAGE":"帐号管理"
+    },
+    "nav": {
+      "SINGLEVIEW": "单页视图",
+      "SYSTEMPARAMETER":"系统参数",
+      "menu": {
+        "MENU": "菜单",
+        "SUBMENU": "子菜单"
+      }
+    }
+  }
+}

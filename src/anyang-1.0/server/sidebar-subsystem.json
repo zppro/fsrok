@@ -1,0 +1,17 @@
+[
+  {
+    "text": "Organization PFTA",
+    "menujson":"server/sidebar-menu-organization-pfta.json",
+    "translate": "sidebar.subsystem.ORGANIZATION-PFTA"
+  },
+  {
+    "text": "Community PFTA",
+    "menujson":"server/sidebar-menu-community-pfta.json",
+    "translate": "sidebar.subsystem.COMMUNITY-PFTA"
+  },
+  {
+    "text": "Manage Center",
+    "menujson":"server/sidebar-menu-manage-center.json",
+    "translate": "sidebar.subsystem.MANAGE-CENTER"
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "text": "Metadata",
+    "translate": "sidebar.menu-manage-center.METADATA-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "DictionaryManage",
+        "sref": "app.manage-center.metadata-dictionary-manage",
+        "translate": "sidebar.menu-manage-center.DICTIONARY-MANAGE"
+      },
+      {
+        "text": "Param",
+        "sref": "app.manage-center.metadata-param",
+        "translate": "sidebar.menu-manage-center.PARAM"
+      }
+    ]
+  },
+  {
+    "text": "CustomerManage",
+    "translate": "sidebar.menu-manage-center.CUSTOMER-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "AccountManage",
+        "sref": "app.manage-center.customer-account-manage",
+        "translate": "sidebar.menu-manage-center.ACCOUNT-MANAGE"
+      }
+    ]
+  }
+]

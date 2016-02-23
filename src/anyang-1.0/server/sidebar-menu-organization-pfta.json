@@ -1,0 +1,125 @@
+[
+  {
+    "text": "OldManManage",
+    "translate": "sidebar.menu-organization-pfta.OLDMAN-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "EnterManage",
+        "sref": "app.organization-pfta.oldman-enter-manage",
+        "translate": "sidebar.menu-organization-pfta.ENTER-MANAGE"
+      },
+      {
+        "text": "InManage",
+        "sref": "app.organization-pfta.oldman-in-manage",
+        "translate": "sidebar.menu-organization-pfta.IN-MANAGE"
+      },
+      {
+        "text": "ExitManage",
+        "sref": "app.organization-pfta.oldman-exit-manage",
+        "translate": "sidebar.menu-organization-pfta.EXIT-MANAGE"
+      },
+      {
+        "text": "ReceptionManage",
+        "sref": "app.organization-pfta.oldman-reception-manage",
+        "translate": "sidebar.menu-organization-pfta.RECEPTION-MANAGE"
+      },
+      {
+        "text": "LeaveManage",
+        "sref": "app.organization-pfta.oldman-leave-manage",
+        "translate": "sidebar.menu-organization-pfta.LEAVE-MANAGE"
+      }
+    ]
+  },
+  {
+    "text": "FinancialManage",
+    "translate": "sidebar.menu-organization-pfta.FINANCIAL-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "EnterPayment",
+        "sref": "app.organization-pfta.financial-enter-payment",
+        "translate": "sidebar.menu-organization-pfta.ENTER-PAYMENT"
+      },
+      {
+        "text": "Recharge",
+        "sref": "app.organization-pfta.financial-recharge",
+        "translate": "sidebar.menu-organization-pfta.RECHARGE"
+      },
+      {
+        "text": "ArrearageManage",
+        "sref": "app.organization-pfta.financial-arrearage-manage",
+        "translate": "sidebar.menu-organization-pfta.ARREARAGE-MANAGE"
+      },
+      {
+        "text": "PaymentDetails",
+        "sref": "app.organization-pfta.financial-payment-details",
+        "translate": "sidebar.menu-organization-pfta.PAYMENT-DETAILS"
+      },
+      {
+        "text": "ExitSettlement",
+        "sref": "app.organization-pfta.financial-exit-settlement",
+        "translate": "sidebar.menu-organization-pfta.EXIT-SETTLEMENT"
+      }
+    ]
+  },
+  {
+    "text": "MaterialManage",
+    "translate": "sidebar.menu-organization-pfta.MATERIAL-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "InventoryManage",
+        "sref": "app.organization-pfta.material-inventory-manage",
+        "translate": "sidebar.menu-organization-pfta.INVENTORY-MANAGE"
+      },
+      {
+        "text": "DonationManage",
+        "sref": "app.organization-pfta.material-donation-manage",
+        "translate": "sidebar.menu-organization-pfta.DONATION-MANAGE"
+      }
+    ]
+  },
+  {
+    "text": "KnowledgeBaseManage",
+    "sref": "app.organization-pfta.knowledge-base-manage",
+    "icon": "fa fa-file-o",
+    "translate": "sidebar.menu-organization-pfta.KNOWLEDGE-BASE-MANAGE"
+  },
+  {
+    "text": "SystemManage",
+    "translate": "sidebar.menu-organization-pfta.SYSTEM-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "UserManage",
+        "sref": "app.organization-pfta.system-user-manage",
+        "translate": "sidebar.menu-organization-pfta.USER-MANAGE"
+      },
+      {
+        "text": "DepartmentManage",
+        "sref": "app.organization-pfta.system-department-manage",
+        "translate": "sidebar.menu-organization-pfta.DEPARTMENT-MANAGE"
+      },
+      {
+        "text": "DistrictManage",
+        "sref": "app.organization-pfta.system-district-manage",
+        "translate": "sidebar.menu-organization-pfta.DISTRICT-MANAGE"
+      },
+      {
+        "text": "BedManage",
+        "sref": "app.organization-pfta.system-bed-manage",
+        "translate": "sidebar.menu-organization-pfta.BED-MANAGE"
+      },
+      {
+        "text": "Log",
+        "sref": "app.organization-pfta.system-log",
+        "translate": "sidebar.menu-organization-pfta.LOG"
+      }
+    ]
+  }
+]
