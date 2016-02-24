@@ -157,6 +157,42 @@
                 title: '客户管理',
                 templateUrl: helper.basepath('manage-center/customer-account-manage.html')
             })
+            //
+            // Single Page Routes
+            // -----------------------------------
+            .state('page', {
+                url: '/page',
+                templateUrl: 'app/pages/page.html',
+                resolve: helper.resolveFor('modernizr', 'icons'),
+                controller: ['$rootScope', function($rootScope) {
+                    $rootScope.app.layout.isBoxed = false;
+                }]
+            })
+            .state('page.login', {
+                url: '/login',
+                title: 'Login',
+                templateUrl: 'app/pages/login.html'
+            })
+            .state('page.register', {
+                url: '/register',
+                title: 'Register',
+                templateUrl: 'app/pages/register.html'
+            })
+            .state('page.recover', {
+                url: '/recover',
+                title: 'Recover',
+                templateUrl: 'app/pages/recover.html'
+            })
+            .state('page.lock', {
+                url: '/lock',
+                title: 'Lock',
+                templateUrl: 'app/pages/lock.html'
+            })
+            .state('page.404', {
+                url: '/404',
+                title: 'Not Found',
+                templateUrl: 'app/pages/404.html'
+            })
           // 
           // CUSTOM RESOLVES
           //   Add your own resolves properties

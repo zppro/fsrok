@@ -4,7 +4,7 @@
     img.img-thumbnail.img-circle.center-block(ng-src="{{user.picture}}", alt="Avatar", width="60", height="60")
   .panel.widget.b0
     .panel-body
-      p.text-center Please login to unlock your screen.
+      p.text-center {{ 'page.lock.TIP' | translate}}.
       form(role='form', name="lockForm")
         .form-group.has-feedback
           input#exampleInputPassword1.form-control(type='password', placeholder='Password', required='', name='lock_password', ng-model="lock.password")
@@ -12,10 +12,10 @@
           span.text-danger(ng-show="lockForm.lock_password.$dirty && lockForm.lock_password.$error.required") This field is required
         .clearfix
           .pull-left.mt-sm
-            a(ui-sref="page.recover").text-muted: small Forgot your password?
+            a(ui-sref="page.recover").text-muted: small {{ 'page.lock.FORGOT-YOUR-PASSWORD' | translate}}?
           .pull-right
             // Change this button type to submit to send the form data
-            button.btn.btn-sm.btn-primary(type='button', ng-click="$state.go('app.dashboard')") Unlock
+            button.btn.btn-sm.btn-primary(type='button', ng-click="$state.go('app.dashboard')") {{ 'page.lock.UNLOCK' | translate}}
   // END panel
   .p-lg.text-center
     span &copy; 
