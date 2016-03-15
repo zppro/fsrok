@@ -1,4 +1,26 @@
 {
+  "button":{
+    "DISCARD":"取消",
+    "SAVE":"保存",
+    "ADD":"新增",
+    "EDIT":"修改",
+    "REMOVE":"删除"
+  },
+  "grid":{
+    "NO-RESULTS":"没有找到任何数据"
+  },
+  "validator": {
+    "FIELD-INVALID":"字段验证不通过",
+    "REQUIRED": "必填",
+    "NUMBER": "数字格式不正确",
+    "DATE": "日期格式不正确",
+    "MIN": "大于等于{{min}}",
+    "MAX": "小于等于{{max}}",
+    "EMAIL": "邮箱格式不正确",
+    "PASSWORD-FORMAT": "密码必须匹配大小写字母并且长度大于6小于10",
+    "PASSWORD-MATCH": "二次输入密码不一至",
+    "TERM-AGREE": "必须同意条款"
+  },
   "dashboard": {
     "WELCOME": "欢迎来到{{appName}}"
   },
@@ -22,9 +44,10 @@
   },
   "sidebar": {
     "subsystem":{
-      "ORGANIZATION-PFTA":"机构养老云-标准版",
-      "COMMUNITY-PFTA":"社区养老云-待定",
-      "MANAGE-CENTER":"管理中心"
+      "ORGANIZATION-PFTA-STANDARD":"机构养老云-标准版",
+      "COMMUNITY-PFTA-STANDARD":"社区养老云-待定",
+      "MANAGE-CENTER":"管理中心",
+      "DEMO-CENTER":"演示中心"
     },
     "WELCOME": "欢迎",
     "menu-organization-pfta":{
@@ -59,8 +82,12 @@
       "METADATA-MANAGE":"元数据管理",
       "DICTIONARY-MANAGE":"字典管理",
       "PARAM":"系统参数",
-      "CUSTOMER-MANAGE":"客户管理",
+      "TENANT-MANAGE":"租户管理",
       "ACCOUNT-MANAGE":"帐号管理"
+    },
+    "menu-demo-center":{
+      "GRID":"网格",
+      "GRID-BASIC":"基本功能"
     },
     "nav": {
       "SINGLEVIEW": "单页视图",
@@ -112,13 +139,6 @@
       "ACTION-RETURN":"返回首页",
       "ACTION-LOGIN":"登录",
       "ACTION-REGISTER":"注册"
-    },
-    "validator": {
-      "REQUIRED": "必填",
-      "EMAIL": "邮箱格式不正确",
-      "PASSWORD-FORMAT": "密码必须匹配大小写字母并且长度大于6小于10",
-      "PASSWORD-MATCH": "二次输入密码不一至",
-      "TERM-AGREE": "必须同意条款"
     }
   }
 }

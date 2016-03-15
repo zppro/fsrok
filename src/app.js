@@ -94,7 +94,7 @@ app.wrapper = {
 };
 
 //load dictionary
-app.dictionary = rfcore.dictionary;
+app.dictionary = rfcore.factory('dictionary');
 
 //init database object
 app.db = {};
@@ -121,8 +121,7 @@ co(function*() {
     //app.conf.serviceFiles = yield thunkify(fs.readdir)(app.conf.dir.service);
     //console.log('serviceFiles:'+JSON.stringify(app.conf.serviceFiles));
     console.log('load dictionary...');
-    yield app.wrapper.cb(app.dictionary.readJSON)('pre-defined/dictionary.json');
-
+    yield app.wrapper.cb(app.dictionary.readJSON.bind(app.dictionary))('pre-defined/dictionary.json');
     //配置数据库
     console.log('configure mongoose...');
     //app.db.mongoose = monoogse;
@@ -132,7 +131,7 @@ co(function*() {
         console.log('mongodb error:');
         console.error(err);
     });
-    app.modelFactory = require('./libs/ModelFactory');
+    app.modelFactory = require('./libs/ModelFactory').bind(app);
 
     console.log('configure logs...');
     app.conf.serviceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.service)), function (o) {
@@ -180,7 +179,8 @@ co(function*() {
 
     //注意router.use的middleware有顺序
     router.use(koaBody);
-    router.use('/services', auth(app, _.union(app.conf.auth.ignorePaths, [])), require('./middlewares/t1.js')(app));
+    router.use('/services', auth(app), require('./middlewares/t1.js')(app));
+    //router.use('/services', auth(app, _.union(app.conf.auth.ignorePaths, [])), require('./middlewares/t1.js')(app));
 
     //需要登录访问控制
     //app.use();

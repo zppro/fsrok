@@ -8,7 +8,7 @@ aside.aside(ng-include="'app/views/partials/sidebar.html'", ng-controller="Sideb
 aside.offsidebar(ng-include="'app/views/partials/offsidebar.html'")
 
 // Main section
-section
+section(block-ui="module-block")
 
   // Page content
   .content-wrapper(ui-view="", autoscroll="false", ng-class="app.viewAnimation")

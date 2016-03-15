@@ -11,19 +11,19 @@
           label.text-muted {{ 'page.register.TIP-CODE' | translate}}
           input.form-control(type='email', name="account_email" placeholder='{{ "page.register.PLACEHOLDER-CODE" | translate}}', autocomplete="off", ng-model="reg.account.email", required='')
           span.fa.fa-envelope.form-control-feedback.text-muted
-          span.text-danger(ng-show="reg.registerForm.account_email.$dirty && reg.registerForm.account_email.$error.required") {{ "page.validator.REQUIRED" | translate}}
-          span.text-danger(ng-show="reg.registerForm.account_email.$dirty && reg.registerForm.account_email.$error.email") {{ "page.validator.EMAIL" | translate}}
+          span.text-danger(ng-show="reg.registerForm.account_email.$dirty && reg.registerForm.account_email.$error.required") {{ "validator.REQUIRED" | translate}}
+          span.text-danger(ng-show="reg.registerForm.account_email.$dirty && reg.registerForm.account_email.$error.email") {{ "validator.EMAIL" | translate}}
         .form-group.has-feedback
           label.text-muted {{ 'page.register.TIP-PASSWORD' | translate}}
           input#id-password.form-control(type='password', name="account_password", ng-model="reg.register.password", ng-pattern="/^[a-zA-Z0-9]{6,10}$/", required='')
           span.fa.fa-lock.form-control-feedback.text-muted
-          span.text-danger(ng-show="reg.registerForm.account_password.$dirty && reg.registerForm.account_password.$error.required") {{ "page.validator.REQUIRED" | translate}}
-          span.text-danger(ng-show="reg.registerForm.account_password.$dirty && reg.registerForm.account_password.$error.pattern") {{ "page.validator.PASSWORD-FORMAT" | translate}}
+          span.text-danger(ng-show="reg.registerForm.account_password.$dirty && reg.registerForm.account_password.$error.required") {{ "validator.REQUIRED" | translate}}
+          span.text-danger(ng-show="reg.registerForm.account_password.$dirty && reg.registerForm.account_password.$error.pattern") {{ "validator.PASSWORD-FORMAT" | translate}}
         .form-group.has-feedback
           label.text-muted {{ 'page.register.TIP-REPASSWORD' | translate}}
           input.form-control(type='password', name="account_password_confirm", ng-model="reg.register.account_password_confirm", ui-validate="'$value==register.password'" ui-validate-watch="'password'")
           span.fa.fa-lock.form-control-feedback.text-muted
-          span.text-danger(ng-show="reg.registerForm.account_password_confirm.$dirty && reg.registerForm.account_password_confirm.$error.validator") {{ "page.validator.PASSWORD-MATCH" | translate}}
+          span.text-danger(ng-show="reg.registerForm.account_password_confirm.$dirty && reg.registerForm.account_password_confirm.$error.validator") {{ "validator.PASSWORD-MATCH" | translate}}
         .clearfix
           .checkbox.c-checkbox.pull-left.mt0
             label
@@ -31,7 +31,7 @@
               span.fa.fa-check
               |  {{ 'page.register.TERM-AGREE-A' | translate}}
               a(href="#") {{ 'page.register.TERM-AGREE-B' | translate}}
-        .text-danger(ng-show="reg.registerForm.account_agreed.$dirty && reg.registerForm.account_agreed.$error.required") {{ "page.validator.TERM-AGREE" | translate}}
+        .text-danger(ng-show="reg.registerForm.account_agreed.$dirty && reg.registerForm.account_agreed.$error.required") {{ "validator.TERM-AGREE" | translate}}
         
         button.btn.btn-block.btn-primary.mt-lg(type='submit') {{ 'page.register.CREATE-ACCOUNT' | translate}}
       

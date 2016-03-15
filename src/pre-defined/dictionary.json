@@ -1,3 +1,43 @@
 {
-  "D1000":{"A0001":"超级管理员","A0002":"管理员","A0003":"普通用户"}
+  "D1000": {
+    "name": "用户类型",
+    "A0001": {
+      "name": "Admin",
+      "order": 1
+    },
+    "A0002": {
+      "name": "Normal",
+      "order": 2
+    }
+  },
+  "D1001": {
+    "name": "子系统",
+    "A0001": {
+      "name": "Organization-PFTA-Standard",
+      "order": 1
+    },
+    "A0002": {
+      "name": "Community-PFTA-Standard",
+      "order": 2
+    },
+    "A0003": {
+      "name": "Manage-Center",
+      "order": 3
+    }
+  },
+  "D1002": {
+    "name": "客户类型",
+    "A0001": {
+      "name": "Tiny-PFTA-Organization",
+      "order": 1
+    },
+    "A0002": {
+      "name": "Standard-PFTA-Organization",
+      "order": 2
+    },
+    "A0003": {
+      "name": "Large-PFTA-Organization",
+      "order": 3
+    }
+  }
 }

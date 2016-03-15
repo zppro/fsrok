@@ -1,7 +1,0 @@
-[
-  "src/{{target}}/bower_components/modernizr/modernizr.js",
-  "src/{{target}}/bower_components/fontawesome/css/font-awesome.min.css",
-  "src/{{target}}/bower_components/fontawesome/fonts/*",
-  "src/{{target}}/bower_components/simple-line-icons/css/simple-line-icons.css",
-  "src/{{target}}/bower_components/simple-line-icons/fonts/*"
-]

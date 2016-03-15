@@ -7,7 +7,7 @@ var ModelFactory = function(conn) {
     if (conn == null) {
         conn = mongoose.connection;
     }
-
+    ModelFactory.context = this;
     return {
         create: function (name, path, data) {
             return ModelFactory._create(ModelFactory.getModel(conn, name, path), data);
@@ -30,11 +30,13 @@ var ModelFactory = function(conn) {
     };
 };
 
+
 ModelFactory.getModel = function (conn,name,path) {
     if (conn == null) {
         conn = mongoose.connection;
     }
-    return conn.model(name, require(path)(name));
+
+    return conn.model(name, require(path)(this.context, name));
 };
 
 ModelFactory._create =function (model,data) {

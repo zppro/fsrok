@@ -6,6 +6,7 @@
   "src/{{target}}/bower_components/angular-animate/angular-animate.js",
   "src/{{target}}/bower_components/angular-touch/angular-touch.js",
   "src/{{target}}/bower_components/angular-ui-router/release/angular-ui-router.js",
+  "src/{{target}}/bower_components/angular-block-ui/dist/angular-block-ui.js",
   "src/{{target}}/bower_components/ngstorage/ngStorage.js",
   "src/{{target}}/bower_components/angular-ui-utils/ui-utils.js",
   "src/{{target}}/bower_components/angular-sanitize/angular-sanitize.js",
@@ -18,5 +19,6 @@
   "src/{{target}}/bower_components/oclazyload/dist/ocLazyLoad.js",
   "src/{{target}}/bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
   "src/{{target}}/bower_components/angular-loading-bar/build/loading-bar.js",
-  "src/{{target}}/bower_components/jquery.browser/dist/jquery.browser.js"
+  "src/{{target}}/bower_components/jquery.browser/dist/jquery.browser.js",
+  "src/{{target}}/bower_components/underscore/underscore.js"
 ]

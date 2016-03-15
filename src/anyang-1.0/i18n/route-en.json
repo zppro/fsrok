@@ -1,19 +1,19 @@
 {
   "dashboard": {
-    "WELCOME": "Bienvenido a {{appName}}"
+    "WELCOME": "Welcome to {{appName}}"
   },
   "topbar": {
     "search": {
-      "PLACEHOLDER": "Tipea y pulsa enter.."
+      "PLACEHOLDER": "Type and hit enter.."
     }
   },
   "sidebar": {
-    "WELCOME": "Bienvenido",
+    "WELCOME": "Welcome",
     "heading": {
-      "HEADER": "Navegacion principal"
+      "HEADER": "Main Navigation"
     },
     "nav": {
-      "SINGLEVIEW": "Vista simple",
+      "SINGLEVIEW": "Single View",
       "menu": {
         "MENU": "Menu",
         "SUBMENU": "Sub Menu"

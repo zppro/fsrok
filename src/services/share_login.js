@@ -1,8 +1,10 @@
 /**
  * Created by zppro on 15-12-16.
  */
+var _ = require('underscore');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
+
 module.exports = {
     init: function () {
         var self = this;
@@ -49,7 +51,8 @@ module.exports = {
                                  var nounce = crypto.createHash('md5').update(objectId).digest('hex');
                                  console.log(nounce);
                                  */
-                                this.body = token;// app.wrapper.res.ret(yield app.modelFactory().create(modelOption.model_name, modelOption.model_path, this.request.body));
+
+                                this.body = app.wrapper.res.ret(_.defaults(_.pick(user,'_id','code','name'), {token: token}));
                             }
                             else {
                                 this.body = app.wrapper.res.error({message: '无效的的登录名密码!'});

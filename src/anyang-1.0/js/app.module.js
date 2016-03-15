@@ -26,7 +26,11 @@
             'app.translate',
             'app.settings',
             'app.pages',
-            'app.utils'
+            'app.utils',
+            'app.auth',
+            'app.model',
+            'app.grid',
+            'app.demo'
         ]);
 })();
 

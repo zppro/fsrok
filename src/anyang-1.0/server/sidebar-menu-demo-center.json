@@ -1,0 +1,15 @@
+[
+  {
+    "text": "Table",
+    "translate": "sidebar.menu-demo-center.GRID",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "Table-Basic",
+        "sref": "app.demo-center.grid-basic.list",
+        "translate": "sidebar.menu-demo-center.GRID-BASIC"
+      }
+    ]
+  }
+]

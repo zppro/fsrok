@@ -21,6 +21,7 @@
         // defaults to dashboard
         $urlRouterProvider.otherwise('/app/dashboard');
 
+
         // 
         // Application Routes
         // -----------------------------------   
@@ -29,7 +30,7 @@
               url: '/app',
               abstract: true,
               templateUrl: helper.basepath('app.html'),
-              resolve: helper.resolveFor('modernizr', 'icons')
+              resolve: helper.resolveFor('modernizr', 'icons','moment','locale_zh-cn')
             })
             .state('app.dashboard', {
               url: '/dashboard',
@@ -152,10 +153,43 @@
                 title: '系统参数',
                 templateUrl: helper.basepath('manage-center/metadata-param.html')
             })
-            .state('app.manage-center.customer-account-manage', {
-                url: '/customer-account-manage',
-                title: '客户管理',
-                templateUrl: helper.basepath('manage-center/customer-account-manage.html')
+            .state('app.manage-center.tenant-account-manage', {
+                url: '/tenant-account-manage',
+                title: '租户管理',
+                templateUrl: helper.basepath('manage-center/tenant-account-manage.html'),
+                controller: 'GridController'
+            })
+            //演示中心开始
+            .state('app.demo-center', {
+                url: '/demo-center',
+                abstract: true,
+                template: '<div class="data-ui-view subsystem-wrapper"></div>',
+                resolve: {
+                    vmh: helper.buildVMHelper()
+                }
+            })
+            .state('app.demo-center.grid-basic', {
+                url: '/grid-basic',
+                abstract: true,
+                template: '<div class="data-ui-view module-wrapper" ></div>'
+            })
+            .state('app.demo-center.grid-basic.list', {
+                url: '/list/:action',
+                title: '网格-基本-列表',
+                templateUrl: helper.basepath('demo-center/grid-basic-list.html'),
+                controller: 'DemoGridController',
+                resolve: {
+                    entry: helper.buildEntry('app.demo-center.grid-basic.list')
+                }
+            })
+            .state('app.demo-center.grid-basic.details', {
+                url: '/details/:action/:id',
+                title: '网格-基本-详情',
+                templateUrl: helper.basepath('demo-center/grid-basic-details.html'),
+                controller: 'DemoGridDetailsController',
+                resolve: {
+                    entity: helper.buildEntity('app.demo-center.grid-basic.details')
+                }
             })
             //
             // Single Page Routes

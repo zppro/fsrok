@@ -33,13 +33,17 @@
           $scope.subsystem = {
             listIsOpen: false,
             init: function () {
+              var self = this;
               SidebarLoader.getSubsystem(function (items) {
                 $scope.subsystem.available = items;
-                if (items.length > 0) {
-                  $scope.subsystem.selected = items[0];
+                angular.forEach($scope.subsystem.available,function(item){
+                  if(self.isActive(item)){
+                    $scope.subsystem.selected = item;
+                  }
+                });
 
+                if ($scope.subsystem.selected) {
                   // Load menu from json file
-                  // -----------------------------------
                   SidebarLoader.getMenu($scope.subsystem.selected, sidebarReady);
                 }
               });
@@ -47,11 +51,13 @@
             switchSubsystem: function (item) {
               $scope.subsystem.selected = item;
               SidebarLoader.getMenu($scope.subsystem.selected, sidebarReady);
+            },
+            isActive:function(item){
+              if(!item) return;
+              return $state.is(item.sref) || $state.includes(item.sref);
             }
           };
           $scope.subsystem.init();
-
-
 
           
           function sidebarReady(items) {

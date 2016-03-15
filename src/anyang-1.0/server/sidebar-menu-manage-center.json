@@ -18,14 +18,14 @@
     ]
   },
   {
-    "text": "CustomerManage",
-    "translate": "sidebar.menu-manage-center.CUSTOMER-MANAGE",
+    "text": "TenantManage",
+    "translate": "sidebar.menu-manage-center.TENANT-MANAGE",
     "sref": "#",
     "icon": "icon-folder",
     "submenu": [
       {
         "text": "AccountManage",
-        "sref": "app.manage-center.customer-account-manage",
+        "sref": "app.manage-center.tenant-account-manage",
         "translate": "sidebar.menu-manage-center.ACCOUNT-MANAGE"
       }
     ]

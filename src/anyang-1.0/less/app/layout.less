@@ -23,7 +23,7 @@
 @content-heading-border:                  #cfdbe2;
 @content-padding:                         20px;
 
-@footer-hg:                               60px;
+@footer-hg:                               40px;//60->40 modified by zppro 2016.3.1
 
 @navbar-hg:                               @navbar-height;
 
@@ -110,7 +110,7 @@ html, body {
     bottom: 0;
     height: @footer-hg;
     border-top: 1px solid @gray-light;
-    padding: @content-padding;
+    padding: @content-padding/2; //@content-padding -> @content-padding/2 modified by zppro 2016.3.1
     z-index: @z-index-main-section - 2;
     > p {
       margin: 0;
@@ -139,7 +139,8 @@ html, body {
 
   > h3,
   > .content-heading,
-  > .subsystem-wrapper > h3 {
+  > .subsystem-wrapper > h3,
+  > .subsystem-wrapper > .module-wrapper > h3{
     font-size: @font-size-h3;
     line-height: @headings-line-height;
     color: #929292;
@@ -170,7 +171,8 @@ html, body {
     //overflow: auto; // required for portlets
     > h3,
     > .content-heading,
-    > .subsystem-wrapper > h3 {
+    > .subsystem-wrapper > h3
+    > .subsystem-wrapper > .module-wrapper > h3{
       margin: -@content-padding;
       margin-bottom: @content-padding;
       padding: @content-padding;

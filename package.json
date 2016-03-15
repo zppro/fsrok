@@ -57,7 +57,7 @@
     "koa-static": "^1.5.2",
     "log4js": "^0.6.25",
     "mongoose": "^4.3.0",
-    "rfcore": "0.0.21",
+    "rfcore": "0.0.25",
     "thunkify": "^2.1.2",
     "underscore": "^1.8.3"
   }

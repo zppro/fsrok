@@ -42,15 +42,6 @@ var bower = {
     dest_production: paths.pub_client_production + 'vendor/'
 };
 
-// VENDOR CONFIG
-var vendor = {
-    // vendor css required to start the app
-    source_base_css: _.map(require(paths.build + 'gulp-vendor-base-css.json'), function (o) {
-        return o.replace(/\{\{(.+?)\}\}/g, target)
-    }),
-    dest_develop: paths.pub_client_develop + 'vendor/',
-    dest_production: paths.pub_client_production + 'vendor/'
-};
 
 // server data config
 var serverdata = {
@@ -172,19 +163,6 @@ gulp.task('bower:app', function() {
 });
 
 gulp.task('bower', gulpsync.sync(['bower:base','bower:app']) );
-
-// Build the base css to start the application from vendor assets
-gulp.task('vendor:base:css', function() {
-    log('Copying base vendor css..');
-    return gulp.src(vendor.source_base_css)
-        .pipe($plugins.expectFile(vendor.source_base_css))
-        .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe(gulp.dest(isProduction ? vendor.dest_production : vendor.dest_develop))
-        ;
-});
-
-
-gulp.task('vendor',['vendor:base:css']);
 
 // Build the server data to start the application
 gulp.task('server:data', function() {
@@ -401,7 +379,6 @@ gulp.task('clean', function(done) {
 gulp.task('production', gulpsync.sync([
     'prod',
     'bower',
-    'vendor',
     'server',
     'images',
     'i18n',
@@ -424,7 +401,6 @@ gulp.task('prod', function() {
 // build for develop (no minify)
 gulp.task('develop', gulpsync.sync([
     'bower',
-    'vendor',
     'server',
     'images',
     'i18n',

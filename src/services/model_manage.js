@@ -2,7 +2,6 @@
  * Created by zppro on 15-12-10.
  * 操作多个model
  */
-
 module.exports = {
     init: function () {
         var self = this;

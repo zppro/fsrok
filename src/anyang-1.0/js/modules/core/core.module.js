@@ -11,6 +11,7 @@
             'ui.bootstrap',
             'ui.router',
             'oc.lazyLoad',
+            'blockUI',
             'cfp.loadingBar',
             'ngSanitize',
             'ngResource',
