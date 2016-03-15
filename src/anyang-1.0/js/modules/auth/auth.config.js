@@ -16,7 +16,7 @@
             return {
                 'request': function(req) {
                     var _url = req.url.toLowerCase();
-                    console.log(_url);
+                    //console.log(_url);
                     if (_url.indexOf('services/') == 0 && _url !=='services/share/login/signin') {
                         console.log('model op');
                         req.headers.Authorization =  Auth.getToken();

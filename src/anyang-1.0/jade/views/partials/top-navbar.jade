@@ -28,12 +28,12 @@ nav.navbar.topnavbar(role='navigation')
         // END User avatar toggle
         // START lock screen
         li
-          a(ui-sref="page.lock", title="{{ 'topbar.lock.TITLE' | translate }}")
+          a(ng-click="app.lock($event)", title="{{ 'topbar.lock.TITLE' | translate }}")
             em.icon-lock
          // END lock screen
         // START lock screen
         li
-          a(ui-sref="page.login", title="{{ 'topbar.logout.TITLE' | translate }}")
+          a(ng-click="app.logout($event)" title="{{ 'topbar.logout.TITLE' | translate }}")
             em.icon-logout
         // END lock screen
       // END Left navbar

@@ -23,6 +23,8 @@
             vm.account = {};
             // place the message if something goes wrong
             vm.authMsg = '';
+            vm.account.email = Auth.getCode();
+            vm.account.remember = vm.account.email!=null;
 
             vm.login = function () {
                 vm.authMsg = '';
@@ -34,7 +36,8 @@
                         .then(function (user) {
                             // assumes if ok, response is an object with some data, if not, a string with error
                             // customize according to your api
-                            Auth.setUser(user);
+                            console.log(vm.account.remember);
+                            Auth.setUser(user,vm.account.remember);
                             $state.go('app.dashboard');
                         }, function (err) {
                             vm.authMsg = err;

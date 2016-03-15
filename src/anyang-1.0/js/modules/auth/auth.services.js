@@ -12,9 +12,15 @@
     function Auth($cookieStore) {
         console.log('Auth');
         var _user = $cookieStore.get('user');
-        var setUser = function (user) {
+        var setUser = function (user,rememberCode) {
             _user = user;
             $cookieStore.put('user', _user);
+            if(rememberCode) {
+                $cookieStore.put('code',_user.code);
+            }
+            else {
+                $cookieStore.remove("code");
+            }
         };
         return {
             isAuthorized: function (lvl) {
@@ -29,6 +35,12 @@
             },
             getToken: function () {
                 return _user ? _user.token : '';
+            },
+            setCode:function() {
+                $cookieStore.put('code', _user.code);
+            },
+            getCode: function () {
+                return $cookieStore.get('code') || (_user || {code: null}).code;
             },
             logout: function () {
                 $cookieStore.remove('user');

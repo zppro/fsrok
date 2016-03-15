@@ -102,6 +102,7 @@
     "lock": {
       "TIP": "登录解锁屏幕",
       "FORGOT-YOUR-PASSWORD": "忘记密码",
+      "PLACEHOLDER-PASSWORD": "输入密码",
       "UNLOCK": "解锁"
     },
     "login": {
