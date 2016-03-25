@@ -7,7 +7,7 @@ script(type='text/ng-template', id="sidebar-renderer.html")
     span {{(item.translate | translate) || item.text}}
   ul(class="nav sidebar-subnav", ng-if="item.submenu", collapse="isCollapse(pIndex)",  ng-init="addCollapse(pIndex, item)")
     li.sidebar-subnav-header {{(item.translate | translate) || item.text}}
-    li(ng-repeat='item in item.submenu', ng-include="'sidebar-renderer.html'", ng-class="getMenuItemPropClasses(item)", ng-init="pIndex=(pIndex+'-'+$index); inSubmenu = true", ng-click="toggleCollapse(pIndex)")
+    li(ng-repeat='item in item.submenu', ng-include="'sidebar-renderer.html'", ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)",  ng-init="pIndex=(pIndex+'-'+$index); inSubmenu = true", ng-click="toggleCollapse(pIndex)")
 
 
 
@@ -43,7 +43,7 @@ script(type='text/ng-template', id="sidebar-renderer.html")
       // END user info
 
       // Iterates over all sidebar items
-      li.repeat-modify(ng-class="getMenuItemPropClasses(item)", ng-repeat='item in menuItems', ng-init="pIndex = $index", ng-include="'sidebar-renderer.html'", ng-click="toggleCollapse(pIndex, true)")
+      li.repeat-modify(ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)", ng-repeat='item in menuItems',on-finish-render='{"type":"ngRepeat","sub":"sidebar-group"}', ng-init="pIndex = $index", ng-include="'sidebar-renderer.html'", ng-click="toggleCollapse(pIndex, true)")
     // END sidebar nav
 
 

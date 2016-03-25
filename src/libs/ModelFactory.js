@@ -24,6 +24,9 @@ var ModelFactory = function(conn) {
         query: function (name, path, data) {
             return ModelFactory._query(ModelFactory.getModel(conn, name, path), data);
         },
+        totals: function (name, path, data) {
+            return ModelFactory._query(ModelFactory.getModel(conn, name, path), {where: data, select: '_id'});
+        },
         one: function (name, path, data) {
             return ModelFactory._one(ModelFactory.getModel(conn, name, path), data);
         }
@@ -56,26 +59,30 @@ ModelFactory._delete =function (model,id) {
 };
 
 ModelFactory._query =function (model,data) {
-
+    var rows;
     if (data) {
         var options = {};
-        if (data.rows) {
-            options.limit = data.rows;
+        if (data.page && data.page.size) {
+            options.limit = data.page.size;
         }
-        if (data.rows && data.page) {
-            options.skip = (data.page - 1) * data.rows;
+        if (data.page && data.page.no) {
+            options.skip = (data.page.no - 1) * data.page.size;
         }
+
         if (data.sort) {
-            return model.find(data.where, data.select, options).sort(data.sort);
+            rows = model.find(data.where, data.select, options).sort(data.sort);
         }
         else {
-            return model.find(data.where, data.select, options);
+            rows = model.find(data.where, data.select, options);
         }
     }
     else {
-        return model.find();
+        rows = model.find();
     }
+
+    return rows;
 };
+
 
 ModelFactory._one =function (model,data) {
     if (data) {

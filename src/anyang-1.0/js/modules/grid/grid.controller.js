@@ -4,80 +4,32 @@
  =========================================================*/
 
 (function() {
-  'use strict';
+    'use strict';
 
-  angular
-      .module('app.grid')
-      .controller('GridController', GridController);
+    angular
+        .module('app.grid')
+        .controller('GridController', GridController)
+        ;
 
-  GridController.$inject = ['$scope', 'GridDemoModelSerivce','modelNode'];
-  function GridController($scope, GridDemoModelSerivce,modelNode) {
+    GridController.$inject = ['$scope', 'ngDialog','vmh','entryVM'];
+    function GridController($scope, ngDialog,vmh, vm) {
 
-    activate();
+        $scope.vm = vm;
+        $scope.utils = vmh.utils.g;
 
-    ////////////////
+        init();
 
-    function activate() {
 
-      var vm = $scope.vm = {};
-      vm.page = {
-        size: 10,
-        no: 1
-      };
-      vm.sort = {
-        column: 'id',
-        direction: -1,
-        toggle: function (column) {
-          if (column.sortable === false)
-            return;
+        function init() {
 
-          if (this.column === column.name) {
-            this.direction = -this.direction || -1;
-          } else {
-            this.column = column.name;
-            this.direction = -1;
-          }
+            //console.log(vm._subsystem_);
+            //console.log(vm._module_);d
+            //console.log(vm._view_);
+            //console.log(vm._action_);
+            vm.init({removeDialog: ngDialog});
+            vm.query();
         }
-      };
-      // 构建模拟数据
-      vm.columns = [
-        {
-          label: 'ID',
-          name: 'id',
-          type: 'string'
-        },
-        {
-          label: '姓名',
-          name: 'name',
-          type: 'string'
-        },
-        {
-          label: '粉丝数',
-          name: 'followers',
-          type: 'number'
-        },
-        {
-          label: '收入',
-          name: 'income',
-          type: 'currency'
-        },
-        {
-          label: '',
-          name: 'actions',
-          sortable: false
-        }
-      ];
-      // 供页面中使用的函数
-      vm.age = function (birthday) {
-        return moment().diff(birthday, 'years');
-      };
+    }
 
-
-      vm.items = GridDemoModelSerivce.query();
-
-      console.log(modelNode.services['pub-tenant'].query());
-
-    } // activate
-  }
 
 })();

@@ -2,25 +2,32 @@
   {
     "text": "Organization-PFTA-Standard",
     "sref": "app.organization-pfta",
-    "menujson":"server/sidebar-menu-organization-pfta.json",
+    "usertype": ["A0001","A0002"],
+    "menujson": "server/sidebar-menu-organization-pfta.json",
     "translate": "sidebar.subsystem.ORGANIZATION-PFTA-STANDARD"
   },
   {
     "text": "Community-PFTA-Standard",
     "sref": "app.community-pfta",
-    "menujson":"server/sidebar-menu-community-pfta.json",
+    "usertype": ["A0001","A0002"],
+    "menujson": "server/sidebar-menu-community-pfta.json",
     "translate": "sidebar.subsystem.COMMUNITY-PFTA-STANDARD"
   },
   {
     "text": "Manage-Center",
     "sref": "app.manage-center",
-    "menujson":"server/sidebar-menu-manage-center.json",
+    "usertype": [
+      "A0001",
+      "A0003"
+    ],
+    "menujson": "server/sidebar-menu-manage-center.json",
     "translate": "sidebar.subsystem.MANAGE-CENTER"
   },
   {
     "text": "Demo-Center",
     "sref": "app.demo-center",
-    "menujson":"server/sidebar-menu-demo-center.json",
+    "usertype": ["A0001"],
+    "menujson": "server/sidebar-menu-demo-center.json",
     "translate": "sidebar.subsystem.DEMO-CENTER"
   }
 ]

@@ -2,41 +2,49 @@
   "D1000": {
     "name": "用户类型",
     "A0001": {
-      "name": "Admin",
+      "name": "平台管理",
       "order": 1
     },
     "A0002": {
-      "name": "Normal",
-      "order": 2
-    }
-  },
-  "D1001": {
-    "name": "子系统",
-    "A0001": {
-      "name": "Organization-PFTA-Standard",
-      "order": 1
-    },
-    "A0002": {
-      "name": "Community-PFTA-Standard",
+      "name": "普通租户",
       "order": 2
     },
     "A0003": {
-      "name": "Manage-Center",
+      "name": "代理商",
       "order": 3
     }
   },
+  "D1001": {
+    "name": "用户角色",
+    "A1": {
+      "name": "普通用户",
+      "order": 1
+    },
+    "A2": {
+      "name": "业务骨干",
+      "order": 2
+    },
+    "A256": {
+      "name": "系统管理员",
+      "order": 256
+    },
+    "A4096": {
+      "name": "超级管理员",
+      "order": 4096
+    }
+  },
   "D1002": {
-    "name": "客户类型",
+    "name": "租户类型",
     "A0001": {
-      "name": "Tiny-PFTA-Organization",
+      "name": "微型养老机构",
       "order": 1
     },
     "A0002": {
-      "name": "Standard-PFTA-Organization",
+      "name": "中型养老机构",
       "order": 2
     },
     "A0003": {
-      "name": "Large-PFTA-Organization",
+      "name": "大型养老机构",
       "order": 3
     }
   }

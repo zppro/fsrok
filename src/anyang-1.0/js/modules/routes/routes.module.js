@@ -3,6 +3,7 @@
 
     angular
         .module('app.routes', [
-            'app.lazyload'
+            'app.lazyload',
+            'app.auth'
         ]);
 })();

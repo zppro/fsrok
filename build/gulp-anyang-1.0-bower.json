@@ -6,5 +6,10 @@
   "src/{{target}}/bower_components/simple-line-icons/fonts/*",
   "src/{{target}}/bower_components/moment/min/moment-with-locales.min.js",
   "src/{{target}}/bower_components/bootstrap/fonts/*",
-  "src/{{target}}/bower_components/angular-i18n/angular-locale_zh-cn.js"
+  "src/{{target}}/bower_components/angular-i18n/angular-locale_zh-cn.js",
+  "src/{{target}}/bower_components/ui-select/dist/select.js",
+  "src/{{target}}/bower_components/ui-select/dist/select.css",
+  "src/{{target}}/bower_components/ng-dialog/js/ngDialog.min.js",
+  "src/{{target}}/bower_components/ng-dialog/css/ngDialog.min.css",
+  "src/{{target}}/bower_components/ng-dialog/css/ngDialog-theme-default.min.css"
 ]

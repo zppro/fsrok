@@ -9,7 +9,9 @@
     angular
         .module('app.utils')
         .service('Utils', Utils)
-        .service('ViewUtils', ViewUtils);
+        .service('ViewUtils', ViewUtils)
+    ;
+
 
     Utils.$inject = ['$window', 'APP_MEDIAQUERY'];
     function Utils($window, APP_MEDIAQUERY) {
@@ -130,7 +132,8 @@
         return {
             age: age,
             vtab: vtab,
-            vinput: vinput
+            vinput: vinput,
+            isPhone: isPhone
         };
 
         function age(birthday) {
@@ -145,5 +148,16 @@
             var input = form[name];
             return (input.$dirty || form.$submitted) && input.$error[type];
         }
+
+        function isPhone(aPhone) {
+            var bValidate = RegExp(/^(0|86|17951)?(13[0-9]|15[012356789]|18[0-9]|14[57])[0-9]{8}$/).test(aPhone);
+            if (bValidate) {
+                return true;
+            }
+            else
+                return false;
+        }
     }
+
+
 })();

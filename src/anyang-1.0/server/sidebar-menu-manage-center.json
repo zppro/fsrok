@@ -25,8 +25,8 @@
     "submenu": [
       {
         "text": "AccountManage",
-        "sref": "app.manage-center.tenant-account-manage",
-        "translate": "sidebar.menu-manage-center.ACCOUNT-MANAGE"
+        "sref": "app.manage-center.tenant-account-manage.list",
+        "translate": "sidebar.menu-manage-center.TENANT-ACCOUNT-MANAGE"
       }
     ]
   }

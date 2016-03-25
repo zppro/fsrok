@@ -36,7 +36,7 @@ module.exports = {
                                     code: this.request.body.code,
                                     password_hash: passwordHash,
                                     status: 1
-                                }, select: "code name"
+                                }, select: "code name type role tenantId"
                             });
 
                             if (user != null) {
@@ -51,8 +51,17 @@ module.exports = {
                                  var nounce = crypto.createHash('md5').update(objectId).digest('hex');
                                  console.log(nounce);
                                  */
+                                var tenant = null;
+                                if(user.type=='A0002') {
+                                    //普通租户
+                                    tenant = yield app.modelFactory().one('pub_tenant', '../models/pub/tenant', {
+                                        where: {
+                                            _id: user.tenantId
+                                        }, select: "_id name type active_flag certificate_flag termsOfValidity"
+                                    });
+                                }
 
-                                this.body = app.wrapper.res.ret(_.defaults(_.pick(user,'_id','code','name'), {token: token}));
+                                this.body = app.wrapper.res.ret(_.defaults(_.pick(user,'_id','code','name','type','role'), {token: token,tenant:tenant}));
                             }
                             else {
                                 this.body = app.wrapper.res.error({message: '无效的的登录名密码!'});

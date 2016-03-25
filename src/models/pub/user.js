@@ -22,8 +22,10 @@ module.exports = function(ctx,name) {
             code: {type: String, required: true, maxlength: 30, index: {unique: true}},
             name: {type: String, required: true, maxlength: 30},
             type: {type: String, enum: _.rest(ctx.dictionary.keys["D1000"])},
+            role: {type: Number, min: 1, max: 9999},// bit flag
             system_flag: {type: Number, min: 0, max: 1},
-            password_hash: String
+            password_hash: String,
+            tenantId: {type: mongoose.Schema.Types.ObjectId}
         });
 
         userSchema.pre('update', function (next) {

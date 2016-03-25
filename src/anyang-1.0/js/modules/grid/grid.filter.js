@@ -11,14 +11,18 @@
         .filter('totals',totals)
         .filter('hide',hide)
         .filter('width',width)
-        .filter('orderClass',orderClass);
+        .filter('orderClass',orderClass)
+        .filter('formatter',formatter)
+        .filter('orFilter',orFilter)
+    ;
 
     paging.$inject = ['GridUtils'];
     totals.$inject = ['GridUtils'];
     hide.$inject = ['GridUtils'];
     width.$inject = ['GridUtils'];
     orderClass.$inject = ['GridUtils'];
-
+    formatter.$inject = ['GridUtils'];
+    orFilter.$inject = ['GridUtils'];
 
     function paging(GridUtils) {
         return GridUtils.paging;
@@ -40,7 +44,12 @@
         return GridUtils.toggleOrderClass;
     }
 
+    function formatter(GridUtils){
+        return GridUtils.formatter;
+    }
 
-
+    function orFilter(GridUtils) {
+        return GridUtils.orFilter;
+    }
 
 })();

@@ -4,163 +4,145 @@
  =========================================================*/
 
 (function() {
-  'use strict';
+    'use strict';
 
-  angular
-      .module('app.demo')
-      .controller('DemoGridController', DemoGridController)
-      .controller('DemoGridDetailsController', DemoGridDetailsController);
+    angular
+        .module('app.demo')
+        .controller('DemoGridController', DemoGridController)
+        .controller('DemoGridDetailsController', DemoGridDetailsController)
+        .controller('DemoTreeController', DemoTreeController)
+    ;
 
-  DemoGridController.$inject = ['$scope','vmh','entry'];
+    DemoGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-  function DemoGridController($scope,vmh,vm) {
+    function DemoGridController($scope, ngDialog, vmh, vm) {
 
-    $scope.vm = vm;
-    $scope.utils = vmh.utils.g;
+        $scope.vm = vm;
+        $scope.utils = vmh.utils.g;
 
-    init();
+        init();
 
 
+        function init() {
 
-    function init() {
+            //console.log(vm._subsystem_);
+            //console.log(vm._module_);
+            //console.log(vm._view_);
+            //console.log(vm._action_);
+            vm.init({removeDialog: ngDialog});
+            vm.query();
 
-      //console.log(entry._subsystem_);
-      //console.log(entry._module_);
-      //console.log(entry._view_);
-      //console.log(entry._action_);
-
-      // 构建模拟数据
-      vm.columns = [
-        {
-          label: 'ID',
-          name: 'id',
-          type: 'string',
-          width: 60
-        },
-        {
-          label: '姓名',
-          name: 'name',
-          type: 'string',
-          width: 200
-        },
-        {
-          label: '生日',
-          name: 'birthday',
-          type: 'date',
-          width: 120
-        },
-        {
-          label: '粉丝数',
-          name: 'followers',
-          type: 'number',
-          hidden: true
-        },
-        {
-          label: '收入',
-          name: 'income',
-          type: 'currency'
-        },
-        {
-          label: '',
-          name: 'actions',
-          sortable: false,
-          width: 60
         }
-      ];
-
-      vm.rows = vmh.demoModelSerivce.query();
 
     }
 
-  }
+    DemoGridDetailsController.$inject = ['$scope', 'vmh', 'entityVM'];
 
-  DemoGridDetailsController.$inject = ['$scope', '$state', '$q', '$timeout','vmh','entity'];
+    function DemoGridDetailsController($scope, vmh, vm) {
 
-  function DemoGridDetailsController($scope, $state, $q, $timeout,vmh, vm) {
+        var vm = $scope.vm = vm;
+        $scope.utils = vmh.utils.v;
+        //$scope.utils.vinput.$inject = ['$scope'];
 
-    var vm = $scope.vm = vm;
-    $scope.utils = vmh.utils.v;
-    $scope.utils.vinput.$inject = ['$scope'];
+        init();
 
-    init();
+        function init() {
+            //console.log(entity._subsystem_);
+            //console.log(entity._module_);
+            //console.log(entity._view_);
+            //console.log(entity._action_);
+            //console.log(entity._id_);
+            vm.doSubmit = doSubmit;
 
-    function init() {
-        //console.log(entity._subsystem_);
-        //console.log(entity._module_);
-        //console.log(entity._view_);
-        //console.log(entity._action_);
-        //console.log(entity._id_);
-        vm.save = save;
+            vm.tab1 = {cid: 'contentTab1'};
+            vm.tab2 = {cid: 'contentTab2'};
 
-        vm.tab1 = {cid: 'contentTab1'};
-        vm.tab2 = {cid: 'contentTab2'};
+            if (vm._id_ != 'new') {
 
-        load(vm._id_);
 
-    }
+                var defered = vmh.q.defer();
+                var promise = defered.promise;
 
-    function load(id) {
+                vmh.timeout(function () {
 
-      if(id != 'new') {
-        var defered = $q.defer();
-        var promise = defered.promise;
+                    defered.resolve({success: true, error: null});
+                    //defered.reject({success: false, error: 'test error'});
+                }, 1000);
 
-        $timeout(function () {
+                promise.then(function (ret) {
+                    vm.load();
+                }).catch(function (err) {
+                    console.log('load error:');
+                    console.log(err);
+                }).finally(function () {
+                    vmh.loadingBar.complete(); // End loading.
+                    vmh.blockUI.stop();
+                });
 
-          defered.resolve({success: true, error: null});
-          //defered.reject({success: false, error: 'test error'});
-        }, 1000);
+                console.log('load...');
+                vmh.loadingBar.start();
+                vmh.blockUI.start();
+            }
 
-        promise.then(function (ret) {
-          vm.model = vmh.demoModelSerivce.find(id);
-        }).catch(function (err) {
-          console.log('load error:');
-          console.log(err);
-        }).finally(function () {
-          vmh.loadingBar.complete(); // End loading.
-          vmh.blockUI.stop();
-        });
-
-        console.log('load...');
-        vmh.loadingBar.start();
-        vmh.blockUI.start();
-      }
-    }
-
-    function save() {
-
-      if ($scope.demoForm.$valid) {
-        //console.log(vm.model);
-        var defered = $q.defer();
-        var promise = defered.promise;
-
-        $timeout(function () {
-
-            vmh.demoModelSerivce.save(vm._id_,vm.model);
-            defered.resolve({success: true, error: null});
-          //defered.reject({success: false, error: 'test error'});
-        }, 2000);
-
-        promise.then(function (ret) {
-          $state.go(vm.moduleRoute('list'));
-        }).catch(function (err) {
-        }).finally(function () {
-          vmh.loadingBar.complete(); // End loading.
-          vmh.blockUI.stop();
-        });
-
-        vmh.loadingBar.start();
-        vmh.blockUI.start();
-      }
-      else {
-        if ($scope.utils.vtab(vm.tab1.cid)) {
-          vm.tab1.active = true;
         }
-        else if ($scope.utils.vtab(vm.tab2.cid)) {
-          vm.tab2.active = true;
+
+
+        function doSubmit() {
+
+            if ($scope.demoForm.$valid) {
+                //console.log(vm.model);
+                //var defered = vmh.q.defer();
+                //var promise = defered.promise;
+                //
+                //vmh.timeout(function () {
+                //
+                //    vm.save();
+                //    defered.resolve({success: true, error: null});
+                //    //defered.reject({success: false, error: 'test error'});
+                //}, 2000);
+                //
+                //promise.then(function (ret) {
+                //    $scope.$state.go(vm.moduleRoute('list'));
+                //}).catch(function (err) {
+                //}).finally(function () {
+                //    vmh.loadingBar.complete(); // End loading.
+                //    vmh.blockUI.stop();
+                //});
+                //
+                //vmh.loadingBar.start();
+                //vmh.blockUI.start();
+                vm.save();
+            }
+            else {
+                if ($scope.utils.vtab(vm.tab1.cid)) {
+                    vm.tab1.active = true;
+                }
+                else if ($scope.utils.vtab(vm.tab2.cid)) {
+                    vm.tab2.active = true;
+                }
+            }
         }
-      }
     }
-  }
+
+    DemoTreeController.$inject = ['$scope','vmh', 'instanceVM'];
+
+    function DemoTreeController($scope,  vmh, vm) {
+
+        $scope.vm = vm;
+
+        init();
+
+
+        function init() {
+
+            //console.log(vm._subsystem_);
+            //console.log(vm._module_);
+            //console.log(vm._view_);
+            //console.log(vm._action_);
+            vm.init();
+
+        }
+
+    }
 
 })();

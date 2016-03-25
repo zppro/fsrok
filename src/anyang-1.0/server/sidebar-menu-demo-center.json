@@ -11,5 +11,18 @@
         "translate": "sidebar.menu-demo-center.GRID-BASIC"
       }
     ]
+  },
+  {
+    "text": "Table",
+    "translate": "sidebar.menu-demo-center.TREE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "Tree-Basic",
+        "sref": "app.demo-center.tree-basic",
+        "translate": "sidebar.menu-demo-center.TREE-BASIC"
+      }
+    ]
   }
 ]

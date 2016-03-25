@@ -1,12 +1,12 @@
 //
    Created by zppro on 16-2-23.
 h3
-    | {{ vm.viewRoute('H3-TITLE') | translate}}
+    | {{ vm.viewTranslatePath('TITLE') | translate}}
 .col-xs-12.text-center
     .row
         form.form-search
             .input-group.pull-right.page-search
-                label.input-group-addon {{vm.viewRoute('LABEL-SEARACH')|translate}}
+                label.input-group-addon {{'grid.LABEL-SEARACH'|translate}}
                 input.form-control(type="text",ng-model="vm.filter.$")
     .row-split
     .row
@@ -40,7 +40,7 @@ h3
                                     i.glyphicon.glyphicon-pencil
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
-            .panel-footer(ng-if="vm.paged.length>0")
+            .panel-footer
                 .row
                     .col-md-4.text-left
                         .btn-toolbar
@@ -50,4 +50,4 @@ h3
                                 a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.remove()")
                                     i.glyphicon.glyphicon-minus
                     .col-md-8
-                        pagination.pagination-sm.pull-right(total-items="vm.rows|filter:vm.filter|totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true")
+                        pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true")

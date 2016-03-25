@@ -10,7 +10,6 @@
     Auth.$inject = ['$cookieStore'];
 
     function Auth($cookieStore) {
-        console.log('Auth');
         var _user = $cookieStore.get('user');
         var setUser = function (user,rememberCode) {
             _user = user;
@@ -24,7 +23,8 @@
         };
         return {
             isAuthorized: function (lvl) {
-                return _user.role >= lvl;
+                //调试时可以在此切换默认用户角色
+                return ((_user || {}).role || 1) >= lvl;
             },
             setUser: setUser,
             isAuthenticated: function () {

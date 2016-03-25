@@ -26,11 +26,14 @@
             'app.translate',
             'app.settings',
             'app.pages',
+            'app.notify',
             'app.utils',
+            'app.interceptor',
             'app.auth',
             'app.model',
             'app.grid',
-            'app.demo'
+            'app.demo',
+            'biz.manage-center'
         ]);
 })();
 

@@ -8,9 +8,9 @@
         .module('app.model')
         .config(modelConfig);
 
-    modelConfig.$inject = ['modelNodeProvider'];
-    function modelConfig(modelNodeProvider){
-        console.log('modelConfig...');
+    modelConfig.$inject = ['modelNodeProvider','shareNodeProvider'];
+    function modelConfig(modelNodeProvider,shareNodeProvider){
         modelNodeProvider.setBaseUrl('services/model/manage/');
+        shareNodeProvider.setBaseUrl('services/share/');
     }
 })();

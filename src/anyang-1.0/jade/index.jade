@@ -8,7 +8,7 @@ html(lang="en", data-ng-app="anyang")
     meta(name='description', content='{{app.description}}')
     meta(name='keywords', content='app, responsive, angular, bootstrap, dashboard, admin')
 
-    title(data-ng-bind="::pageTitle()") anyang - anyang Bootstrap Admin Template
+    title(data-ng-bind="currTitle") anyang - anyang Bootstrap Admin Template
     // Bootstrap styles
     link(rel='stylesheet', href='app/css/bootstrap.css', data-ng-if="!app.layout.isRTL")
     link(rel='stylesheet', href='app/css/bootstrap-rtl.css', data-ng-if="app.layout.isRTL")
@@ -28,3 +28,11 @@ html(lang="en", data-ng-app="anyang")
     script(src='app/js/app.js')
     //- templates:js
     //- endinject
+    script(type="text/ng-template", id="removeConfirmDialogId")
+      div
+        h4.mt0 {{'dialog.remove.TITLE'|translate}}
+        p
+          | {{'dialog.remove.MESSAGE'|translate}}
+      .text-center
+        button.btn.btn-danger.mr(type='button', ng-click='confirm("ok")') {{'button.CONFIRM'|translate}}
+        button.btn.btn-default(type='button', ng-click="closeThisDialog('cancel')") {{'button.CANCEL'|translate}}

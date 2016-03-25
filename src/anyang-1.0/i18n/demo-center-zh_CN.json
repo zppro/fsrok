@@ -1,0 +1,28 @@
+{
+  "demo-center": {
+    "grid-basic": {
+      "list": {
+        "TITLE": "演示中心-网格-基本功能-列表"
+      },
+      "details": {
+        "TITLE": "演示中心-网格-基本功能-详情",
+        "TAB1": "信息块1",
+        "TAB2": "信息块2",
+        "TAB1-LABEL-ID": "ID",
+        "TAB1-PLACEHOLDER-ID": "数字编号..",
+        "TAB1-LABEL-NAME": "姓名",
+        "TAB1-PLACEHOLDER-NAME": "明星姓名..",
+        "TAB1-LABEL-BIRTHDAY": "生日",
+        "TAB1-PLACEHOLDER-BIRTHDAY": "日期..",
+        "TAB2-LABEL-FOLLOWERS": "粉丝数",
+        "TAB2-PLACEHOLDER-FOLLOWERS": "该明星粉丝数量..",
+        "TAB2-LABEL-INCOME": "收入",
+        "TAB2-PLACEHOLDER-INCOME": "￥123,456..",
+        "BUTTON-TOGGLE-TAB": "第{{num}}个页签"
+      }
+    },
+    "tree-basic": {
+      "TITLE": "演示中心-树-基本功能"
+    }
+  }
+}
