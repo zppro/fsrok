@@ -1,6 +1,10 @@
 //
    Created by zppro on 16-2-23.
-.col-xs-12.text-center
+.col-xs-2
+    .tree.tree-basic#tree1(ng-style="{height:vm.size.h-15}")
+        ul
+            li.repeat-modify(ng-repeat='node in vm.trees[0].treeData',ng-include="'tree-basic-renderer.html'",ng-init="tIndex=0;nIndex = $index")
+.col-xs-10.text-center
     .row
         form.form-search
             .input-group.pull-right.page-search
@@ -27,16 +31,12 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
+                        td.text-left {{::row.tenantId}}
+                        td.text-left {{::row.code}}
                         td.text-left {{::row.name}}
-                        td {{::row.active_flag|formatter:'active_flag':vm.columns}}
-                        td {{::row.certificate_flag|formatter:'certificate_flag':vm.columns}}
-                        td {{::row.phone}}
-                        td {{::row.email}}
+                        td {{::row.system_flag|formatter:'system_flag':vm.columns}}
                         td {{::row.type|formatter:'type':vm.columns}}
                         td
-                            .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.USER'|translate}}",ng-click="$state.go(vm.subsystemRoute('tenant-user-manage','list'),{tenantId:row._id})")
-                                    i.glyphicon.glyphicon-user
                             .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
                                     i.glyphicon.glyphicon-pencil

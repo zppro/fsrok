@@ -27,6 +27,11 @@
         "text": "AccountManage",
         "sref": "app.manage-center.tenant-account-manage.list",
         "translate": "sidebar.menu-manage-center.TENANT-ACCOUNT-MANAGE"
+      },
+      {
+        "text": "UserManage",
+        "sref": "app.manage-center.tenant-user-manage.list",
+        "translate": "sidebar.menu-manage-center.TENANT-USER-MANAGE"
       }
     ]
   }

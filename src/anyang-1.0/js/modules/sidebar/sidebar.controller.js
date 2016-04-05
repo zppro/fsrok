@@ -14,7 +14,6 @@
     function SidebarController($rootScope, $scope, $state, $timeout,SidebarLoader, Utils, Auth) {
 
         activate();
-
         ////////////////
 
         function activate() {
@@ -84,13 +83,16 @@
             }
 
             $scope.$on('ngRepeatFinished:sidebar-group', function($event) {
-                _.each($scope.menuItems, function (item, i) {
-                    if (item.submenu) {
-                        if (i == 0) {
-                            $scope.toggleCollapse(i, true);
+
+                if($state.current.name == 'app.dashboard') {
+                    _.each($scope.menuItems, function (item, i) {
+                        if (item.submenu) {
+                            if (i == 0) {
+                                $scope.toggleCollapse(i, true);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
 
             // Handle sidebar and collapse items

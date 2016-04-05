@@ -5,7 +5,8 @@
     "ADD": "新增",
     "EDIT": "修改",
     "REMOVE": "删除",
-    "CONFIRM": "确定"
+    "CONFIRM": "确定",
+    "USER":"管理用户"
   },
   "grid": {
     "LABEL-SEARACH": "关键字",
@@ -98,13 +99,15 @@
       "DICTIONARY-MANAGE": "字典管理",
       "PARAM": "系统参数",
       "TENANT-MANAGE": "租户管理",
-      "TENANT-ACCOUNT-MANAGE": "帐号管理"
+      "TENANT-ACCOUNT-MANAGE": "帐号管理",
+      "TENANT-USER-MANAGE": "用户管理"
     },
     "menu-demo-center": {
       "GRID": "网格",
       "GRID-BASIC": "网格-基本功能",
       "TREE": "树",
-      "TREE-BASIC": "树-基本功能"
+      "TREE-BASIC": "树-基本功能",
+      "TREE-EXTEND": "树-扩展功能"
     },
     "nav": {
       "SINGLEVIEW": "单页视图",

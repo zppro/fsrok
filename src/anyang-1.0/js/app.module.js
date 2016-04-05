@@ -32,6 +32,7 @@
             'app.auth',
             'app.model',
             'app.grid',
+            'app.tree',
             'app.demo',
             'biz.manage-center'
         ]);

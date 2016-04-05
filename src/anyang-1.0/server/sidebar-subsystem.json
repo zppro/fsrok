@@ -16,10 +16,7 @@
   {
     "text": "Manage-Center",
     "sref": "app.manage-center",
-    "usertype": [
-      "A0001",
-      "A0003"
-    ],
+    "usertype": ["A0001"],
     "menujson": "server/sidebar-menu-manage-center.json",
     "translate": "sidebar.subsystem.MANAGE-CENTER"
   },

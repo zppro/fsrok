@@ -23,6 +23,9 @@
     },
     "tree-basic": {
       "TITLE": "演示中心-树-基本功能"
+    },
+    "tree-extend": {
+      "TITLE": "演示中心-树-扩展功能"
     }
   }
 }

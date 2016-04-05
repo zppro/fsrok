@@ -142,7 +142,7 @@
         } // resolveFor2
 
         function buildVMHelper() {
-            return ['$timeout', '$q', '$http', 'blockUI', 'cfpLoadingBar', 'shareNode','GridUtils', 'ViewUtils', function ($timeout, $q, $http, blockUI, cfpLoadingBar, shareNode, GridUtils, ViewUtils) {
+            return ['$timeout', '$q', '$http', 'blockUI', 'cfpLoadingBar', 'shareNode', 'GridUtils', 'ViewUtils', function ($timeout, $q, $http, blockUI, cfpLoadingBar, shareNode, GridUtils, ViewUtils) {
 
                 return {
                     q: $q,
@@ -151,6 +151,8 @@
                     loadingBar: cfpLoadingBar,
                     blockUI: blockUI.instances.get('module-block'),
                     shareService: shareNode,
+                    stateToTrans: stateToTrans,
+                    subSystemToTrans: subSystemToTrans,
                     utils: {
                         g: GridUtils,
                         v: ViewUtils
@@ -162,10 +164,19 @@
         function buildEntryVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams', '$q', '$translate', '$timeout', '$http', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $q, $translate, $timeout, $http, modelNode, Notify, GridDemoModelSerivce) {
+            return ['$state', '$stateParams', '$window', '$q', '$translate', '$timeout', '$http', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $translate, $timeout, $http, modelNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init(option) {
+                    this.size = calcWH($window);
+
+                    //计算行数
+                    var rowHeight = 40;
+                    var deltaHeight = 35 + 49 + 10.5 + 52;//search.h + thead.h + row.split + panel-footer.h
+                    this.page.size = (this.size.h - deltaHeight) / rowHeight;
+                    //console.log((this.size.h - 35 - 49 - 10.5 - 52) );
+                    //console.log(this.page.size);
+
                     //remote data get
                     var self = this;
                     _.filter(this.columns, function (column) {
@@ -198,26 +209,41 @@
                                         column.formatterData = formatDictionary(ret)
                                     });
                                 }
+                                else if (f.indexOf('model-related:') == 0) {
+                                    var relatedModelName = _.rest(f.split(':')).join(':');
+                                    modelNode.services[relatedModelName].query(null, null, '_id name').$promise.then(function (rows) {
+                                        column.formatterData = {};
+                                        _.each(rows, function (row) {
+                                            column.formatterData[row._id] = row.name;
+                                        });
+                                    });
+                                }
                             }
                         }
                     });
 
                     //依赖lazyload的模块：1Controller注入，2 通过init(option)传入到entry
                     this.removeDialog = option.removeDialog;
+
+                    this.toDetailsParams = _.pick($stateParams, function (v, k) {
+                        return v && _.contains(self.toDetails, k);
+                    });
+
+                    console.log(this.toDetailsParams);
                 }
 
                 function add() {
-                    $state.go(this.moduleRoute('details'), {
+                    $state.go(this.moduleRoute('details'), _.defaults({
                         action: 'add',
                         _id: 'new'
-                    });
+                    }, this.toDetailsParams));
                 }
 
                 function edit(id) {
-                    $state.go(this.moduleRoute('details'), {
+                    $state.go(this.moduleRoute('details'), _.defaults({
                         action: 'edit',
                         _id: id
-                    });
+                    }, this.toDetailsParams));
                 }
 
                 function remove() {
@@ -268,15 +294,15 @@
                 function query() {
                     var self = this;
                     if (self.serverPaging) {
-                        self.rows = modelService.page(self.page, self.search, self.sort.column);
+                        self.rows = modelService.page(self.page, self.searchForm, self.sort.column);
                         //服务端totals在查询数据时计算
-                        modelService.totals(self.search).$promise.then(function (ret) {
+                        modelService.totals(self.searchForm).$promise.then(function (ret) {
                             self.page.totals = ret.totals;
                         });
                     }
                     else {
                         if (self.modelName) {
-                            self.rows = modelService.query(self.search);
+                            self.rows = modelService.query(self.searchForm);
                         }
                         else {
                             self.rows = modelService.query();
@@ -351,6 +377,7 @@
                     pk: option.pk || '_id',
                     serverPaging: option.serverPaging,
                     page: _.defaults(option.page || {}, {size: 9, no: 1}),
+                    searchForm: option.searchForm || {},
                     sort: {
                         column: option.columnPK || this.pk,
                         direction: -1,
@@ -369,8 +396,10 @@
                             }
                         }
                     },
+                    toDetails: option.toDetails || [],
                     columns: option.columns || [],
                     rows: [],
+                    size: {w: 0, h: 0},
                     init: init,
                     removeDialog: ['ngDialog', function (ngDialog) {
                         return ngDialog;
@@ -392,10 +421,12 @@
         function buildEntityVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams','$q', '$timeout','$translate', 'blockUI', 'modelNode','Notify', 'GridDemoModelSerivce', function ($state, $stateParams,$q,$timeout,$translate,blockUI,modelNode,Notify, GridDemoModelSerivce) {
+            return ['$state', '$stateParams','$window','$q', '$timeout','$translate', 'blockUI', 'modelNode','Notify', 'GridDemoModelSerivce', function ($state, $stateParams,$window,$q,$timeout,$translate,blockUI,modelNode,Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init() {
+                    this.size = calcWH($window);
+
                     //remote data get
 
                     //
@@ -532,6 +563,7 @@
                     name: name || 'no-entityName',
                     pk: option.pk || '_id',
                     model: {},
+                    size: {w: 0, h: 0},
                     init: init,
                     cancel: cancel,
                     load: load,
@@ -545,16 +577,19 @@
         function buildInstanceVM(name,option){
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams','$q', '$timeout','$translate', 'blockUI', 'modelNode','Notify', function ($state, $stateParams,$q,$timeout,$translate,blockUI,modelNode,Notify) {
+            return ['$state', '$stateParams','$window','$q', '$timeout','$translate', 'blockUI', 'modelNode','Notify', function ($state, $stateParams,$window,$q,$timeout,$translate,blockUI,modelNode,Notify) {
                 var modelService = modelNode.services[option.modelName];
 
+
                 function init() {
+                    this.size = calcWH($window);
                     //remote data get
 
                     //
                     //需要的对象传入，2 通过init(option)传入到entry
 
                 }
+
 
                 return {
                     _system_: arrNames[0],
@@ -565,6 +600,7 @@
                     moduleRoute: moduleRoute,
                     moduleTranslatePath: moduleTranslatePath,
                     name: name || 'no-instanceName',
+                    size: {w: 0, h: 0},
                     init: init
                 };
             }];
@@ -605,6 +641,10 @@
             return _.union([this._system_,this._subsystem_, this._module_, this._view_], Array.prototype.slice.call(arguments, 0)).join('.');
         }
 
+        function subsystemTranslatePath() {
+            return _.union([this._subsystem_], Array.prototype.slice.call(arguments, 0)).join('.');
+        }
+
         function moduleTranslatePath() {
             //去掉_system_
             return _.union([this._subsystem_, this._module_], Array.prototype.slice.call(arguments, 0)).join('.');
@@ -615,7 +655,14 @@
             return _.union([this._subsystem_, this._module_, this._view_], Array.prototype.slice.call(arguments, 0)).join('.');
         }
 
+        function stateToTrans(stateName) {
+            return stateName.split('.').slice(1).join('.')
+        }
 
+        function subSystemToTrans(stateName) {
+            var arr = stateName.split('.');
+            return arr.slice(1, arr.length - 2).join('.')
+        }
 
         function formatDictionary(rawDictionary){
             var o = {};
@@ -626,6 +673,17 @@
             });
             return o;
         }
+
+        function calcWH(window) {
+            var $headerWrapper = angular.element('.module-header-wrapper');
+            var $contentWrapper = angular.element('.module-content-wrapper');
+            var deltaH = 55 + 30 + 50;//topbar.h + content-wrapper.padding*2 + section.margin-top
+            return {
+                w: $contentWrapper.width(),
+                h: angular.element(window).height() - $headerWrapper.height() - deltaH
+            };
+        }
+
 
     }
 

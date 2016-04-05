@@ -1,5 +1,6 @@
 /**
  * Created by zppro on 15-12-16.
+ * 参考字典D1003-预定义树
  */
 var _ = require('underscore');
 
@@ -14,6 +15,7 @@ module.exports = {
         option = option || {};
 
         this.logger = require('log4js').getLogger(this.filename);
+
         if (!this.logger) {
             console.error('logger not loaded in ' + this.file);
         }
@@ -25,22 +27,14 @@ module.exports = {
             {
                 method: 'fetch',
                 verb: 'get',
-                url: this.service_url_prefix + "/:dictionaryId/:format",
+                url: this.service_url_prefix + "/A1001",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            if(this.params.format=='array') {
-                                var rows = [];
-                                _.each(app.dictionary.pairs[this.params.dictionaryId], function (v, k) {
-                                    if (k != 'name') {
-                                        rows.push(_.defaults(v, {value: k}));
-                                    }
-                                });
-                                this.body = app.wrapper.res.rows(rows);
-                            }
-                            else {
-                                this.body = app.wrapper.res.ret(app.dictionary.pairs[this.params.dictionaryId]);
-                            }
+                            self.logger.info('--------------> tree/A1001');
+                            this.body = app.wrapper.res.rows(yield app.modelFactory().query('pub_tenant', '../models/pub/tenant',
+                                {where: {status: 1}, select: '_id name'}
+                            ));
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

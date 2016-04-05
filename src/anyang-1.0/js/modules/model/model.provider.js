@@ -74,6 +74,7 @@
             $get: ['$rootScope', '$q', '$http', '$resource', function ($rootScope, $q, $http, $resource) {
                 return {
                     shareDictionary: {},
+                    shareTree: {},
                     d: function (id, forceRefresh) {
                         var promise;
                         if (forceRefresh || this.shareDictionary[id] == undefined) {
@@ -85,6 +86,20 @@
                         }
                         else {
                             promise = $q.when(this.shareDictionary[id]);
+                        }
+                        return promise;
+                    },
+                    t: function (id, forceRefresh) {
+                        var promise;
+                        if (forceRefresh || angular.isUndefined(this.shareTree[id])) {
+                            var self = this;
+                            promise = $http.get(baseUrl + 'tree/' + id).then(function (rows) {
+                                self.shareTree[id] = rows;
+                                return self.shareTree[id];
+                            });
+                        }
+                        else {
+                            promise = $q.when(this.shareTree[id]);
                         }
                         return promise;
                     }

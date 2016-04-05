@@ -6,12 +6,14 @@ var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 
 module.exports = {
-    init: function () {
+    init: function (option) {
         var self = this;
         this.file = __filename;
         this.filename = this.file.substr(this.file.lastIndexOf('/') + 1);
         this.module_name = this.filename.substr(0, this.filename.lastIndexOf('.'));
         this.service_url_prefix = '/services/' + this.module_name.split('_').join('/');
+
+        option = option || {};
 
         this.logger = require('log4js').getLogger(this.filename);
         if (!this.logger) {
@@ -102,3 +104,4 @@ module.exports = {
         return {model_name: modelName, model_path: modelPath};
     }
 }.init();
+//.init(option);

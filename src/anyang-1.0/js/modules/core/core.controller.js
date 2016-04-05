@@ -6,7 +6,10 @@
 
     angular
         .module('app.core')
-        .controller('TopbarController', TopbarController);
+        .controller('TopbarController', TopbarController)
+        .controller('ModuleHeaderController', ModuleHeaderController)
+        .controller('ModuleHeaderForTenantController', ModuleHeaderForTenantController)
+    ;
 
     TopbarController.$inject = ['$rootScope', '$state', 'Auth'];
 
@@ -32,5 +35,15 @@
             };
 
         }
+    }
+
+    ModuleHeaderController.$inject = ['$scope','vmh'];
+    function ModuleHeaderController($scope,vmh) {
+        $scope.vmh = vmh;
+    }
+
+    ModuleHeaderForTenantController.$inject = ['$scope','vmh'];
+    function ModuleHeaderForTenantController($scope,vmh) {
+        $scope.vmh = vmh;
     }
 })();

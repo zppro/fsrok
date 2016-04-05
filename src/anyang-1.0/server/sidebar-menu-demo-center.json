@@ -22,6 +22,11 @@
         "text": "Tree-Basic",
         "sref": "app.demo-center.tree-basic",
         "translate": "sidebar.menu-demo-center.TREE-BASIC"
+      },
+      {
+        "text": "Tree-Extend",
+        "sref": "app.demo-center.tree-extend",
+        "translate": "sidebar.menu-demo-center.TREE-EXTEND"
       }
     ]
   }

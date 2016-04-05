@@ -8,14 +8,15 @@
 
     angular
         .module('app.demo')
-        .controller('DemoGridController', DemoGridController)
-        .controller('DemoGridDetailsController', DemoGridDetailsController)
-        .controller('DemoTreeController', DemoTreeController)
+        .controller('DemoGridBasicController', DemoGridBasicController)
+        .controller('DemoGridBasicDetailsController', DemoGridBasicDetailsController)
+        .controller('DemoTreeBasicController', DemoTreeBasicController)
+        .controller('DemoTreeExtendController', DemoTreeExtendController)
     ;
 
-    DemoGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
+    DemoGridBasicController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-    function DemoGridController($scope, ngDialog, vmh, vm) {
+    function DemoGridBasicController($scope, ngDialog, vmh, vm) {
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
@@ -36,9 +37,9 @@
 
     }
 
-    DemoGridDetailsController.$inject = ['$scope', 'vmh', 'entityVM'];
+    DemoGridBasicDetailsController.$inject = ['$scope', 'vmh', 'entityVM'];
 
-    function DemoGridDetailsController($scope, vmh, vm) {
+    function DemoGridBasicDetailsController($scope, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -124,9 +125,9 @@
         }
     }
 
-    DemoTreeController.$inject = ['$scope','vmh', 'instanceVM'];
+    DemoTreeBasicController.$inject = ['$scope','$http','tree','vmh', 'instanceVM'];
 
-    function DemoTreeController($scope,  vmh, vm) {
+    function DemoTreeBasicController($scope, $http,tree, vmh, vm) {
 
         $scope.vm = vm;
 
@@ -134,13 +135,62 @@
 
 
         function init() {
-
-            //console.log(vm._subsystem_);
-            //console.log(vm._module_);
-            //console.log(vm._view_);
-            //console.log(vm._action_);
             vm.init();
 
+            var subsystemURL = 'server/district.json' + '?v=' + (new Date().getTime()); // jumps cache
+
+            $http
+                .get(subsystemURL)
+                .success(function (treeNodes) {
+                    //##import tip##
+                    //单棵树
+                    //vm.tree1 = new tree.sTree('tree1', treeNodes);
+
+                    //##import tip##
+                    //多棵树
+                    vm.trees = [new tree.sTree('tree1', treeNodes), new tree.sTree('tree2', treeNodes, {mode: 'check'})];
+                });
+
+
+            $scope.$on('tree:node:select', function ($event, tree) {
+                console.log(tree.selectedNode);
+            });
+        }
+
+    }
+
+    DemoTreeExtendController.$inject = ['$scope','$http','tree','vmh', 'instanceVM'];
+
+    function DemoTreeExtendController($scope, $http,tree, vmh, vm) {
+
+        $scope.vm = vm;
+
+        init();
+
+
+        function init() {
+            vm.init();
+
+            var subsystemURL = 'server/district.json' + '?v=' + (new Date().getTime()); // jumps cache
+
+            $http
+                .get(subsystemURL)
+                .success(function (treeNodes) {
+                    vm.trees = [new tree.sTree('tree1', treeNodes), new tree.sTree('tree2', treeNodes, {
+                        mode: 'check'
+                        , checkCascade: false
+                    })];//{expandLevel: 2}
+                    //vm.trees[0].selectedNode = vm.trees[0].findNode('0-2-1'); //by $index
+                    vm.trees[0].selectedNode = vm.trees[0].findNodeById('120404');//by _id
+                    //vm.trees[0].setNodeChecked([vm.trees[0].findNodeById('120103'),vm.trees[0].findNodeById('120304')]);
+                    vm.trees[1].checkedNodes = [vm.trees[1].findNodeById('1201'), vm.trees[1].findNodeById('120304')];
+                    console.log(vm.trees[1].checkedNodes);
+                });
+
+
+            $scope.$on('tree:node:select', function ($event, tree) {
+                console.log(tree.selectedNode);
+            });
         }
 
     }

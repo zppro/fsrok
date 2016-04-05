@@ -167,8 +167,9 @@
             .state('app.manage-center', {
                 url: '/manage-center',
                 abstract: true,
-                template: '<div class="data-ui-view subsystem-wrapper"></div>',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                //template: '<div class="data-ui-view subsystem-wrapper"></div>',
+                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div>',
                 resolve: {
                     vmh: helper.buildVMHelper()
                 }
@@ -188,7 +189,15 @@
             .state('app.manage-center.tenant-account-manage', {
                 url: '/tenant-account-manage',
                 abstract: true,
-                template: '<div class="data-ui-view module-wrapper" ></div>'
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                }
             })
             .state('app.manage-center.tenant-account-manage.list', {
                 url: '/list/:action',
@@ -200,7 +209,6 @@
                         modelName: 'pub-tenant',
                         //切换客户端还是服务端分页
                         serverPaging: true,
-                        page: {size: 3, no: 1},
                         columns: [
                             {
                                 label: '租户名称',
@@ -267,12 +275,96 @@
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
+            .state('app.manage-center.tenant-user-manage', {
+                url: '/tenant-user-manage',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                }
+            })
+            .state('app.manage-center.tenant-user-manage.list', {
+                url: '/list/:action/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-user-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'TenantUserManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.tenant-user-manage.list', {
+                        modelName: 'pub-user',
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '所属租户',
+                                name: 'tenantId',
+                                type: 'string',
+                                width: 120,
+                                //sortable: true,
+                                formatter: 'model-related:pub-tenant'
+                            },
+                            {
+                                label: '用户编码',
+                                name: 'code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '用户名称',
+                                name: 'name',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '系统标志',
+                                name: 'system_flag',
+                                type: 'bool',
+                                width: 40,
+                                formatter: 'bool'
+                            },
+                            {
+                                label: '类型',
+                                name: 'type',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1000/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ],
+                        toDetails: ['tenantId']
+                    })
+                }
+            })
+            .state('app.manage-center.tenant-user-manage.details', {
+                url: '/details/:action/:_id/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-user-manage-details.html'),
+                controller: 'TenantUserManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.manage-center.tenant-user-manage.details', {
+                        modelName: 'pub-user'
+                        , blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
             //演示中心开始
             .state('app.demo-center', {
                 url: '/demo-center',
                 abstract: true,
-                template: '<div class="data-ui-view subsystem-wrapper"></div>',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div>',
                 resolve: {
                     vmh: helper.buildVMHelper()
                 }
@@ -280,13 +372,21 @@
             .state('app.demo-center.grid-basic', {
                 url: '/grid-basic',
                 abstract: true,
-                template: '<div class="data-ui-view module-wrapper" ></div>'
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                }
             })
             .state('app.demo-center.grid-basic.list', {
                 url: '/list/:action',
-                templateUrl: helper.basepath('demo-center/grid-basic-list.html'),
-                controller: 'DemoGridController',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                templateUrl: helper.basepath('demo-center/grid-basic-list.html'),
+                controller: 'DemoGridBasicController',
                 resolve: {
                     entryVM: helper.buildEntryVM('app.demo-center.grid-basic.list', {
                         columns: [
@@ -331,9 +431,9 @@
             })
             .state('app.demo-center.grid-basic.details', {
                 url: '/details/:action/:_id',
-                templateUrl: helper.basepath('demo-center/grid-basic-details.html'),
-                controller: 'DemoGridDetailsController',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                templateUrl: helper.basepath('demo-center/grid-basic-details.html'),
+                controller: 'DemoGridBasicDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM('app.demo-center.grid-basic.details', {
                         blockUI: true
@@ -342,11 +442,36 @@
             })
             .state('app.demo-center.tree-basic', {
                 url: '/tree-basic',
-                templateUrl: helper.basepath('demo-center/tree-basic.html'),
-                controller: 'DemoTreeController',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
-                resolve: {
-                    instanceVM: helper.buildInstanceVM('app.demo-center.tree-basic')
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('demo-center/tree-basic.html'),
+                        controller: 'DemoTreeBasicController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.demo-center.tree-basic')
+                        }
+                    }
+                }
+            })
+            .state('app.demo-center.tree-extend', {
+                url: '/tree-extend',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('demo-center/tree-extend.html'),
+                        controller: 'DemoTreeExtendController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.demo-center.tree-extend')
+                        }
+                    }
                 }
             })
             //

@@ -11,6 +11,7 @@
     modelRun.$inject = ['modelNode'];
     function modelRun(modelNode) {
         modelNode.factory('pub-tenant');
+        modelNode.factory('pub-user');
     }
 
 })();

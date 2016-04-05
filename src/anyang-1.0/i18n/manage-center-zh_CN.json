@@ -1,5 +1,6 @@
 {
   "manage-center": {
+    "HEAD-ORG-NAME":"安养管理",
     "tenant-account-manage": {
       "list": {
         "TITLE": "管理中心-租户-帐号-列表"
@@ -21,6 +22,20 @@
         "TAB1-LABEL-CERTIFICATE_FLAG": "认证标志",
         "TAB1-LABEL-TERMSOFVALIDITY_LATEST": "有效期至",
         "TAB1-PLACEHOLDER-TERMSOFVALIDITY_LATEST": "日期.."
+      }
+    },
+    "tenant-user-manage": {
+      "list": {
+        "TITLE": "管理中心-租户-用户-列表"
+      },
+      "details": {
+        "TITLE": "管理中心-租户-用户-详情",
+        "TAB1-LABEL-CODE": "用户编码",
+        "TAB1-PLACEHOLDER-CODE": "rainbow@anyang.com",
+        "TAB1-LABEL-NAME": "用户名称",
+        "TAB1-PLACEHOLDER-NAME": "钟芷睿..",
+        "TAB1-LABEL-TENANT_ID": "所属租户",
+        "TAB1-PLACEHOLDER-TENANT_ID": "请选择用户所属企业.."
       }
     }
   }

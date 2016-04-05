@@ -1,0 +1,61 @@
+/* ========================================================================
+   Component: tree Created by zppro on 16-3-30.
+ ========================================================================== */
+.tree {
+  overflow-y: auto;
+  ul {
+    list-style: none;
+    padding-left: 0px;
+    margin-left: 0px;
+  }
+  li {
+    cursor: pointer;
+    padding-left: 0.8em;
+    margin: 0.25em 0;
+    > div.tree-node {
+      //width: 150%;
+      > i {
+        width: 16px;
+        //padding-left: -0.5em;
+        //margin-right: 0.25em;
+        //width:16px;
+        text-align: center;
+        display: inline-block;
+      }
+      //> span {
+      //  text-indent: 0px;
+      //}
+    }
+    > div.tree-node.tree-node-selected,
+    > div.tree-node.tree-node-selected:hover{
+      background: #0092DC;
+      color: white;
+    }
+    > div.tree-node:hover {
+      background: #E2E2E2;
+    }
+  }
+}
+
+.tree-basic{
+  border: solid 1px #ccc;
+  background: whitesmoke;
+}
+.tree-demo{
+  border: solid 1px #000;
+  background: white;
+}
+
+input[type=checkbox]:checked + span.undetermined{
+  opacity: 0.3;
+}
+
+
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
