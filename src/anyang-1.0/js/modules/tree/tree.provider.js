@@ -7,16 +7,36 @@
 
     angular
         .module('app.tree')
-        .provider('tree', tree)
+        .provider('treeFactory', treeFactory)
     ;
 
-    function tree() {
+    function treeFactory() {
+
+        function filter(nodes,fn) {
+            if(!fn)
+                return nodes;
+
+            for (var i = 0; i < nodes.length; i++) {
+                if(fn(nodes[i])) {
+
+                    if(nodes[i].children && nodes[i].children.length>0) {
+                        filter(nodes[i].children, fn);
+                    }
+                }
+                else {
+                    nodes.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
         return {
 
             // controller access level
             $get: ['$q', '$rootScope', function ($q, $rootScope) {
 
                 return {
+                    filter: filter,
                     sTree: sTree
                 };
 

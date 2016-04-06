@@ -13,6 +13,12 @@
         var _user = $cookieStore.get('user');
         var setUser = function (user,rememberCode) {
             _user = user;
+            if(_user.roles && _user.roles.length>0) {
+                _user.role = 0;
+                _.each(_user.roles, function (o) {
+                    _user.role += parseInt(o);
+                });
+            }
             $cookieStore.put('user', _user);
             if(rememberCode) {
                 $cookieStore.put('code',_user.code);

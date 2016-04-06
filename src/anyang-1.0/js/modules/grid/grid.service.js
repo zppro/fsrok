@@ -151,7 +151,7 @@
         function formatter(rowValue, columnName, columns) {
             var one = _.findWhere(columns, {name: columnName});
 
-            if (one && one.formatter && one.formatterData) {
+            if (one && !one.hidden && one.formatter && one.formatterData) {
                 return one.formatterData[rowValue]
             }
             return rowValue;

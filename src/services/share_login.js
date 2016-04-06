@@ -38,7 +38,7 @@ module.exports = {
                                     code: this.request.body.code,
                                     password_hash: passwordHash,
                                     status: 1
-                                }, select: "code name type role tenantId"
+                                }, select: "code name type roles tenantId"
                             });
 
                             if (user != null) {
@@ -63,7 +63,7 @@ module.exports = {
                                     });
                                 }
 
-                                this.body = app.wrapper.res.ret(_.defaults(_.pick(user,'_id','code','name','type','role'), {token: token,tenant:tenant}));
+                                this.body = app.wrapper.res.ret(_.defaults(_.pick(user,'_id','code','name','type','roles'), {token: token,tenant:tenant}));
                             }
                             else {
                                 this.body = app.wrapper.res.error({message: '无效的的登录名密码!'});

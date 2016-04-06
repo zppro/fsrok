@@ -167,8 +167,18 @@
             return ['$state', '$stateParams', '$window', '$q', '$translate', '$timeout', '$http', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $translate, $timeout, $http, modelNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
-                function init(option) {
+                function init(initOption) {
+                    var self = this;
                     this.size = calcWH($window);
+
+                    //设置searchForm
+                    this.searchForm = _.defaults(this.searchForm, processStateParamToSearchForm($stateParams, 'action'), option.searchForm);
+
+                    //继承数据处理
+                    //设置selectFilterObject
+                    this.selectFilterObject = _.defaults(this.selectFilterObject, $state.current.data && $state.current.data.selectFilterObject);
+                    //设置treeFilterObject
+                    this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
 
                     //计算行数
                     var rowHeight = 40;
@@ -178,7 +188,7 @@
                     //console.log(this.page.size);
 
                     //remote data get
-                    var self = this;
+
                     _.filter(this.columns, function (column) {
                         if (column && column.formatter) {
                             var f = column.formatter
@@ -198,14 +208,6 @@
                                     ///dictionary-remote:{url}
                                     var url = _.rest(f.split(':')).join(':');
                                     $http.get(url).then(function (ret) {
-                                        //column.formatterData = column.formatterData || {};
-                                        //_.each(ret, function (v, k) {
-                                        //    if (_.isObject(v)) {
-                                        //        column.formatterData [k] = v.name;
-                                        //    }
-                                        //});
-                                        //console.log(column.formatterData);
-
                                         column.formatterData = formatDictionary(ret)
                                     });
                                 }
@@ -223,13 +225,13 @@
                     });
 
                     //依赖lazyload的模块：1Controller注入，2 通过init(option)传入到entry
-                    this.removeDialog = option.removeDialog;
+                    this.removeDialog = initOption.removeDialog;
 
                     this.toDetailsParams = _.pick($stateParams, function (v, k) {
                         return v && _.contains(self.toDetails, k);
                     });
 
-                    console.log(this.toDetailsParams);
+
                 }
 
                 function add() {
@@ -367,7 +369,7 @@
                     _module_: arrNames[2],
                     _view_: arrNames[3],
                     _action_: $stateParams.action || 'query',
-                    _modelService_: modelService,
+                    modelNode: modelNode,
                     systemRoute: systemRoute,
                     subsystemRoute: subsystemRoute,
                     moduleRoute: moduleRoute,
@@ -377,7 +379,12 @@
                     pk: option.pk || '_id',
                     serverPaging: option.serverPaging,
                     page: _.defaults(option.page || {}, {size: 9, no: 1}),
-                    searchForm: option.searchForm || {},
+                    switches: option.switches || {},
+                    searchForm: {},//因数据会在view或controller中变化，所以在init里出设置。类似buildEntityVM中的model
+                    transTo: option.transTo || {},//跳转到另外module设置对象
+                    treeFilterObject: option.treeFilterObject || {},
+                    selectBinding: {},
+                    selectFilterObject: {},
                     sort: {
                         column: option.columnPK || this.pk,
                         direction: -1,
@@ -425,26 +432,39 @@
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init() {
+                    var self = this;
+                    //this.model = option.model;
+
                     this.size = calcWH($window);
 
+                    //继承数据处理
+                    //设置selectFilterObject
+                    this.selectFilterObject = _.defaults(this.selectFilterObject, $state.current.data && $state.current.data.selectFilterObject);
+                    //设置treeFilterObject
+                    this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
+
+                    console.log(this.selectFilterObject);
                     //remote data get
 
                     //
                     //需要的对象传入，2 通过init(option)传入到entry
 
+                    this.toListParams = _.pick($stateParams, function (v, k) {
+                        return v && _.contains(self.toList, k);
+                    });
                 }
 
                 function cancel() {
-                    $state.go(this.moduleRoute('list'));
+                    $state.go(this.moduleRoute('list'), this.toListParams);
                 }
 
                 function load() {
                     if (this._id_ == 'new') {
-                        return;
+                        this.model = _.defaults(this.model, this.toListParams, option.model);
+                        return $q.when(this.model);
                     }
 
-                    this.model = option.modelName ? modelService.get({_id: this._id_}) : modelService.find(this._id_);
-
+                    this.model = _.defaults((option.modelName ?  modelService.get({_id: this._id_}) : modelService.find(this._id_)),option.model);
                     //loading效果
                     if (option.modelName) {
                         this.model.$promise.finally(function () {
@@ -455,6 +475,11 @@
                         if (option.blockUI) {
                             blockUI.instances.get('module-block').start();
                         }
+
+                        return this.model.$promise;
+                    }
+                    else {
+                        return $q.when(this.model);
                     }
                 }
 
@@ -464,10 +489,10 @@
                     if (option.modelName) {
                         if (self._id_ == 'new') {
                             //create
-                            promise = modelService.save({}, self.model).$promise;
+                            promise = modelService.save({}, _.defaults(self.model, self.toListParams,option.model)).$promise;
                         }
                         else {
-                            promise = modelService.update({id: self._id_}, self.model).$promise;
+                            promise = modelService.update({id: self._id_}, _.defaults(self.model, self.toListParams,option.model)).$promise;
                         }
                     }
                     else {
@@ -498,7 +523,8 @@
                     return $q.all([$translate('notification.SAVE-SUCCESS'), promise]).then(function (ret) {
                         console.log('success:' + ret);
                         Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
-                        $state.go(self.moduleRoute('list'));
+                        console.log(self.toListParams);
+                        $state.go(self.moduleRoute('list'), self.toListParams);
                         console.log('--------------end success----------------')
                     }).finally(function () {
                         if (option.blockUI) {
@@ -554,7 +580,7 @@
                     _view_: arrNames[3],
                     _action_: $stateParams.action,
                     _id_: $stateParams._id,
-                    _modelService_: modelService,
+                    modelNode: modelNode,
                     systemRoute: systemRoute,
                     subsystemRoute: subsystemRoute,
                     moduleRoute: moduleRoute,
@@ -562,7 +588,12 @@
                     viewTranslatePath: viewTranslatePath,
                     name: name || 'no-entityName',
                     pk: option.pk || '_id',
-                    model: {},
+                    model: {},//因数据会在view或controller中变化，所以在load里出设置.类似buildEntryVM中的searchForm
+                    switches: option.switches || {},
+                    transTo: option.transTo || {},//跳转到另外module设置对象
+                    selectBinding: {},
+                    selectFilterObject: {},
+                    toList: option.toList || [],
                     size: {w: 0, h: 0},
                     init: init,
                     cancel: cancel,
@@ -601,6 +632,8 @@
                     moduleTranslatePath: moduleTranslatePath,
                     name: name || 'no-instanceName',
                     size: {w: 0, h: 0},
+                    switches: option.switches || {},
+                    transTo: option.transTo || {},//跳转到另外module设置对象
                     init: init
                 };
             }];
@@ -674,6 +707,16 @@
             return o;
         }
 
+        function processStateParamToSearchForm() {
+            var obj = _.omit.apply(this,arguments);
+            for(var k in obj){
+                if (!obj[k]) {
+                    obj[k] = {$exists: true};
+                }
+            }
+            return obj;
+        }
+
         function calcWH(window) {
             var $headerWrapper = angular.element('.module-header-wrapper');
             var $contentWrapper = angular.element('.module-content-wrapper');
@@ -683,7 +726,6 @@
                 h: angular.element(window).height() - $headerWrapper.height() - deltaH
             };
         }
-
 
     }
 

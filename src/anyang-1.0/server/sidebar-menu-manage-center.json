@@ -1,5 +1,54 @@
 [
   {
+    "text": "PensionAgencyManage",
+    "translate": "sidebar.menu-manage-center.PENSION-AGENCY-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "AccountManage",
+        "sref": "app.manage-center.pension-agency-account-manage.list",
+        "translate": "sidebar.menu-manage-center.PENSION-AGENCY-ACCOUNT-MANAGE"
+      },
+      {
+        "text": "UserManage",
+        "sref": "app.manage-center.pension-agency-user-manage.list",
+        "translate": "sidebar.menu-manage-center.PENSION-AGENCY-USER-MANAGE"
+      }
+    ]
+  },
+  {
+    "text": "AgentManage",
+    "translate": "sidebar.menu-manage-center.AGENT-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "AccountManage",
+        "sref": "app.manage-center.agent-account-manage.list",
+        "translate": "sidebar.menu-manage-center.AGENT-ACCOUNT-MANAGE"
+      },
+      {
+        "text": "UserManage",
+        "sref": "app.manage-center.agent-user-manage.list",
+        "translate": "sidebar.menu-manage-center.AGENT-USER-MANAGE"
+      }
+    ]
+  },
+  {
+    "text": "PlatformManage",
+    "translate": "sidebar.menu-manage-center.PLATFORM-MANAGE",
+    "sref": "#",
+    "icon": "icon-folder",
+    "submenu": [
+      {
+        "text": "UserManage",
+        "sref": "app.manage-center.platform-user-manage.list",
+        "translate": "sidebar.menu-manage-center.PLATFORM-USER-MANAGE"
+      }
+    ]
+  },
+  {
     "text": "Metadata",
     "translate": "sidebar.menu-manage-center.METADATA-MANAGE",
     "sref": "#",
@@ -14,24 +63,6 @@
         "text": "Param",
         "sref": "app.manage-center.metadata-param",
         "translate": "sidebar.menu-manage-center.PARAM"
-      }
-    ]
-  },
-  {
-    "text": "TenantManage",
-    "translate": "sidebar.menu-manage-center.TENANT-MANAGE",
-    "sref": "#",
-    "icon": "icon-folder",
-    "submenu": [
-      {
-        "text": "AccountManage",
-        "sref": "app.manage-center.tenant-account-manage.list",
-        "translate": "sidebar.menu-manage-center.TENANT-ACCOUNT-MANAGE"
-      },
-      {
-        "text": "UserManage",
-        "sref": "app.manage-center.tenant-user-manage.list",
-        "translate": "sidebar.menu-manage-center.TENANT-USER-MANAGE"
       }
     ]
   }

@@ -71,7 +71,8 @@
             setBaseUrl: setBaseUrl,
 
             // controller access level
-            $get: ['$rootScope', '$q', '$http', '$resource', function ($rootScope, $q, $http, $resource) {
+            $get: ['$rootScope', '$q', '$http', '$resource', 'treeFactory', function ($rootScope, $q, $http, $resource, treeFactory) {
+
                 return {
                     shareDictionary: {},
                     shareTree: {},
@@ -89,19 +90,41 @@
                         }
                         return promise;
                     },
-                    t: function (id, forceRefresh) {
+                    t: function (id, select, where, forceRefresh) {
+
                         var promise;
                         if (forceRefresh || angular.isUndefined(this.shareTree[id])) {
                             var self = this;
-                            promise = $http.get(baseUrl + 'tree/' + id).then(function (rows) {
-                                self.shareTree[id] = rows;
+                            if (select && (select.indexOf('_id ') == -1 || select.indexOf(' _id') == -1)) {
+                                select = '_id ' + select;
+                            }
+                            promise = $http.get(baseUrl + 'tree/' + id + '/' + (select || '_id name')).then(function (nodes) {
+                                self.shareTree[id] = nodes;
                                 return self.shareTree[id];
                             });
                         }
                         else {
                             promise = $q.when(this.shareTree[id]);
                         }
-                        return promise;
+
+                        return where ? promise.then(function (nodes) {
+                            var clone = angular.copy(nodes);
+                            for (var key in where) {
+                                treeFactory.filter(clone, function (node) {
+                                    if (node[key]) {
+                                        var filterData = where[key];
+                                        if (_.isString(filterData)) {
+                                            return node[key] == filterData;
+                                        }
+                                        else if (_.isArray(filterData)) {
+                                            return _.contains(filterData, node[key]);
+                                        }
+                                    }
+                                    return true;
+                                });
+                            }
+                            return clone;
+                        }) : promise;
                     }
                 };
             }]

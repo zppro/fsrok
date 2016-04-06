@@ -21,9 +21,12 @@ module.exports = function(ctx,name) {
             status: {type: Number, min: 0, max: 1, default: 1},
             code: {type: String, required: true, maxlength: 30, index: {unique: true}},
             name: {type: String, required: true, maxlength: 30},
+            phone: {type: String, maxlength: 20, unique: true, index: true},
             type: {type: String, enum: _.rest(ctx.dictionary.keys["D1000"])},
-            role: {type: Number, min: 1, max: 9999},// bit flag
-            system_flag: {type: Number, min: 0, max: 1},
+            //role: {type: Number, min: 1, max: 9999},// bit flag
+            roles: [String],
+            system_flag: {type: Boolean, default: false},
+            stop_flag: {type: Boolean, default: false},//开通标志 租户是否可用
             password_hash: String,
             tenantId: {type: mongoose.Schema.Types.ObjectId}
         });

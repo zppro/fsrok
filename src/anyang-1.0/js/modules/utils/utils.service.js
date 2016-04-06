@@ -145,6 +145,7 @@
         }
 
         function vinput(form, name, type) {
+
             var input = form[name];
             return (input.$dirty || form.$submitted) && input.$error[type];
         }

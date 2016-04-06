@@ -174,20 +174,8 @@
                     vmh: helper.buildVMHelper()
                 }
             })
-            .state('app.manage-center.metadata-dictionary-manage', {
-                url: '/metadata-dictionary-manage',
-                title: '字典管理',
-                templateUrl: helper.basepath('manage-center/metadata-dictionary-manage.html'),
-                access_level: AUTH_ACCESS_LEVELS.ADMIN
-            })
-            .state('app.manage-center.metadata-param', {
-                url: '/metadata-param',
-                title: '系统参数',
-                templateUrl: helper.basepath('manage-center/metadata-param.html'),
-                access_level: AUTH_ACCESS_LEVELS.ADMIN
-            })
-            .state('app.manage-center.tenant-account-manage', {
-                url: '/tenant-account-manage',
+            .state('app.manage-center.pension-agency-account-manage', {
+                url: '/pension-agency-account-manage',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -197,21 +185,26 @@
                     "module-content": {
                         template: '<div class="data-ui-view"></div>'
                     }
+                },
+                data: {
+                    selectFilterObject: {"type": ['A0001', 'A0002', 'A0003']}
                 }
             })
-            .state('app.manage-center.tenant-account-manage.list', {
+            .state('app.manage-center.pension-agency-account-manage.list', {
                 url: '/list/:action',
-                templateUrl: helper.basepath('manage-center/tenant-account-manage-list.html'),
+                templateUrl: helper.basepath('manage-center/tenant-account-manage-list.html'),//复用页面
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
                 controller: 'GridController',
                 resolve: {
-                    entryVM: helper.buildEntryVM('app.manage-center.tenant-account-manage.list', {
+                    entryVM: helper.buildEntryVM('app.manage-center.pension-agency-account-manage.list', {
                         modelName: 'pub-tenant',
+                        searchForm: {"type": {"$in": ['A0001', 'A0002', 'A0003']}},
+                        transTo: {"user": 'app.manage-center.pension-agency-user-manage.list'},
                         //切换客户端还是服务端分页
                         serverPaging: true,
                         columns: [
                             {
-                                label: '租户名称',
+                                label: '养老机构名称',
                                 name: 'name',
                                 type: 'string',
                                 width: 200,
@@ -262,21 +255,21 @@
                     })
                 }
             })
-            .state('app.manage-center.tenant-account-manage.details', {
+            .state('app.manage-center.pension-agency-account-manage.details', {
                 url: '/details/:action/:_id',
                 templateUrl: helper.basepath('manage-center/tenant-account-manage-details.html'),
                 controller: 'TenantAccountManageDetailsController',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
                 resolve: {
-                    entityVM: helper.buildEntityVM('app.manage-center.tenant-account-manage.details', {
+                    entityVM: helper.buildEntityVM('app.manage-center.pension-agency-account-manage.details', {
                         modelName: 'pub-tenant'
                         , blockUI: true
                     })
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
-            .state('app.manage-center.tenant-user-manage', {
-                url: '/tenant-user-manage',
+            .state('app.manage-center.pension-agency-user-manage', {
+                url: '/pension-agency-user-manage',
                 abstract: true,
                 views: {
                     "module-header": {
@@ -286,21 +279,27 @@
                     "module-content": {
                         template: '<div class="data-ui-view"></div>'
                     }
+                },
+                data: {
+
+                    selectFilterObject: {"tenants": {"type": {"$in": ['A0001', 'A0002', 'A0003']}}},
+                    treeFilterObject: {"type": ['A0001', 'A0002', 'A0003']}//treeFilter[key]==treeNode[key]
                 }
             })
-            .state('app.manage-center.tenant-user-manage.list', {
+            .state('app.manage-center.pension-agency-user-manage.list', {
                 url: '/list/:action/:tenantId',
                 templateUrl: helper.basepath('manage-center/tenant-user-manage-list.html'),
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
                 controller: 'TenantUserManageGridController',
                 resolve: {
-                    entryVM: helper.buildEntryVM('app.manage-center.tenant-user-manage.list', {
+                    entryVM: helper.buildEntryVM('app.manage-center.pension-agency-user-manage.list', {
                         modelName: 'pub-user',
+                        searchForm: {"type": 'A0002'},//user.type 养老机构用户
                         //切换客户端还是服务端分页
                         serverPaging: true,
                         columns: [
                             {
-                                label: '所属租户',
+                                label: '所属',
                                 name: 'tenantId',
                                 type: 'string',
                                 width: 120,
@@ -322,8 +321,15 @@
                                 sortable: true
                             },
                             {
-                                label: '系统标志',
-                                name: 'system_flag',
+                                label: '手机号码',
+                                name: 'phone',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '停用',
+                                name: 'stop_flag',
                                 type: 'bool',
                                 width: 40,
                                 formatter: 'bool'
@@ -342,22 +348,322 @@
                                 width: 60
                             }
                         ],
+                        switches: {leftTree: true},
                         toDetails: ['tenantId']
                     })
                 }
             })
-            .state('app.manage-center.tenant-user-manage.details', {
+            .state('app.manage-center.pension-agency-user-manage.details', {
                 url: '/details/:action/:_id/:tenantId',
                 templateUrl: helper.basepath('manage-center/tenant-user-manage-details.html'),
                 controller: 'TenantUserManageDetailsController',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
                 resolve: {
-                    entityVM: helper.buildEntityVM('app.manage-center.tenant-user-manage.details', {
-                        modelName: 'pub-user'
+                    entityVM: helper.buildEntityVM('app.manage-center.pension-agency-user-manage.details', {
+                        modelName: 'pub-user',
+                        model: {type:'A0002'},
+                        blockUI: true,
+                        toList: ['tenantId']
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state('app.manage-center.agent-account-manage', {
+                url: '/agent-account-manage',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+                    selectFilterObject: {"type": ['A1001', 'A1002']}
+                }
+            })
+            .state('app.manage-center.agent-account-manage.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('manage-center/tenant-account-manage-list.html'),//复用页面
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'GridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.agent-account-manage.list', {
+                        modelName: 'pub-tenant',
+                        searchForm: {"type": {"$in": ['A1001', 'A1002']}},
+                        transTo: {"user": 'app.manage-center.agent-user-manage.list'},
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '代理商名称',
+                                name: 'name',
+                                type: 'string',
+                                width: 200,
+                                sortable: true
+                            },
+                            {
+                                label: '开通',
+                                name: 'active_flag',
+                                type: 'bool',
+                                width: 40,
+                                formatter: 'bool'
+                            },
+                            {
+                                label: '认证',
+                                name: 'certificate_flag',
+                                type: 'bool',
+                                width: 40,
+                                formatter: 'bool'
+                            },
+                            {
+                                label: '手机号码',
+                                name: 'phone',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '邮箱地址',
+                                name: 'email',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '类型',
+                                name: 'type',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1002/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.manage-center.agent-account-manage.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('manage-center/tenant-account-manage-details.html'),
+                controller: 'TenantAccountManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.manage-center.agent-account-manage.details', {
+                        modelName: 'pub-tenant'
                         , blockUI: true
                     })
                     //, deps: helper.resolveFor2('ui.select')
                 }
+            })
+            .state('app.manage-center.agent-user-manage', {
+                url: '/agent-user-manage',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+                    //selectFilterObject: {"type": ['A1001', 'A1002']},
+                    selectFilterObject: {"tenants": {"type": {"$in": ['A1001', 'A1002']}}},//tenant.type
+                    treeFilterObject: {"type": ['A1001', 'A1002']}//treeFilter[key]==treeNode[key] tenant.type
+                }
+            })
+            .state('app.manage-center.agent-user-manage.list', {
+                url: '/list/:action/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-user-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'TenantUserManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.agent-user-manage.list', {
+                        modelName: 'pub-user',
+                        searchForm: {"type": 'A0003'},//user.type 代理商用户
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '所属',
+                                name: 'tenantId',
+                                type: 'string',
+                                width: 120,
+                                //sortable: true,
+                                formatter: 'model-related:pub-tenant'
+                            },
+                            {
+                                label: '用户编码',
+                                name: 'code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '用户名称',
+                                name: 'name',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '手机号码',
+                                name: 'phone',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '停用',
+                                name: 'stop_flag',
+                                type: 'bool',
+                                width: 40,
+                                formatter: 'bool'
+                            },
+                            {
+                                label: '类型',
+                                name: 'type',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1000/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ],
+                        switches: {leftTree: true},
+                        toDetails: ['tenantId']
+                    })
+                }
+            })
+            .state('app.manage-center.agent-user-manage.details', {
+                url: '/details/:action/:_id/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-user-manage-details.html'),
+                controller: 'TenantUserManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.manage-center.agent-user-manage.details', {
+                        modelName: 'pub-user',
+                        model: {type: 'A0003'},//D1000
+                        blockUI: true,
+                        toList: ['tenantId']
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state('app.manage-center.platform-user-manage', {
+                url: '/platform-user-manage',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                }
+            })
+            .state('app.manage-center.platform-user-manage.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('manage-center/tenant-user-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'TenantUserManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.platform-user-manage.list', {
+                        modelName: 'pub-user',
+                        searchForm: {"type": 'A0001'},//user.type 平台用户
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '所属',
+                                name: 'tenantId',
+                                type: 'string',
+                                width: 120,
+                                hidden: true
+                            },
+                            {
+                                label: '用户编码',
+                                name: 'code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '用户名称',
+                                name: 'name',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '手机号码',
+                                name: 'phone',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '停用',
+                                name: 'stop_flag',
+                                type: 'bool',
+                                width: 40,
+                                formatter: 'bool'
+                            },
+                            {
+                                label: '类型',
+                                name: 'type',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1000/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.manage-center.platform-user-manage.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('manage-center/tenant-user-manage-details.html'),
+                controller: 'TenantUserManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.manage-center.platform-user-manage.details', {
+                        modelName: 'pub-user',
+                        model: {type: 'A0001'},//D1000
+                        blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state('app.manage-center.metadata-dictionary-manage', {
+                url: '/metadata-dictionary-manage',
+                title: '字典管理',
+                templateUrl: helper.basepath('manage-center/metadata-dictionary-manage.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN
+            })
+            .state('app.manage-center.metadata-param', {
+                url: '/metadata-param',
+                title: '系统参数',
+                templateUrl: helper.basepath('manage-center/metadata-param.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN
             })
             //演示中心开始
             .state('app.demo-center', {

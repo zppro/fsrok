@@ -1,10 +1,10 @@
 //
    Created by zppro on 16-2-23.
-.col-xs-2
+.col-xs-2(ng-if="vm.switches.leftTree")
     .tree.tree-basic#tree1(ng-style="{height:vm.size.h-15}")
         ul
             li.repeat-modify(ng-repeat='node in vm.trees[0].treeData',ng-include="'tree-basic-renderer.html'",ng-init="tIndex=0;nIndex = $index")
-.col-xs-10.text-center
+.text-center(ng-class='{"col-xs-10":vm.switches.leftTree,"col-xs-12":!vm.switches.leftTree}')
     .row
         form.form-search
             .input-group.pull-right.page-search
@@ -31,10 +31,11 @@
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
-                        td.text-left {{::row.tenantId}}
+                        td.text-left(ng-hide="vm.columns[0]|hide") {{::row.tenantId|formatter:'tenantId':vm.columns}}
                         td.text-left {{::row.code}}
                         td.text-left {{::row.name}}
-                        td {{::row.system_flag|formatter:'system_flag':vm.columns}}
+                        td {{::row.phone}}
+                        td {{::row.stop_flag|formatter:'stop_flag':vm.columns}}
                         td {{::row.type|formatter:'type':vm.columns}}
                         td
                             .btn-group

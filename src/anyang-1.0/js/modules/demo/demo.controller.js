@@ -125,9 +125,9 @@
         }
     }
 
-    DemoTreeBasicController.$inject = ['$scope','$http','tree','vmh', 'instanceVM'];
+    DemoTreeBasicController.$inject = ['$scope','$http','treeFactory','vmh', 'instanceVM'];
 
-    function DemoTreeBasicController($scope, $http,tree, vmh, vm) {
+    function DemoTreeBasicController($scope, $http,treeFactory, vmh, vm) {
 
         $scope.vm = vm;
 
@@ -145,10 +145,14 @@
                     //##import tip##
                     //单棵树
                     //vm.tree1 = new tree.sTree('tree1', treeNodes);
-
+                    //过滤
+                    //treeFactory.filter(treeNodes,function(node) {
+                    //    console.log(node._id);
+                    //    return node._id.indexOf('120502') != 0;
+                    //});
                     //##import tip##
                     //多棵树
-                    vm.trees = [new tree.sTree('tree1', treeNodes), new tree.sTree('tree2', treeNodes, {mode: 'check'})];
+                    vm.trees = [new treeFactory.sTree('tree1', treeNodes), new treeFactory.sTree('tree2', treeNodes, {mode: 'check'})];
                 });
 
 
@@ -159,9 +163,9 @@
 
     }
 
-    DemoTreeExtendController.$inject = ['$scope','$http','tree','vmh', 'instanceVM'];
+    DemoTreeExtendController.$inject = ['$scope','$http','treeFactory','vmh', 'instanceVM'];
 
-    function DemoTreeExtendController($scope, $http,tree, vmh, vm) {
+    function DemoTreeExtendController($scope, $http,treeFactory, vmh, vm) {
 
         $scope.vm = vm;
 
@@ -176,7 +180,7 @@
             $http
                 .get(subsystemURL)
                 .success(function (treeNodes) {
-                    vm.trees = [new tree.sTree('tree1', treeNodes), new tree.sTree('tree2', treeNodes, {
+                    vm.trees = [new treeFactory.sTree('tree1', treeNodes), new treeFactory.sTree('tree2', treeNodes, {
                         mode: 'check'
                         , checkCascade: false
                     })];//{expandLevel: 2}

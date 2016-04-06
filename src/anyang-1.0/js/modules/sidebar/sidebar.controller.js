@@ -65,7 +65,20 @@
 
 
             function sidebarReady(items) {
+                _.each(items,function(item1){
+                    if(item1.submenu){
+                        _.each(item1.submenu,function(item2){
+                            if(item2.params) {
+                                item2.params = angular.fromJson(item2.params);
+                            }
+                        });
+                    }
+                });
+                //菜单中带参数如下
+                ///{"sref": "app.manage-center.tenant-account-manage.list","params": "{\"types\":[\"A0001\",\"A0002\"]}"}}
+
                 $scope.menuItems = items;
+
 
                 //打开第一层
                 //$timeout(function(){

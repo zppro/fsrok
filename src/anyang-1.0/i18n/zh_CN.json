@@ -95,12 +95,17 @@
       "LOG": "系统日志"
     },
     "menu-manage-center": {
+      "PENSION-AGENCY-MANAGE": "养老机构管理",
+      "PENSION-AGENCY-ACCOUNT-MANAGE": "帐号管理",
+      "PENSION-AGENCY-USER-MANAGE": "用户管理",
+      "AGENT-MANAGE": "代理商管理",
+      "AGENT-ACCOUNT-MANAGE": "帐号管理",
+      "AGENT-USER-MANAGE": "用户管理",
+      "PLATFORM-MANAGE": "平台管理",
+      "PLATFORM-USER-MANAGE": "用户管理",
       "METADATA-MANAGE": "元数据管理",
       "DICTIONARY-MANAGE": "字典管理",
-      "PARAM": "系统参数",
-      "TENANT-MANAGE": "租户管理",
-      "TENANT-ACCOUNT-MANAGE": "帐号管理",
-      "TENANT-USER-MANAGE": "用户管理"
+      "PARAM": "系统参数"
     },
     "menu-demo-center": {
       "GRID": "网格",

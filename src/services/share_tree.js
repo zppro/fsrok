@@ -27,13 +27,14 @@ module.exports = {
             {
                 method: 'fetch',
                 verb: 'get',
-                url: this.service_url_prefix + "/A1001",
+                url: this.service_url_prefix + "/T1001/:select",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            self.logger.info('--------------> tree/A1001');
+                            //self.logger.info('--------------> tree/T1001');
+                            //self.logger.info('--------------> this.params.select:'+this.params.select);
                             this.body = app.wrapper.res.rows(yield app.modelFactory().query('pub_tenant', '../models/pub/tenant',
-                                {where: {status: 1}, select: '_id name'}
+                                {where: {status: 1}, select: this.params.select || '_id name'}
                             ));
                         } catch (e) {
                             self.logger.error(e.message);

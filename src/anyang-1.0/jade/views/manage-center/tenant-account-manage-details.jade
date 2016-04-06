@@ -20,7 +20,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             //input.form-control(type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewviewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
                             ui-select(name="type",ng-model='vm.model.type', theme='bootstrap',required='')
                                 ui-select-match(placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-TYPE")|translate}}') {{$select.selected.name}}
-                                ui-select-choices(repeat='type.value as type in tenantTypes | filter: {name: $select.search}')
+                                ui-select-choices(repeat='type.value as type in vm.selectBinding.tenantTypes | filter: {name: $select.search}')
                                     div(ng-bind-html='type.name | highlight: $select.search')
                             span.text-danger(ng-show="utils.vinput(this.theForm,'type','required')") {{ "validator.REQUIRED" | translate}}
 

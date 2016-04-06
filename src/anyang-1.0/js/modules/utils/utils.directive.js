@@ -7,7 +7,9 @@
 
     angular
         .module('app.utils')
-        .directive('onFinishRender', onFinishRender);
+        .directive('onFinishRender', onFinishRender)
+        .directive('requireMultiple',requireMultiple)
+    ;
 
     onFinishRender.$inject = ['$timeout'];
     function onFinishRender ($timeout) {
@@ -25,6 +27,21 @@
                         scope.$emit(option.type + 'Finished:' + option.sub || '');
                     });
             }
+        }
+    }
+
+    function requireMultiple() {
+        var directive = {
+            link: link,
+            restrict: 'A',
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ngModel) {
+            ngModel.$validators.required = function (value) {
+                return angular.isArray(value) && value.length > 0;
+            };
         }
     }
 
