@@ -1,32 +1,32 @@
 [
   {
-    "text": "Table",
-    "translate": "sidebar.menu-demo-center.GRID",
+    "_id": "menu.demo-center.GRID",
+    "name": "网格",
     "sref": "#",
     "icon": "icon-folder",
-    "submenu": [
+    "children": [
       {
-        "text": "Table-Basic",
-        "sref": "app.demo-center.grid-basic.list",
-        "translate": "sidebar.menu-demo-center.GRID-BASIC"
+        "_id": "menu.demo-center.GRID-BASIC",
+        "name": "网格-基本功能",
+        "sref": "app.demo-center.grid-basic.list"
       }
     ]
   },
   {
-    "text": "Table",
-    "translate": "sidebar.menu-demo-center.TREE",
+    "_id": "menu.demo-center.TREE",
+    "name": "树",
     "sref": "#",
     "icon": "icon-folder",
-    "submenu": [
+    "children": [
       {
-        "text": "Tree-Basic",
-        "sref": "app.demo-center.tree-basic",
-        "translate": "sidebar.menu-demo-center.TREE-BASIC"
+        "_id": "menu.demo-center.TREE-BASIC",
+        "name": "树-基本功能",
+        "sref": "app.demo-center.tree-basic"
       },
       {
-        "text": "Tree-Extend",
-        "sref": "app.demo-center.tree-extend",
-        "translate": "sidebar.menu-demo-center.TREE-EXTEND"
+        "_id": "menu.demo-center.TREE-EXTEND",
+        "name": "树-扩展功能",
+        "sref": "app.demo-center.tree-extend"
       }
     ]
   }

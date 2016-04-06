@@ -66,8 +66,8 @@
 
             function sidebarReady(items) {
                 _.each(items,function(item1){
-                    if(item1.submenu){
-                        _.each(item1.submenu,function(item2){
+                    if(item1.children){
+                        _.each(item1.children,function(item2){
                             if(item2.params) {
                                 item2.params = angular.fromJson(item2.params);
                             }
@@ -83,7 +83,7 @@
                 //打开第一层
                 //$timeout(function(){
                 //    _.each($scope.menuItems,function(item,i){
-                //        if(item.submenu){
+                //        if(item.children){
                 //            console.log(i);
                 //            if(i==0) {
                 //                console.log(item);
@@ -99,7 +99,7 @@
 
                 if($state.current.name == 'app.dashboard') {
                     _.each($scope.menuItems, function (item, i) {
-                        if (item.submenu) {
+                        if (item.children) {
                             if (i == 0) {
                                 $scope.toggleCollapse(i, true);
                             }
@@ -133,8 +133,8 @@
             function checkAuthorition(item) {
                 if (!item.sref || item.sref == '#') {
                     //父节点
-                    if (item.submenu) {
-                        return _.some(item.submenu, checkAuthorition);
+                    if (item.children) {
+                        return _.some(item.children, checkAuthorition);
                     }
                     else {
                         return false;
@@ -180,7 +180,7 @@
 
                 if (!item.sref || item.sref === '#') {
                     var foundActive = false;
-                    angular.forEach(item.submenu, function (value) {
+                    angular.forEach(item.children, function (value) {
                         if (isActive(value)) foundActive = true;
                     });
                     return foundActive;

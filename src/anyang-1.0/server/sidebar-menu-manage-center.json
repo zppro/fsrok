@@ -1,68 +1,68 @@
 [
   {
-    "text": "PensionAgencyManage",
-    "translate": "sidebar.menu-manage-center.PENSION-AGENCY-MANAGE",
+    "_id": "menu.manage-center.PENSION-AGENCY-MANAGE",
+    "name": "养老机构管理",
     "sref": "#",
     "icon": "icon-folder",
-    "submenu": [
+    "children": [
       {
-        "text": "AccountManage",
-        "sref": "app.manage-center.pension-agency-account-manage.list",
-        "translate": "sidebar.menu-manage-center.PENSION-AGENCY-ACCOUNT-MANAGE"
+        "_id": "menu.manage-center.PENSION-AGENCY-ACCOUNT-MANAGE",
+        "name": "帐号管理",
+        "sref": "app.manage-center.pension-agency-account-manage.list"
       },
       {
-        "text": "UserManage",
-        "sref": "app.manage-center.pension-agency-user-manage.list",
-        "translate": "sidebar.menu-manage-center.PENSION-AGENCY-USER-MANAGE"
+        "_id": "menu.manage-center.PENSION-AGENCY-USER-MANAGE",
+        "name": "用户管理",
+        "sref": "app.manage-center.pension-agency-user-manage.list"
       }
     ]
   },
   {
-    "text": "AgentManage",
-    "translate": "sidebar.menu-manage-center.AGENT-MANAGE",
+    "_id": "menu.manage-center.AGENT-MANAGE",
+    "name": "代理商管理",
     "sref": "#",
     "icon": "icon-folder",
-    "submenu": [
+    "children": [
       {
-        "text": "AccountManage",
-        "sref": "app.manage-center.agent-account-manage.list",
-        "translate": "sidebar.menu-manage-center.AGENT-ACCOUNT-MANAGE"
+        "_id": "menu.manage-center.AGENT-ACCOUNT-MANAGE",
+        "name": "帐号管理",
+        "sref": "app.manage-center.agent-account-manage.list"
       },
       {
-        "text": "UserManage",
-        "sref": "app.manage-center.agent-user-manage.list",
-        "translate": "sidebar.menu-manage-center.AGENT-USER-MANAGE"
+        "_id": "menu.manage-center.AGENT-USER-MANAGE",
+        "name": "用户管理",
+        "sref": "app.manage-center.agent-user-manage.list"
       }
     ]
   },
   {
-    "text": "PlatformManage",
-    "translate": "sidebar.menu-manage-center.PLATFORM-MANAGE",
+    "_id": "menu.manage-center.PLATFORM-MANAGE",
+    "name": "平台管理",
     "sref": "#",
     "icon": "icon-folder",
-    "submenu": [
+    "children": [
       {
-        "text": "UserManage",
-        "sref": "app.manage-center.platform-user-manage.list",
-        "translate": "sidebar.menu-manage-center.PLATFORM-USER-MANAGE"
+        "_id": "menu.manage-center.PLATFORM-USER-MANAGE",
+        "name": "用户管理",
+        "sref": "app.manage-center.platform-user-manage.list"
       }
     ]
   },
   {
-    "text": "Metadata",
-    "translate": "sidebar.menu-manage-center.METADATA-MANAGE",
+    "_id": "menu.manage-center.METADATA-MANAGE",
+    "name": "Metadata",
     "sref": "#",
     "icon": "icon-folder",
-    "submenu": [
+    "children": [
       {
-        "text": "DictionaryManage",
-        "sref": "app.manage-center.metadata-dictionary-manage",
-        "translate": "sidebar.menu-manage-center.DICTIONARY-MANAGE"
+        "_id": "menu.manage-center.DICTIONARY-MANAGE",
+        "name": "DictionaryManage",
+        "sref": "app.manage-center.metadata-dictionary-manage"
       },
       {
-        "text": "Param",
-        "sref": "app.manage-center.metadata-param",
-        "translate": "sidebar.menu-manage-center.PARAM"
+        "_id": "menu.manage-center.PARAM",
+        "name": "Param",
+        "sref": "app.manage-center.metadata-param"
       }
     ]
   }

@@ -58,15 +58,14 @@
       "PLACEHOLDER": "输入查询内容.."
     }
   },
-  "sidebar": {
-    "subsystem": {
-      "ORGANIZATION-PFTA-STANDARD": "机构养老云-标准版",
-      "COMMUNITY-PFTA-STANDARD": "社区养老云-待定",
-      "MANAGE-CENTER": "管理中心",
-      "DEMO-CENTER": "演示中心"
-    },
-    "WELCOME": "欢迎",
-    "menu-organization-pfta": {
+  "subsystem": {
+    "ORGANIZATION-PFTA-STANDARD": "机构养老云-标准版",
+    "COMMUNITY-PFTA-STANDARD": "社区养老云-待定",
+    "MANAGE-CENTER": "管理中心",
+    "DEMO-CENTER": "演示中心"
+  },
+  "menu":{
+    "organization-pfta": {
       "OLDMAN-MANAGE": "老人管理",
       "ENTER-MANAGE": "入院管理",
       "IN-MANAGE": "在院管理",
@@ -94,7 +93,7 @@
       "BED-MANAGE": "床位管理",
       "LOG": "系统日志"
     },
-    "menu-manage-center": {
+    "manage-center": {
       "PENSION-AGENCY-MANAGE": "养老机构管理",
       "PENSION-AGENCY-ACCOUNT-MANAGE": "帐号管理",
       "PENSION-AGENCY-USER-MANAGE": "用户管理",
@@ -107,21 +106,16 @@
       "DICTIONARY-MANAGE": "字典管理",
       "PARAM": "系统参数"
     },
-    "menu-demo-center": {
+    "demo-center": {
       "GRID": "网格",
       "GRID-BASIC": "网格-基本功能",
       "TREE": "树",
       "TREE-BASIC": "树-基本功能",
       "TREE-EXTEND": "树-扩展功能"
-    },
-    "nav": {
-      "SINGLEVIEW": "单页视图",
-      "SYSTEMPARAMETER": "系统参数",
-      "menu": {
-        "MENU": "菜单",
-        "SUBMENU": "子菜单"
-      }
     }
+  },
+  "sidebar": {
+    "WELCOME": "欢迎"
   },
   "page": {
     "lock": {

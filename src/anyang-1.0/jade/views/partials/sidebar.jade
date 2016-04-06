@@ -1,13 +1,13 @@
 // Inline template with sidebar items markup and ng-directives
 script(type='text/ng-template', id="sidebar-renderer.html")
-  span(ng-if="item.heading") {{(item.translate | translate) || item.text}}
-  a(ng-if="!item.heading", ng-href='{{$state.href(item.sref, item.params)}}', title="{{item.text}}")
+  span(ng-if="item.heading") {{(item._id | translate) || item.name}}
+  a(ng-if="!item.heading", ng-href='{{$state.href(item.sref, item.params)}}', title="{{item.name}}")
     .pull-right(ng-if="item.alert", ng-class="item.label || 'label label-success'") {{item.alert}}
     em(class="{{item.icon}}", ng-if="item.icon")
-    span {{(item.translate | translate) || item.text}}
-  ul(class="nav sidebar-subnav", ng-if="item.submenu", collapse="isCollapse(pIndex)",  ng-init="addCollapse(pIndex, item)")
-    li.sidebar-subnav-header {{(item.translate | translate) || item.text}}
-    li(ng-repeat='item in item.submenu', ng-include="'sidebar-renderer.html'", ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)",  ng-init="pIndex=(pIndex+'-'+$index); inSubmenu = true", ng-click="toggleCollapse(pIndex)")
+    span {{(item._id | translate) || item.name}}
+  ul(class="nav sidebar-subnav", ng-if="item.children", collapse="isCollapse(pIndex)",  ng-init="addCollapse(pIndex, item)")
+    li.sidebar-subnav-header {{(item._id | translate) || item.name}}
+    li(ng-repeat='item in item.children', ng-include="'sidebar-renderer.html'", ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)",  ng-init="pIndex=(pIndex+'-'+$index); inSubmenu = true", ng-click="toggleCollapse(pIndex)")
 
 
 
@@ -17,11 +17,11 @@ script(type='text/ng-template', id="sidebar-renderer.html")
   // 切换子系统
   .btn-group(dropdown='', is-open='subsystem.listIsOpen')
     button.subsystem.btn.btn-default(type='button', dropdown-toggle="")
-      | {{(subsystem.selected.translate | translate) || subsystem.selected.text}}
+      | {{(subsystem.selected._id | translate) || subsystem.selected.name}}
       span.caret
     ul.dropdown-menu.dropdown-menu-left.animated.fadeInUpShort(role='menu' ,dir="rtl")
       li(ng-repeat='item in subsystem.available')
-        a(ng-click='subsystem.switchSubsystem(item)') {{(item.translate | translate) || item.text}}
+        a(ng-click='subsystem.switchSubsystem(item)') {{(item._id | translate) || item.name}}
   // 结束切换子系统
 
   nav.sidebar(sidebar="", sidebar-anyclick-close="")

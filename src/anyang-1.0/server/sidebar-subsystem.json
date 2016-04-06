@@ -1,30 +1,30 @@
 [
   {
-    "text": "Organization-PFTA-Standard",
+    "_id": "subsystem.ORGANIZATION-PFTA-STANDARD",
+    "name": "Organization-PFTA-Standard",
     "sref": "app.organization-pfta",
     "usertype": ["A0001","A0002"],
-    "menujson": "server/sidebar-menu-organization-pfta.json",
-    "translate": "sidebar.subsystem.ORGANIZATION-PFTA-STANDARD"
+    "menujson": "server/sidebar-menu-organization-pfta.json"
   },
   {
-    "text": "Community-PFTA-Standard",
+    "_id": "subsystem.COMMUNITY-PFTA-STANDARD",
+    "name": "Community-PFTA-Standard",
     "sref": "app.community-pfta",
     "usertype": ["A0001","A0002"],
-    "menujson": "server/sidebar-menu-community-pfta.json",
-    "translate": "sidebar.subsystem.COMMUNITY-PFTA-STANDARD"
+    "menujson": "server/sidebar-menu-community-pfta.json"
   },
   {
-    "text": "Manage-Center",
+    "_id": "subsystem.MANAGE-CENTER",
+    "name": "Manage-Center",
     "sref": "app.manage-center",
     "usertype": ["A0001"],
-    "menujson": "server/sidebar-menu-manage-center.json",
-    "translate": "sidebar.subsystem.MANAGE-CENTER"
+    "menujson": "server/sidebar-menu-manage-center.json"
   },
   {
-    "text": "Demo-Center",
+    "_id": "subsystem.DEMO-CENTER",
+    "name": "Demo-Center",
     "sref": "app.demo-center",
     "usertype": ["A0001"],
-    "menujson": "server/sidebar-menu-demo-center.json",
-    "translate": "sidebar.subsystem.DEMO-CENTER"
+    "menujson": "server/sidebar-menu-demo-center.json"
   }
 ]
