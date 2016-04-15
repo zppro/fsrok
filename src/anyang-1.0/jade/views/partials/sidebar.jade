@@ -7,7 +7,7 @@ script(type='text/ng-template', id="sidebar-renderer.html")
     span {{(item._id | translate) || item.name}}
   ul(class="nav sidebar-subnav", ng-if="item.children", collapse="isCollapse(pIndex)",  ng-init="addCollapse(pIndex, item)")
     li.sidebar-subnav-header {{(item._id | translate) || item.name}}
-    li(ng-repeat='item in item.children', ng-include="'sidebar-renderer.html'", ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)",  ng-init="pIndex=(pIndex+'-'+$index); inSubmenu = true", ng-click="toggleCollapse(pIndex)")
+    li(ng-repeat='item in item.children', ng-include="'sidebar-renderer.html'", ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)&&isPermit(item)",  ng-init="pIndex=(pIndex+'-'+$index); inSubmenu = true", ng-click="toggleCollapse(pIndex)")
 
 
 
@@ -38,12 +38,14 @@ script(type='text/ng-template', id="sidebar-renderer.html")
                 .circle.circle-success.circle-lg
             // Name and Job
             .user-block-info
-              span.user-block-name {{ 'sidebar.WELCOME' | translate }} {{user.name}}
-              span.user-block-role {{user.job}}
+              h4.user-block-name {{ 'sidebar.WELCOME' | translate }} {{user.name}}
+              //span.user-block-role {{user.job}}
+              a.btn.btn-primary.btn-xs(ng-click="userChangePassword()")
+                i.fa.fa-key 设置密码
       // END user info
 
       // Iterates over all sidebar items
-      li.repeat-modify(ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)", ng-repeat='item in menuItems',on-finish-render='{"type":"ngRepeat","sub":"sidebar-group"}', ng-init="pIndex = $index", ng-include="'sidebar-renderer.html'", ng-click="toggleCollapse(pIndex, true)")
+      li.repeat-modify(ng-class="getMenuItemPropClasses(item)",ng-if="isAuthorized(item)&&isPermit(item)", ng-repeat='item in menuItems',on-finish-render='{"type":"ngRepeat","sub":"sidebar-group"}', ng-init="pIndex = $index", ng-include="'sidebar-renderer.html'", ng-click="toggleCollapse(pIndex, true)")
     // END sidebar nav
 
 

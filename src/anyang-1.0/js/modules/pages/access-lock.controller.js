@@ -31,7 +31,7 @@
                         .then(function (user) {
                             // assumes if ok, response is an object with some data, if not, a string with error
                             // customize according to your api
-                            console.log(123);
+                            console.log(user);
                             Auth.setUser(user,true);
                             $state.go('app.dashboard');
                         }, function (err) {

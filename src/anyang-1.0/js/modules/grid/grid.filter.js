@@ -12,7 +12,9 @@
         .filter('hide',hide)
         .filter('width',width)
         .filter('orderClass',orderClass)
+        .filter('revertNumber',revertNumber)
         .filter('formatter',formatter)
+        .filter('boolFilter',boolFilter)
         .filter('orFilter',orFilter)
     ;
 
@@ -44,9 +46,18 @@
         return GridUtils.toggleOrderClass;
     }
 
+    function revertNumber(GridUtils){
+        return GridUtils.revertNumber;
+    }
+
     function formatter(GridUtils){
         return GridUtils.formatter;
     }
+
+    function boolFilter(GridUtils) {
+        return GridUtils.boolFilter;
+    }
+
 
     function orFilter(GridUtils) {
         return GridUtils.orFilter;

@@ -39,15 +39,15 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                     span.fa.fa-check
                             label(for="certificateFlag") {{ vm.viewTranslatePath('TAB1-LABEL-CERTIFICATE_FLAG') | translate}}
                     fieldset: .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-TERMSOFVALIDITY_LATEST') | translate}}:
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-VALIDATE_UTIL') | translate}}:
                         .col-md-2
                             .input-group
-                                input.form-control(type="text",name='termsofvalidity_latest',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.terms_validity.latest" ,placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-TERMSOFVALIDITY_LATEST")|translate}}',required='',ng-click="vm.openDP($event)")
+                                input.form-control(type="text",name='validate_util',is-open="vm.openedDP",datepicker-popup="",ng-model="vm.model.validate_util" ,placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-VALIDATE_UTIL")|translate}}',required='',ng-click="vm.openDP($event)")
                                 span.input-group-btn
                                     button.btn.btn-primary(ng-click="vm.openDP($event)")
                                         i.glyphicon.glyphicon-calendar
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'termsofvalidity_latest','required')") {{ "validator.REQUIRED" | translate}}
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'termsofvalidity_latest','date')") {{ "validator.DATE" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'validate_util','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'validate_util','date')") {{ "validator.DATE" | translate}}
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-PHONE') | translate}}:
                         .col-md-10

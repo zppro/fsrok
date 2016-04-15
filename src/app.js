@@ -5,6 +5,7 @@
 'use strict';
 
 var _ = require('underscore');
+var moment = require("moment");
 var log4js = require('log4js');
 var koa = require('koa');
 var Router = require('koa-router');
@@ -96,8 +97,28 @@ app.wrapper = {
 //load dictionary
 app.dictionary = rfcore.factory('dictionary');
 
+//load pre-defined except dictionary.json
+app.modelVariables = require('./pre-defined/model-variables.json');
+
 //init database object
 app.db = {};
+
+//underscore
+app._ = _;
+
+//crypto
+app.crypto = require('crypto');
+
+//moment
+app.moment = moment;
+
+//rfcore.util
+app.rfcore = rfcore;
+
+//mongoose default date function
+app.utcNow  = function() {
+    return moment().add(8, 'h');
+};
 
 
 // logger
@@ -122,6 +143,8 @@ co(function*() {
     //console.log('serviceFiles:'+JSON.stringify(app.conf.serviceFiles));
     console.log('load dictionary...');
     yield app.wrapper.cb(app.dictionary.readJSON.bind(app.dictionary))('pre-defined/dictionary.json');
+
+    console.log(app.modelVariables);
     //配置数据库
     console.log('configure mongoose...');
     //app.db.mongoose = monoogse;

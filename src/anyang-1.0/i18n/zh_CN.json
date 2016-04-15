@@ -1,12 +1,22 @@
 {
   "button": {
     "CANCEL": "取消",
+    "RETURN": "返回",
     "SAVE": "保存",
     "ADD": "新增",
     "EDIT": "修改",
+    "READ": "查看",
     "REMOVE": "删除",
     "CONFIRM": "确定",
-    "USER":"管理用户"
+    "USER": "管理用户",
+    "RESET-USER-PASSWORD":"重设密码",
+    "OPEN-FUNCS": "开通功能模块",
+    "ORDER": "管理订单",
+    "ORDER-SUBMIT": "提交订单",
+    "CONFIRM-ORDER-RECEIPT": "确认收款",
+    "CONFIRM-ORDER-REFUND": "确认退款",
+    "ORDER-COMPLETE":"完成订单",
+    "REFUND-ENTRY":"申请退款"
   },
   "grid": {
     "LABEL-SEARACH": "关键字",
@@ -23,19 +33,26 @@
     "FORMAT": "{{item}}格式不正确;",
     "PASSWORD-FORMAT": "密码必须匹配大小写字母并且长度大于6小于10;",
     "PASSWORD-MATCH": "二次输入密码不一至;",
+    "PASSWORD-NEED-CHANGED":"新密码不能和旧密码相同;",
     "TERM-AGREE": "必须同意条款;",
-    "ALREADY-EXISTS": "已经存在相同的{{item}};"
+    "ALREADY-EXISTS": "已经存在相同的{{item}};",
+    "ORDER-MUST_CHOOSE_ONE_FUNC": "订单必须选择至少一个功能;"
   },
   "dialog": {
     "remove": {
       "TITLE": "删除确认对话框",
       "MESSAGE": "您确定要删除当前选中记录码？"
+    },
+    "normal": {
+      "TITLE": "确认对话框",
+      "MESSAGE": "您确定要在当前选中记录上执行操作码？"
     }
   },
   "notification": {
     "SAVE-SUCCESS": "保存成功",
     "REMOVE-SUCCESS": "删除成功",
-    "REMOVE-WARNING-NONE": "没有选中任何记录"
+    "NORMAL-SUCCESS": "操作成功",
+    "SELECT-NONE-WARNING": "没有选中任何记录"
   },
   "dashboard": {
     "WELCOME": "欢迎来到{{appName}}"
@@ -97,11 +114,19 @@
       "PENSION-AGENCY-MANAGE": "养老机构管理",
       "PENSION-AGENCY-ACCOUNT-MANAGE": "帐号管理",
       "PENSION-AGENCY-USER-MANAGE": "用户管理",
+      "PENSION-AGENCY-ORDER-MANAGE": "订单管理",
+      "------------": "",
       "AGENT-MANAGE": "代理商管理",
       "AGENT-ACCOUNT-MANAGE": "帐号管理",
       "AGENT-USER-MANAGE": "用户管理",
+      "AGENT-ORDER-MANAGE": "订单管理",
+      "------------": "",
       "PLATFORM-MANAGE": "平台管理",
       "PLATFORM-USER-MANAGE": "用户管理",
+      "FUNC": "功能模块",
+      "ORDER-RECEIPT-CONFIRMATION": "收款确认",
+      "ORDER-REFUND-CONFIRMATION": "退款确认",
+      "------------": "",
       "METADATA-MANAGE": "元数据管理",
       "DICTIONARY-MANAGE": "字典管理",
       "PARAM": "系统参数"
@@ -115,7 +140,15 @@
     }
   },
   "sidebar": {
-    "WELCOME": "欢迎"
+    "WELCOME": "欢迎",
+    "reset-password":{
+      "LABEL-OLD-PASSWORD":"旧密码",
+      "LABEL-NEW-PASSWORD":"新密码",
+      "LABEL-RE-NEW-PASSWORD":"确认新密码",
+      "PLACEHOLDER-OLD-PASSWORD":"请输入当前密码",
+      "PLACEHOLDER-NEW-PASSWORD":"请输入需要修改的新密码",
+      "PLACEHOLDER-RE-NEW-PASSWORD":"请再次输入新密码"
+    }
   },
   "page": {
     "lock": {

@@ -28,18 +28,26 @@
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
                                     span.fa.fa-check(data="trBubble")
                         td.text-left {{::row.name}}
-                        td {{::row.active_flag|formatter:'active_flag':vm.columns}}
-                        td {{::row.certificate_flag|formatter:'certificate_flag':vm.columns}}
+                        td.text-center {{::row.validate_util|date:'yyyy-MM-dd'}}
+                        td {{::row.active_flag|boolFilter}}
+                        td {{::row.certificate_flag|boolFilter}}
                         td {{::row.phone}}
                         td {{::row.email}}
                         td {{::row.type|formatter:'type':vm.columns}}
                         td
                             .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
+                                    i.glyphicon.glyphicon-pencil
+                            .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.USER'|translate}}",ng-click="$state.go(vm.transTo.user,{tenantId:row._id})")
                                     i.glyphicon.glyphicon-user
                             .btn-group
-                                a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
-                                    i.glyphicon.glyphicon-pencil
+                                a.btn.btn-primary.btn-xs(title="{{'button.OPEN-FUNCS'|translate}}",ng-click="$state.go(vm.transTo.openFuncs,{tenantId:row._id})")
+                                    i.glyphicon.glyphicon-th-list
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.ORDER'|translate}}",ng-click="$state.go(vm.transTo.order,{tenantId:row._id})")
+                                    i.glyphicon.glyphicon-list-alt
+
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

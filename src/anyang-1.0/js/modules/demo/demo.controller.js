@@ -77,12 +77,12 @@
                     console.log(err);
                 }).finally(function () {
                     vmh.loadingBar.complete(); // End loading.
-                    vmh.blockUI.stop();
+                    vmh.blocker.stop();
                 });
 
                 console.log('load...');
                 vmh.loadingBar.start();
-                vmh.blockUI.start();
+                vmh.blocker.start();
             }
 
         }
@@ -107,11 +107,11 @@
                 //}).catch(function (err) {
                 //}).finally(function () {
                 //    vmh.loadingBar.complete(); // End loading.
-                //    vmh.blockUI.stop();
+                //    vmh.blocker.stop();
                 //});
                 //
                 //vmh.loadingBar.start();
-                //vmh.blockUI.start();
+                //vmh.blocker.start();
                 vm.save();
             }
             else {
@@ -125,9 +125,9 @@
         }
     }
 
-    DemoTreeBasicController.$inject = ['$scope','$http','treeFactory','vmh', 'instanceVM'];
+    DemoTreeBasicController.$inject = ['$scope','vmh', 'instanceVM'];
 
-    function DemoTreeBasicController($scope, $http,treeFactory, vmh, vm) {
+    function DemoTreeBasicController($scope,vmh, vm) {
 
         $scope.vm = vm;
 
@@ -139,20 +139,20 @@
 
             var subsystemURL = 'server/district.json' + '?v=' + (new Date().getTime()); // jumps cache
 
-            $http
+            vmh.http
                 .get(subsystemURL)
                 .success(function (treeNodes) {
                     //##import tip##
                     //单棵树
                     //vm.tree1 = new tree.sTree('tree1', treeNodes);
                     //过滤
-                    //treeFactory.filter(treeNodes,function(node) {
+                    //vmh.treeFactory.filter(treeNodes,function(node) {
                     //    console.log(node._id);
                     //    return node._id.indexOf('120502') != 0;
                     //});
                     //##import tip##
                     //多棵树
-                    vm.trees = [new treeFactory.sTree('tree1', treeNodes), new treeFactory.sTree('tree2', treeNodes, {mode: 'check'})];
+                    vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes), new vmh.treeFactory.sTree('tree2', treeNodes, {mode: 'check'})];
                 });
 
 
@@ -163,9 +163,9 @@
 
     }
 
-    DemoTreeExtendController.$inject = ['$scope','$http','treeFactory','vmh', 'instanceVM'];
+    DemoTreeExtendController.$inject = ['$scope','vmh', 'instanceVM'];
 
-    function DemoTreeExtendController($scope, $http,treeFactory, vmh, vm) {
+    function DemoTreeExtendController($scope, vmh, vm) {
 
         $scope.vm = vm;
 
@@ -177,10 +177,10 @@
 
             var subsystemURL = 'server/district.json' + '?v=' + (new Date().getTime()); // jumps cache
 
-            $http
+            vmh.http
                 .get(subsystemURL)
                 .success(function (treeNodes) {
-                    vm.trees = [new treeFactory.sTree('tree1', treeNodes), new treeFactory.sTree('tree2', treeNodes, {
+                    vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes), new vmh.treeFactory.sTree('tree2', treeNodes, {
                         mode: 'check'
                         , checkCascade: false
                     })];//{expandLevel: 2}

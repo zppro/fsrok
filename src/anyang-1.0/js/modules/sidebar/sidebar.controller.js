@@ -65,7 +65,13 @@
 
 
             function sidebarReady(items) {
-                _.each(items,function(item1){
+
+                var permitItemsOfLevelOne = _.filter(items,function(item){
+
+                    return checkPermit(item);
+                });
+
+                _.each(permitItemsOfLevelOne,function(item1){
                     if(item1.children){
                         _.each(item1.children,function(item2){
                             if(item2.params) {
@@ -77,7 +83,7 @@
                 //菜单中带参数如下
                 ///{"sref": "app.manage-center.tenant-account-manage.list","params": "{\"types\":[\"A0001\",\"A0002\"]}"}}
 
-                $scope.menuItems = items;
+                $scope.menuItems = permitItemsOfLevelOne;
 
 
                 //打开第一层
@@ -96,9 +102,9 @@
             }
 
             $scope.$on('ngRepeatFinished:sidebar-group', function($event) {
-
                 if($state.current.name == 'app.dashboard') {
                     _.each($scope.menuItems, function (item, i) {
+
                         if (item.children) {
                             if (i == 0) {
                                 $scope.toggleCollapse(i, true);
@@ -146,6 +152,22 @@
                 }
             }
 
+            function checkPermit(item){
+                if (!item.sref || item.sref == '#') {
+                    if (item.children) {
+                        return _.some(item.children, checkPermit);
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else{
+                    return  Auth.isPermit(item._id);
+                }
+            }
+
+
+            $scope.isPermit = checkPermit;
             $scope.isAuthorized = checkAuthorition;
 
             $scope.toggleCollapse = function ($index, isParentItem) {

@@ -24,6 +24,7 @@
                 var option = angular.fromJson(attrs.onFinishRender);
                 if (option && option.type)
                     $timeout(function () {
+
                         scope.$emit(option.type + 'Finished:' + option.sub || '');
                     });
             }

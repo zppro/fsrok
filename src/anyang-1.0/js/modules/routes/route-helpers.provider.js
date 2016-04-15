@@ -142,15 +142,49 @@
         } // resolveFor2
 
         function buildVMHelper() {
-            return ['$timeout', '$q', '$http', 'blockUI', 'cfpLoadingBar', 'shareNode', 'GridUtils', 'ViewUtils', function ($timeout, $q, $http, blockUI, cfpLoadingBar, shareNode, GridUtils, ViewUtils) {
+
+            return ['$timeout', '$q', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'shareNode','extensionNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', function ($timeout, $q, $translate, $http, Browser, blockUI, cfpLoadingBar, shareNode,extensionNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
+
+                function exec(promise) {
+                    var self = this;
+                    self.blocker.start();
+
+                    return $q.all([$translate('notification.SAVE-SUCCESS'), promise.$promise || promise]).then(function (ret) {
+                        Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                    }).finally(function () {
+                        self.blocker.stop();
+                    });
+                }
+
+                function fetch(promise) {
+                    return (promise || {}).$promise || promise;
+                }
+
+                function parallel(promises) {
+                    if (!_.isArray(promises)) {
+                        promises = [promises];
+                    }
+                    return $q.all(_.map(promises, function (p) {
+                        return (p || {}).$promise || p;
+                    }));
+                }
 
                 return {
                     q: $q,
                     timeout: $timeout,
                     http: $http,
+                    browser: Browser,
                     loadingBar: cfpLoadingBar,
-                    blockUI: blockUI.instances.get('module-block'),
+                    blocker: blockUI.instances.get('module-block'),
+                    exec: exec,
+                    fetch: fetch,
+                    parallel: parallel,
                     shareService: shareNode,
+                    extensionService: extensionNode,
+                    clientData: clientData,
+                    treeFactory: treeFactory,
+                    notify: Notify,
+                    translate: $translate,
                     stateToTrans: stateToTrans,
                     subSystemToTrans: subSystemToTrans,
                     utils: {
@@ -171,6 +205,7 @@
                     var self = this;
                     this.size = calcWH($window);
 
+
                     //设置searchForm
                     this.searchForm = _.defaults(this.searchForm, processStateParamToSearchForm($stateParams, 'action'), option.searchForm);
 
@@ -188,37 +223,41 @@
                     //console.log(this.page.size);
 
                     //remote data get
-
-                    _.filter(this.columns, function (column) {
-                        if (column && column.formatter) {
-                            var f = column.formatter
-                            if (_.isFunction(f)) {
-                                column.formatterData = f();
+                    _.each(this.columns, function (column) {
+                        if (column) {
+                            if (column.type == 'bool') {
+                                column.formatterData = {"1": "是", "0": "否", "true": "是", "false": "否"};
                             }
-                            else if (_.isString(f)) {
-                                if (f == 'bool') {
-                                    column.formatterData = {"1": "是", "0": "否", "true": "是", "false": "否"};
+                            if (column.formatter) {
+
+                                self.columnFormatters[column.name] = column;
+
+                                var f = column.formatter
+                                if (_.isFunction(f)) {
+                                    column.formatterData = f();
                                 }
-                                else if (f.indexOf('dictionary-local:') == 0) {
-                                    ///dictionary-remote:{v1:k1,v2:k2}
-                                    var jsonStr = _.rest(f.split(':')).join(':');
-                                    column.formatterData = angular.fromJson(jsonStr);
-                                }
-                                else if (f.indexOf('dictionary-remote:') == 0) {
-                                    ///dictionary-remote:{url}
-                                    var url = _.rest(f.split(':')).join(':');
-                                    $http.get(url).then(function (ret) {
-                                        column.formatterData = formatDictionary(ret)
-                                    });
-                                }
-                                else if (f.indexOf('model-related:') == 0) {
-                                    var relatedModelName = _.rest(f.split(':')).join(':');
-                                    modelNode.services[relatedModelName].query(null, null, '_id name').$promise.then(function (rows) {
-                                        column.formatterData = {};
-                                        _.each(rows, function (row) {
-                                            column.formatterData[row._id] = row.name;
+                                else if (_.isString(f)) {
+                                    if (f.indexOf('dictionary-local:') == 0) {
+                                        ///dictionary-remote:{v1:k1,v2:k2}
+                                        var jsonStr = _.rest(f.split(':')).join(':');
+                                        column.formatterData = angular.fromJson(jsonStr);
+                                    }
+                                    else if (f.indexOf('dictionary-remote:') == 0) {
+                                        ///dictionary-remote:{url}
+                                        var url = _.rest(f.split(':')).join(':');
+                                        $http.get(url).then(function (ret) {
+                                            column.formatterData = formatDictionary(ret)
                                         });
-                                    });
+                                    }
+                                    else if (f.indexOf('model-related:') == 0) {
+                                        var relatedModelName = _.rest(f.split(':')).join(':');
+                                        modelNode.services[relatedModelName].query(null, '_id name').$promise.then(function (rows) {
+                                            column.formatterData = {};
+                                            _.each(rows, function (row) {
+                                                column.formatterData[row._id] = row.name;
+                                            });
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -248,17 +287,24 @@
                     }, this.toDetailsParams));
                 }
 
+                function read(id) {
+                    $state.go(this.moduleRoute('details'), _.defaults({
+                        action: 'read',
+                        _id: id
+                    }, this.toDetailsParams));
+                }
+
                 function remove() {
                     var self = this;
                     if (self.selectedRows.length == 0) {
 
-                        return $translate('notification.REMOVE-WARNING-NONE').then(function (ret) {
+                        return $translate('notification.SELECT-NONE-WARNING').then(function (ret) {
                             Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + ret + '</div>', 'warning');
                         });
                     }
 
                     var promise = self.removeDialog.openConfirm({
-                        template: 'removeConfirmDialogId',
+                        template: 'removeConfirmDialog.html',
                         className: 'ngdialog-theme-default'
                     }).then(function () {
                         //没有选中提醒???
@@ -295,8 +341,11 @@
 
                 function query() {
                     var self = this;
+
+                    this.conditionBeforeQuery && this.conditionBeforeQuery();
+
                     if (self.serverPaging) {
-                        self.rows = modelService.page(self.page, self.searchForm, self.sort.column);
+                        self.rows = modelService.page(self.page, self.searchForm, null, self.sort.column);
                         //服务端totals在查询数据时计算
                         modelService.totals(self.searchForm).$promise.then(function (ret) {
                             self.page.totals = ret.totals;
@@ -375,8 +424,10 @@
                     moduleRoute: moduleRoute,
                     viewRoute: viewRoute,
                     viewTranslatePath: viewTranslatePath,
+                    modelService: modelService,
                     name: name || 'no-entryName',
                     pk: option.pk || '_id',
+                    blocker: option.blockUI ? blockUI.instances.get('module-block') : false,
                     serverPaging: option.serverPaging,
                     page: _.defaults(option.page || {}, {size: 9, no: 1}),
                     switches: option.switches || {},
@@ -405,6 +456,7 @@
                     },
                     toDetails: option.toDetails || [],
                     columns: option.columns || [],
+                    columnFormatters: {},
                     rows: [],
                     size: {w: 0, h: 0},
                     init: init,
@@ -413,6 +465,7 @@
                     }],
                     add: add,
                     edit: edit,
+                    read: read,
                     remove: remove,
                     query: query,
                     paging: paging,
@@ -428,11 +481,12 @@
         function buildEntityVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams','$window','$q', '$timeout','$translate', 'blockUI', 'modelNode','Notify', 'GridDemoModelSerivce', function ($state, $stateParams,$window,$q,$timeout,$translate,blockUI,modelNode,Notify, GridDemoModelSerivce) {
+            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI, modelNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init() {
                     var self = this;
+                    this.readonly = this._action_ == 'read';
                     //this.model = option.model;
 
                     this.size = calcWH($window);
@@ -443,7 +497,6 @@
                     //设置treeFilterObject
                     this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
 
-                    console.log(this.selectFilterObject);
                     //remote data get
 
                     //
@@ -452,6 +505,9 @@
                     this.toListParams = _.pick($stateParams, function (v, k) {
                         return v && _.contains(self.toList, k);
                     });
+
+                    //初始化只读模式下模型实体字段转换器
+                    this.fieldConverters = {};
                 }
 
                 function cancel() {
@@ -459,21 +515,22 @@
                 }
 
                 function load() {
+                    var self = this;
                     if (this._id_ == 'new') {
                         this.model = _.defaults(this.model, this.toListParams, option.model);
                         return $q.when(this.model);
                     }
 
-                    this.model = _.defaults((option.modelName ?  modelService.get({_id: this._id_}) : modelService.find(this._id_)),option.model);
+                    this.model = _.defaults((option.modelName ? modelService.get({_id: this._id_}) : modelService.find(this._id_)), option.model);
                     //loading效果
                     if (option.modelName) {
                         this.model.$promise.finally(function () {
-                            if (option.blockUI) {
-                                blockUI.instances.get('module-block').stop();
+                            if (self.blocker) {
+                                self.blocker.stop();
                             }
                         });
-                        if (option.blockUI) {
-                            blockUI.instances.get('module-block').start();
+                        if (self.blocker) {
+                            self.blocker.start();
                         }
 
                         return this.model.$promise;
@@ -489,10 +546,12 @@
                     if (option.modelName) {
                         if (self._id_ == 'new') {
                             //create
-                            promise = modelService.save({}, _.defaults(self.model, self.toListParams,option.model)).$promise;
+
+                            console.log(_.defaults(self.model, self.toListParams, option.model));
+                            promise = modelService.save(_.defaults(self.model, self.toListParams, option.model)).$promise;
                         }
                         else {
-                            promise = modelService.update({id: self._id_}, _.defaults(self.model, self.toListParams,option.model)).$promise;
+                            promise = modelService.update(self._id_, _.defaults(self.model, self.toListParams, option.model)).$promise;
                         }
                     }
                     else {
@@ -504,10 +563,10 @@
 
                             if (self._id_ == 'new') {
                                 //create
-                                modelService.save({}, self.model);
+                                modelService.save(self.model);
                             }
                             else {
-                                modelService.update({id: self._id_}, self.model);
+                                modelService.update(self._id_, self.model);
                             }
 
                             defered.resolve({success: true, error: null});
@@ -515,21 +574,20 @@
                         }, 1000);
 
                     }
-
-                    if (option.blockUI) {
-                        blockUI.instances.get('module-block').start();
+                    if (self.blocker) {
+                        self.blocker.start();
                     }
 
                     return $q.all([$translate('notification.SAVE-SUCCESS'), promise]).then(function (ret) {
-                        console.log('success:' + ret);
                         Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
-                        console.log(self.toListParams);
                         $state.go(self.moduleRoute('list'), self.toListParams);
                         console.log('--------------end success----------------')
                     }).finally(function () {
-                        if (option.blockUI) {
-                            blockUI.instances.get('module-block').stop();
+
+                        if (self.blocker) {
+                            self.blocker.stop();
                         }
+
                     });
                 }
 
@@ -573,6 +631,16 @@
                     });
                 }
 
+                function fieldConvert(fieldName) {
+                    return ( _.isFunction(this.fieldConverters[fieldName]) && this.fieldConverters[fieldName]()) || this.model[fieldName];
+                }
+
+                function registerFieldConverter(key, fn) {
+                    if (!this.fieldConverters[key]) {
+                        this.fieldConverters[key] = fn;
+                    }
+                }
+
                 return {
                     _system_: arrNames[0],
                     _subsystem_: arrNames[1],
@@ -586,6 +654,9 @@
                     moduleRoute: moduleRoute,
                     viewRoute: viewRoute,
                     viewTranslatePath: viewTranslatePath,
+                    fieldConvert: fieldConvert,
+                    registerFieldConverter: registerFieldConverter,
+                    modelService: modelService,
                     name: name || 'no-entityName',
                     pk: option.pk || '_id',
                     model: {},//因数据会在view或controller中变化，所以在load里出设置.类似buildEntryVM中的searchForm
@@ -595,6 +666,7 @@
                     selectFilterObject: {},
                     toList: option.toList || [],
                     size: {w: 0, h: 0},
+                    blocker: option.blockUI ? blockUI.instances.get('module-block') : false,
                     init: init,
                     cancel: cancel,
                     load: load,
@@ -605,18 +677,20 @@
             }];
         };
 
-        function buildInstanceVM(name,option){
+        function buildInstanceVM(name,option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams','$window','$q', '$timeout','$translate', 'blockUI', 'modelNode','Notify', function ($state, $stateParams,$window,$q,$timeout,$translate,blockUI,modelNode,Notify) {
-                var modelService = modelNode.services[option.modelName];
+            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'modelNode', 'Notify', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI, modelNode, Notify) {
+                //var modelService = modelNode.services[option.modelName];
 
 
                 function init() {
                     this.size = calcWH($window);
+
+                    //设置selectFilterObject
+                    this.selectFilterObject = _.defaults(this.selectFilterObject, $state.current.data && $state.current.data.selectFilterObject);
                     //remote data get
 
-                    //
                     //需要的对象传入，2 通过init(option)传入到entry
 
                 }
@@ -626,14 +700,18 @@
                     _system_: arrNames[0],
                     _subsystem_: arrNames[1],
                     _module_: arrNames[2],
+                    modelNode: modelNode,
                     systemRoute: systemRoute,
                     subsystemRoute: subsystemRoute,
                     moduleRoute: moduleRoute,
                     moduleTranslatePath: moduleTranslatePath,
                     name: name || 'no-instanceName',
                     size: {w: 0, h: 0},
+                    blocker: option.blockUI ? blockUI.instances.get('module-block') : false,
                     switches: option.switches || {},
                     transTo: option.transTo || {},//跳转到另外module设置对象
+                    selectBinding: {},
+                    selectFilterObject: {},
                     init: init
                 };
             }];
@@ -694,7 +772,7 @@
 
         function subSystemToTrans(stateName) {
             var arr = stateName.split('.');
-            return arr.slice(1, arr.length - 2).join('.')
+            return arr.splice(1, 1);
         }
 
         function formatDictionary(rawDictionary){

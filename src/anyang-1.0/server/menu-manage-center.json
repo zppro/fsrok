@@ -14,6 +14,11 @@
         "_id": "menu.manage-center.PENSION-AGENCY-USER-MANAGE",
         "name": "用户管理",
         "sref": "app.manage-center.pension-agency-user-manage.list"
+      },
+      {
+        "_id": "menu.manage-center.PENSION-AGENCY-ORDER-MANAGE",
+        "name": "订单管理",
+        "sref": "app.manage-center.pension-agency-order-manage.list"
       }
     ]
   },
@@ -32,6 +37,11 @@
         "_id": "menu.manage-center.AGENT-USER-MANAGE",
         "name": "用户管理",
         "sref": "app.manage-center.agent-user-manage.list"
+      },
+      {
+        "_id": "menu.manage-center.AGENT-ORDER-MANAGE",
+        "name": "订单管理",
+        "sref": "app.manage-center.agent-order-manage.list"
       }
     ]
   },
@@ -45,6 +55,21 @@
         "_id": "menu.manage-center.PLATFORM-USER-MANAGE",
         "name": "用户管理",
         "sref": "app.manage-center.platform-user-manage.list"
+      },
+      {
+        "_id": "menu.manage-center.FUNC",
+        "name": "功能模块",
+        "sref": "app.manage-center.func"
+      },
+      {
+        "_id": "menu.manage-center.ORDER-RECEIPT-CONFIRMATION",
+        "name": "收款确认",
+        "sref": "app.manage-center.order-receipt-confirmation.list"
+      },
+      {
+        "_id": "menu.manage-center.ORDER-REFUND-CONFIRMATION",
+        "name": "退款确认",
+        "sref": "app.manage-center.order-refund-confirmation.list"
       }
     ]
   },

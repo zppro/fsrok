@@ -1,7 +1,6 @@
 /**
  * Created by zppro on 15-12-16.
  */
-var _ = require('underscore');
 
 module.exports = {
     init: function (option) {
@@ -31,9 +30,9 @@ module.exports = {
                         try {
                             if(this.params.format=='array') {
                                 var rows = [];
-                                _.each(app.dictionary.pairs[this.params.dictionaryId], function (v, k) {
+                                app._.each(app.dictionary.pairs[this.params.dictionaryId], function (v, k) {
                                     if (k != 'name') {
-                                        rows.push(_.defaults(v, {value: k}));
+                                        rows.push(app._.defaults(v, {value: k}));
                                     }
                                 });
                                 this.body = app.wrapper.res.rows(rows);

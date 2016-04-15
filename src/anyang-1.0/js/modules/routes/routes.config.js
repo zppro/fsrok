@@ -11,8 +11,8 @@
         .module('app.routes')
         .config(routesConfig);
 
-    routesConfig.$inject = ['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteHelpersProvider', 'AUTH_ACCESS_LEVELS'];
-    function routesConfig($stateProvider, $locationProvider, $urlRouterProvider, helper, AUTH_ACCESS_LEVELS) {
+    routesConfig.$inject = ['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteHelpersProvider', 'AUTH_ACCESS_LEVELS','MODEL_VARIABLES'];
+    function routesConfig($stateProvider, $locationProvider, $urlRouterProvider, helper, AUTH_ACCESS_LEVELS,MODEL_VARIABLES) {
 
         // Set the following to true to enable the HTML5 Mode
         // You may have to set <base> tag in index and a routing configuration in your server
@@ -35,7 +35,15 @@
             .state('app', {
                 url: '/app',
                 abstract: true,
-                templateUrl: helper.basepath('app.html'),
+                views: {
+                    "main": {
+                        templateUrl: helper.basepath('app.html')
+                    },
+                    "main-template": {
+                        templateUrl: helper.basepath('app-template.html')
+                    }
+                },
+                //templateUrl: helper.basepath('app.html'),
                 resolve: helper.resolveFor('modernizr', 'icons', 'moment', 'locale_zh-cn','ui.select', 'ngDialog')
             })
             .state('app.dashboard', {
@@ -179,7 +187,7 @@
                 abstract: true,
                 views: {
                     "module-header": {
-                        templateUrl: helper.basepath('partials/module-header.html'),
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
                         controller: 'ModuleHeaderController'
                     },
                     "module-content": {
@@ -199,7 +207,11 @@
                     entryVM: helper.buildEntryVM('app.manage-center.pension-agency-account-manage.list', {
                         modelName: 'pub-tenant',
                         searchForm: {"type": {"$in": ['A0001', 'A0002', 'A0003']}},
-                        transTo: {"user": 'app.manage-center.pension-agency-user-manage.list'},
+                        transTo: {
+                            "user": 'app.manage-center.pension-agency-user-manage.list',
+                            "openFuncs": 'app.manage-center.pension-agency-open-funcs',
+                            "order":'app.manage-center.pension-agency-order-manage.list'
+                        },
                         //切换客户端还是服务端分页
                         serverPaging: true,
                         columns: [
@@ -211,18 +223,22 @@
                                 sortable: true
                             },
                             {
+                                label: '有效期至',
+                                name: 'validate_util',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
                                 label: '开通',
                                 name: 'active_flag',
                                 type: 'bool',
-                                width: 40,
-                                formatter: 'bool'
+                                width: 40
                             },
                             {
                                 label: '认证',
                                 name: 'certificate_flag',
                                 type: 'bool',
-                                width: 40,
-                                formatter: 'bool'
+                                width: 40
                             },
                             {
                                 label: '手机号码',
@@ -249,7 +265,7 @@
                                 label: '',
                                 name: 'actions',
                                 sortable: false,
-                                width: 60
+                                width: 80
                             }
                         ]
                     })
@@ -331,8 +347,7 @@
                                 label: '停用',
                                 name: 'stop_flag',
                                 type: 'bool',
-                                width: 40,
-                                formatter: 'bool'
+                                width: 40
                             },
                             {
                                 label: '类型',
@@ -368,12 +383,150 @@
                     //, deps: helper.resolveFor2('ui.select')
                 }
             })
+            .state('app.manage-center.pension-agency-open-funcs', {
+                url: '/pension-agency-open-funcs/:tenantId',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('manage-center/func.html'),
+                        controller: 'FuncController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.manage-center.pension-agency-open-funcs'),
+                            deps: helper.resolveFor2('angularjs-slider')
+                        }
+                    }
+                },
+                data: {
+                    selectFilterObject: {"tenants": {"type": {"$in": ['A0001', 'A0002', 'A0003']}}}
+                }
+            })
+            .state('app.manage-center.pension-agency-order-manage', {
+                url: '/pension-agency-order-manage',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+
+                    selectFilterObject: {"tenants": {"type": {"$in": ['A0001', 'A0002', 'A0003']}}},
+                    treeFilterObject: {"type": ['A0001', 'A0002', 'A0003']}//treeFilter[key]==treeNode[key]
+                }
+            })
+            .state('app.manage-center.pension-agency-order-manage.list', {
+                url: '/list/:action/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-order-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'TenantOrderManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.pension-agency-order-manage.list', {
+                        modelName: 'pub-order',
+                        searchForm: {"type": 'TP'},//养老机构产生的订单
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '所属',
+                                name: 'tenantId',
+                                type: 'string',
+                                width: 120,
+                                //sortable: true,
+                                formatter: 'model-related:pub-tenant'
+                            },
+                            {
+                                label: '订单编号',
+                                name: 'full_code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '下单时间',
+                                name: 'check_in_time',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '开通时间',
+                                name: 'success_on',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '单价',
+                                name: 'period_charge',
+                                type: 'currency',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '数量(月)',
+                                name: 'duration',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '总价',
+                                name: 'total_charge',
+                                type: 'currency',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '订单状态',
+                                name: 'order_status',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1005/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ],
+                        switches: {leftTree: true},
+                        toDetails: ['tenantId']
+                    })
+                }
+            })
+            .state('app.manage-center.pension-agency-order-manage.details', {
+                url: '/details/:action/:_id/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-order-manage-details.html'),
+                controller: 'TenantOrderManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.manage-center.pension-agency-order-manage.details', {
+                        modelName: 'pub-order',
+                        model: {
+                            code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN,
+                            type: 'TP',
+                            period_charge: 0,
+                            duration: 1
+                        },
+                        blockUI: true,
+                        toList: ['tenantId']
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
             .state('app.manage-center.agent-account-manage', {
                 url: '/agent-account-manage',
                 abstract: true,
                 views: {
                     "module-header": {
-                        templateUrl: helper.basepath('partials/module-header.html'),
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
                         controller: 'ModuleHeaderController'
                     },
                     "module-content": {
@@ -393,7 +546,11 @@
                     entryVM: helper.buildEntryVM('app.manage-center.agent-account-manage.list', {
                         modelName: 'pub-tenant',
                         searchForm: {"type": {"$in": ['A1001', 'A1002']}},
-                        transTo: {"user": 'app.manage-center.agent-user-manage.list'},
+                        transTo: {
+                            "user": 'app.manage-center.agent-user-manage.list',
+                            "openFuncs": 'app.manage-center.agent-open-funcs',
+                            "order": 'app.manage-center.agent-order-manage.list'
+                        },
                         //切换客户端还是服务端分页
                         serverPaging: true,
                         columns: [
@@ -405,18 +562,22 @@
                                 sortable: true
                             },
                             {
+                                label: '有效期至',
+                                name: 'validate_util',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
                                 label: '开通',
                                 name: 'active_flag',
                                 type: 'bool',
-                                width: 40,
-                                formatter: 'bool'
+                                width: 40
                             },
                             {
                                 label: '认证',
                                 name: 'certificate_flag',
                                 type: 'bool',
-                                width: 40,
-                                formatter: 'bool'
+                                width: 40
                             },
                             {
                                 label: '手机号码',
@@ -443,7 +604,7 @@
                                 label: '',
                                 name: 'actions',
                                 sortable: false,
-                                width: 60
+                                width: 80
                             }
                         ]
                     })
@@ -525,8 +686,7 @@
                                 label: '停用',
                                 name: 'stop_flag',
                                 type: 'bool',
-                                width: 40,
-                                formatter: 'bool'
+                                width: 40
                             },
                             {
                                 label: '类型',
@@ -556,6 +716,144 @@
                     entityVM: helper.buildEntityVM('app.manage-center.agent-user-manage.details', {
                         modelName: 'pub-user',
                         model: {type: 'A0003'},//D1000
+                        blockUI: true,
+                        toList: ['tenantId']
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state('app.manage-center.agent-open-funcs', {
+                url: '/agent-open-funcs/:tenantId',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('manage-center/func.html'),
+                        controller: 'FuncController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.manage-center.agent-open-funcs'),
+                            deps: helper.resolveFor2('angularjs-slider')
+                        }
+                    }
+                },
+                data: {
+                    selectFilterObject: {"tenants": {"type": {"$in": ['A1001', 'A1002']}}}
+                }
+            })
+            .state('app.manage-center.agent-order-manage', {
+                url: '/agent-order-manage',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+
+                    selectFilterObject: {"tenants": {"type": {"$in": ['A1001', 'A1002']}}},
+                    treeFilterObject: {"type": ['A1001', 'A1002']}//treeFilter[key]==treeNode[key]
+                }
+            })
+            .state('app.manage-center.agent-order-manage.list', {
+                url: '/list/:action/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-order-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'TenantOrderManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.agent-order-manage.list', {
+                        modelName: 'pub-order',
+                        searchForm: {"type": 'TA'},//代理产生的订单
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '所属',
+                                name: 'tenantId',
+                                type: 'string',
+                                width: 120,
+                                //sortable: true,
+                                formatter: 'model-related:pub-tenant'
+                            },
+                            {
+                                label: '订单编号',
+                                name: 'full_code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '下单时间',
+                                name: 'check_in_time',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '开通时间',
+                                name: 'success_on',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '单价',
+                                name: 'period_charge',
+                                type: 'currency',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '数量(月)',
+                                name: 'duration',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '总价',
+                                name: 'total_charge',
+                                type: 'currency',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '订单状态',
+                                name: 'order_status',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1005/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ],
+                        switches: {leftTree: true},
+                        toDetails: ['tenantId']
+                    })
+                }
+            })
+            .state('app.manage-center.agent-order-manage.details', {
+                url: '/details/:action/:_id/:tenantId',
+                templateUrl: helper.basepath('manage-center/tenant-order-manage-details.html'),
+                controller: 'TenantOrderManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.manage-center.agent-order-manage.details', {
+                        modelName: 'pub-order',
+                        model: {
+                            code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN,
+                            type: 'TA',
+                            period_charge: 0,
+                            duration: 1
+                        },
                         blockUI: true,
                         toList: ['tenantId']
                     })
@@ -619,8 +917,7 @@
                                 label: '停用',
                                 name: 'stop_flag',
                                 type: 'bool',
-                                width: 40,
-                                formatter: 'bool'
+                                width: 40
                             },
                             {
                                 label: '类型',
@@ -651,6 +948,216 @@
                         blockUI: true
                     })
                     //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state('app.manage-center.func', {
+                url: '/func',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('manage-center/func.html'),
+                        controller: 'FuncController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.manage-center.func'),
+                            deps: helper.resolveFor2('angularjs-slider')
+                        }
+                    }
+                }
+            })
+            .state('app.manage-center.order-receipt-confirmation', {
+                url: '/order-receipt-confirmation',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                }
+            })
+            .state('app.manage-center.order-receipt-confirmation.list', {
+                url: '/list/:action/:tenantId',
+                templateUrl: helper.basepath('manage-center/order-receipt-confirmation-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'OrderReceiptConfirmationGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.order-receipt-confirmation.list', {
+                        modelName: 'pub-order',
+                        searchForm: {"order_status": {"$in": ['A1002', 'A1003', 'A1004']}},//等待客户付款,财务确认收款,交易成功
+                        transTo: {
+                            "TP": 'app.manage-center.pension-agency-order-manage.details',
+                            "TA": 'app.manage-center.agent-order-manage.details'
+                        },
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '所属',
+                                name: 'tenantId',
+                                type: 'string',
+                                width: 120,
+                                //sortable: true,
+                                formatter: 'model-related:pub-tenant'
+                            },
+                            {
+                                label: '订单编号',
+                                name: 'full_code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '下单时间',
+                                name: 'check_in_time',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '开通时间',
+                                name: 'success_on',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '单价',
+                                name: 'period_charge',
+                                type: 'currency',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '数量(月)',
+                                name: 'duration',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '总价',
+                                name: 'total_charge',
+                                type: 'currency',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '订单状态',
+                                name: 'order_status',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1005/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ],
+                        switches: {leftTree: true},
+                        toDetails: ['tenantId']
+                    })
+                }
+            })
+            .state('app.manage-center.order-refund-confirmation', {
+                url: '/order-refund-confirmation',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                }
+            })
+            .state('app.manage-center.order-refund-confirmation.list', {
+                url: '/list/:action/:tenantId',
+                templateUrl: helper.basepath('manage-center/order-refund-confirmation-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                controller: 'OrderRefundConfirmationGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.manage-center.order-refund-confirmation.list', {
+                        modelName: 'pub-order',
+                        searchForm: {"order_status": {"$in": ['A1006', 'A1007']}},//等待退款,退款成功
+                        transTo: {
+                            "TP": 'app.manage-center.pension-agency-order-manage.details',
+                            "TA": 'app.manage-center.agent-order-manage.details'
+                        },
+                        //切换客户端还是服务端分页
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '所属',
+                                name: 'tenantId',
+                                type: 'string',
+                                width: 120,
+                                //sortable: true,
+                                formatter: 'model-related:pub-tenant'
+                            },
+                            {
+                                label: '订单编号',
+                                name: 'full_code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '下单时间',
+                                name: 'check_in_time',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '开通时间',
+                                name: 'success_on',
+                                type: 'date',
+                                width: 80
+                            },
+                            {
+                                label: '单价',
+                                name: 'period_charge',
+                                type: 'currency',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '数量(月)',
+                                name: 'duration',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '总价',
+                                name: 'total_charge',
+                                type: 'currency',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '订单状态',
+                                name: 'order_status',
+                                type: 'string',
+                                sortable: true,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1005/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ],
+                        switches: {leftTree: true},
+                        toDetails: ['tenantId']
+                    })
                 }
             })
             .state('app.manage-center.metadata-dictionary-manage', {
@@ -785,7 +1292,12 @@
             // -----------------------------------
             .state('page', {
                 url: '/page',
-                templateUrl: 'app/pages/page.html',
+                views: {
+                    "main": {
+                        templateUrl: 'app/pages/page.html'
+                    }
+                },
+                //templateUrl: 'app/pages/page.html',
                 resolve: helper.resolveFor('modernizr', 'icons'),
                 controller: ['$rootScope', function ($rootScope) {
                     $rootScope.app.layout.isBoxed = false;

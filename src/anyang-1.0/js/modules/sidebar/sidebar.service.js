@@ -12,7 +12,7 @@
 
         ////////////////
         function getSubsystem(onReady, onError) {
-            var subsystemJson = 'server/sidebar-subsystem.json',
+            var subsystemJson = 'server/subsystem.json',
                 subsystemURL  = subsystemJson + '?v=' + (new Date().getTime()); // jumps cache
 
             onError = onError || function() { alert('Failure loading subsystem'); };
@@ -24,7 +24,7 @@
         }
 
         function getMenu(subsystemItem,onReady, onError) {
-            var menuURL = subsystemItem.menujson + '?v=' + (new Date().getTime()); // jumps cache
+            var menuURL = 'server/' + subsystemItem.menujson + '?v=' + (new Date().getTime()); // jumps cache
             onError = onError || function () {
                     alert('Failure loading menu');
                 };

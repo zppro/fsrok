@@ -29,7 +29,7 @@
                         return;
                     }
                     // 用户登录了，但没有访问当前视图的权限
-                    if (!Auth.isAuthorized(toState.access_level)) {
+                    if (!Auth.isAuthorized(toState.access_level) || !Auth.isPermit(toState.name)) {
                         event.preventDefault();
 
                         $state.go('app.dashboard');

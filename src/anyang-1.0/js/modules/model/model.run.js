@@ -12,6 +12,8 @@
     function modelRun(modelNode) {
         modelNode.factory('pub-tenant');
         modelNode.factory('pub-user');
+        modelNode.factory('pub-func');
+        modelNode.factory('pub-order');
     }
 
 })();

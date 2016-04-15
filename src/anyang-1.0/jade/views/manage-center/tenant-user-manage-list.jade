@@ -35,12 +35,15 @@
                         td.text-left {{::row.code}}
                         td.text-left {{::row.name}}
                         td {{::row.phone}}
-                        td {{::row.stop_flag|formatter:'stop_flag':vm.columns}}
+                        td {{::row.stop_flag|boolFilter}}
                         td {{::row.type|formatter:'type':vm.columns}}
                         td
                             .btn-group
                                 a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
                                     i.glyphicon.glyphicon-pencil
+                            .btn-group
+                                a.btn.btn-primary.btn-xs(title="{{'button.RESET-USER-PASSWORD'|translate}}",ng-click="vmc.resetUserPassword(row._id)")
+                                    em.icon-key
                     tr(ng-if="vm.paged.length==0")
                         td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
             .panel-footer

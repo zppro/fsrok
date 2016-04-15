@@ -6,13 +6,13 @@
     'use strict';
 
     angular
-        .module('biz.manage-center')
+        .module('subsystem.manage-center')
         .controller('TenantAccountManageDetailsController', TenantAccountManageDetailsController)
     ;
 
-    TenantAccountManageDetailsController.$inject = ['$scope', '$state','vmh','entityVM'];
+    TenantAccountManageDetailsController.$inject = ['$scope','vmh','entityVM'];
 
-    function TenantAccountManageDetailsController($scope, $state, vmh, vm) {
+    function TenantAccountManageDetailsController($scope, vmh, vm) {
 
 
         var vm = $scope.vm = vm;

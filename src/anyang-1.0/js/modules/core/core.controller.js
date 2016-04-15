@@ -11,9 +11,9 @@
         .controller('ModuleHeaderForTenantController', ModuleHeaderForTenantController)
     ;
 
-    TopbarController.$inject = ['$rootScope', '$state', 'Auth'];
+    TopbarController.$inject = ['$rootScope','Auth'];
 
-    function TopbarController($rootScope, $state, Auth) {
+    function TopbarController($rootScope, Auth) {
 
         activate();
 
@@ -21,16 +21,15 @@
 
             //topbar some actions
             $rootScope.app.logout = function ($event) {
-
                 Auth.logout();
-                $state.go('page.login');
+                $rootScope.$state.go('page.login');
                 $event.stopPropagation();
             };
 
             $rootScope.app.lock = function ($event) {
                 Auth.setCode();
                 Auth.logout();
-                $state.go('page.lock');
+                $rootScope.$state.go('page.lock');
                 $event.stopPropagation();
             };
 

@@ -6,17 +6,18 @@
     'use strict';
 
     angular
-        .module('biz.manage-center')
+        .module('subsystem.manage-center')
         .controller('TenantUserManageGridController', TenantUserManageGridController)
         .controller('TenantUserManageDetailsController', TenantUserManageDetailsController)
     ;
 
 
-    TenantUserManageGridController.$inject = ['$scope', 'treeFactory', 'ngDialog', 'vmh', 'entryVM'];
+    TenantUserManageGridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
 
-    function TenantUserManageGridController($scope, treeFactory, ngDialog, vmh, vm) {
+    function TenantUserManageGridController($scope, ngDialog, vmh, vm) {
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
+        var vmc = $scope.vmc = {};
 
         init();
 
@@ -31,6 +32,7 @@
             //console.log(vm._action_);
             vm.init({removeDialog: ngDialog});
 
+            vmc.resetUserPassword = resetUserPassword;
             //if($scope.$stateParams.tenantId) {
             //    vm.searchForm.tenantId = $scope.$stateParams.tenantId;
             //}
@@ -38,9 +40,9 @@
             //    vm.searchForm.tenantId = {$exists: true};
             //}
             //console.log(vm.treeFilterObject);
-            if(vm.switches.leftTree) {
+            if (vm.switches.leftTree) {
                 vmh.shareService.t('T1001', 'name type', vm.treeFilterObject).then(function (treeNodes) {
-                    vm.trees = [new treeFactory.sTree('tree1', treeNodes, {mode: 'grid'})];
+                    vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes, {mode: 'grid'})];
                     vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.tenantId);
                 });
 
@@ -53,14 +55,31 @@
                     }
                 });
             }
+
+            vmh.translate(vm.viewTranslatePath('RESET-USER-PASSWORD-COMMENT')).then(function (ret) {
+                $scope.dialogData = {details: ret};
+            });
+
             vm.query();
+        }
+
+        function resetUserPassword(userId) {
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default',
+                scope: $scope
+            }).then(function () {
+
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), vmh.extensionService.resetUserPassword(userId)]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                });
+            });
         }
     }
 
-    TenantUserManageDetailsController.$inject = ['$scope', '$state','vmh','entityVM'];
+    TenantUserManageDetailsController.$inject = ['$scope', 'ngDialog', 'vmh', 'entityVM'];
 
-    function TenantUserManageDetailsController($scope, $state, vmh, vm) {
-
+    function TenantUserManageDetailsController($scope, ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -71,8 +90,9 @@
         function init() {
 
             vm.init();
+
             if (vm.selectFilterObject.tenants) {
-                vm.selectBinding.tenants = vm.modelNode.services['pub-tenant'].query(vm.selectFilterObject.tenants, null, '_id name');
+                vm.selectBinding.tenants = vm.modelNode.services['pub-tenant'].query(vm.selectFilterObject.tenants, '_id name');
             }
             vmh.shareService.d('D1001').then(function (rows) {
                 vm.selectBinding.roles = rows;
@@ -84,7 +104,6 @@
 
             vm.load();
 
-            console.log(vm);
         }
 
 
@@ -103,6 +122,8 @@
                 //}
             }
         }
+
+
     }
 
 })();

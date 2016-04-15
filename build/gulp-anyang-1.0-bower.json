@@ -11,5 +11,7 @@
   "src/{{target}}/bower_components/ui-select/dist/select.css",
   "src/{{target}}/bower_components/ng-dialog/js/ngDialog.min.js",
   "src/{{target}}/bower_components/ng-dialog/css/ngDialog.min.css",
-  "src/{{target}}/bower_components/ng-dialog/css/ngDialog-theme-default.min.css"
+  "src/{{target}}/bower_components/ng-dialog/css/ngDialog-theme-default.min.css",
+  "src/{{target}}/bower_components/angularjs-slider/dist/rzslider.js",
+  "src/{{target}}/bower_components/angularjs-slider/dist/rzslider.css"
 ]

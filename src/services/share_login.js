@@ -38,14 +38,16 @@ module.exports = {
                                     code: this.request.body.code,
                                     password_hash: passwordHash,
                                     status: 1
-                                }, select: "code name type roles tenantId"
+                                }, select: "code name stop_flag type roles tenantId"
                             });
 
-                            if (user != null) {
-                                //日期字符 保证token当日有效
-                                // sign with default (HMAC SHA256)
-                                var token = jwt.sign(user, app.conf.secure.authSecret + ':' + (new Date().f('yyyy-MM-dd').toString()));
-                                console.log(token);
+                            if (user) {
+
+                                if(user.stop_flag){
+                                    this.body = app.wrapper.res.error({message: '该用户已停用!'});
+                                    yield next;
+                                    return;
+                                }
                                 /*
                                  var objectId = new require('mongoose').Types.ObjectId().toString().substr(12);
                                  console.log(objectId.length);
@@ -59,9 +61,30 @@ module.exports = {
                                     tenant = yield app.modelFactory().one('pub_tenant', '../models/pub/tenant', {
                                         where: {
                                             _id: user.tenantId
-                                        }, select: "_id name type active_flag certificate_flag termsOfValidity"
+                                        }, select: "_id name type active_flag certificate_flag validate_util open_funcs"
                                     });
+
+                                    //检查租户是否激活
+                                    if(!tenant.active_flag){
+                                        this.body = app.wrapper.res.error({message: '该用户所属的【' + tenant.name + '】未激活!'});
+                                        yield next;
+                                        return;
+                                    }
+
+                                    //检查租户是否到期
+                                    if(app.moment(tenant.validate_util).diff(app.moment())<0) {
+                                        //用户所属租户到期
+                                        this.body = app.wrapper.res.error({message: '该用户所属的【' + tenant.name + '】已经超过使用有效期!'});
+                                        yield next;
+                                        return;
+                                    }
+
                                 }
+
+                                //日期字符 保证token当日有效
+                                // sign with default (HMAC SHA256)
+                                var token = jwt.sign(user, app.conf.secure.authSecret + ':' + (new Date().f('yyyy-MM-dd').toString()));
+                                console.log(token);
 
                                 this.body = app.wrapper.res.ret(_.defaults(_.pick(user,'_id','code','name','type','roles'), {token: token,tenant:tenant}));
                             }

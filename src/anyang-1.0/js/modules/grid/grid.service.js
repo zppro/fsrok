@@ -51,7 +51,7 @@
         }
 
         ///为了保证何$resource中的save功能一样此方法用于添加
-        function save(id, data) {
+        function save(data) {
             //添加
             this._demoData_.push(_.defaults(data, {}));
             //if (id != 'new') {
@@ -79,7 +79,8 @@
         }
     }
 
-    function GridUtils() {
+    GridUtils.$inject = ['$filter'];
+    function GridUtils($filter) {
         return {
             paging: paging,
             totals: totals,
@@ -87,7 +88,10 @@
             width: width,
             toggleOrderClass: toggleOrderClass,
             noResultsColspan: noResultsColspan,
-            formatter: formatter
+            revertNumber:revertNumber,
+            formatter: formatter,
+            boolFilter: boolFilter,
+            orFilter: orFilter
         };
 
         function paging(items, vm) {
@@ -148,14 +152,32 @@
             return 1 + vm.columns.length - _.where(vm.columns, {hidden: true}).length;
         }
 
+
+        function revertNumber(num,notConvert) {
+            if (num && !notConvert) {
+                return -num;
+            }
+            return num;
+        }
+
+
         function formatter(rowValue, columnName, columns) {
             var one = _.findWhere(columns, {name: columnName});
 
-            if (one && !one.hidden && one.formatter && one.formatterData) {
-                return one.formatterData[rowValue]
+            if(one && !one.hidden) {
+                if (one.formatterData) {
+                    return one.formatterData[rowValue]
+                }
             }
             return rowValue;
         }
+
+        function boolFilter(rowValue){
+            return {"1": "是", "0": "否", "true": "是", "false": "否"}[rowValue];
+        }
+
+
+
 
         /**
          * AngularJS default filter with the following expression:

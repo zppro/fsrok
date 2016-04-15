@@ -34,7 +34,7 @@
             'app.grid',
             'app.tree',
             'app.demo',
-            'biz.manage-center'
+            'subsystem.manage-center'
         ]);
 })();
 

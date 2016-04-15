@@ -30,6 +30,7 @@ script(type='text/ng-template', id="tree-demo-baisc-renderer.html")
                 span.fa.fa-check(ng-class="{'undetermined':vm.trees[tIndex].isUndetermined(nIndex)}")
         i(class="{{node.icon}}", ng-if="node.icon")
         span {{node.name}}
+        span(ng-if="node.data") {{node.data}}
     ul(ng-if="node.children",ng-show="vm.trees[tIndex].isExpanded(nIndex)")
         li(ng-repeat='node in node.children',ng-include="'tree-demo-baisc-renderer.html'",ng-init="nIndex = (nIndex+vm.trees[tIndex].levelSplitChar+$index)")
 .col-xs-6

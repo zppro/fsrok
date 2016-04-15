@@ -5,32 +5,40 @@
         .module('app.sidebar')
         .controller('UserBlockController', UserBlockController);
 
-    UserBlockController.$inject = ['$rootScope'];
-    function UserBlockController($rootScope) {
+    UserBlockController.$inject = ['$rootScope','Auth','ngDialog'];
+    function UserBlockController($rootScope,Auth,ngDialog) {
 
         activate();
 
         ////////////////
 
         function activate() {
-          $rootScope.user = {
-            name:     'John',
-            job:      'ng-developer',
-            picture:  'app/img/user/05.jpg'
-          };
+            $rootScope.user = _.defaults(Auth.getUser(), {
+                picture: 'app/img/user/04.jpg'
+            });
 
-          // Hides/show user avatar on sidebar
-          $rootScope.toggleUserBlock = function(){
-            $rootScope.$broadcast('toggleUserBlock');
-          };
+            // Hides/show user avatar on sidebar
+            $rootScope.toggleUserBlock = function () {
 
-          $rootScope.userBlockVisible = true;
-          
-          $rootScope.$on('toggleUserBlock', function(/*event, args*/) {
+                $rootScope.$broadcast('toggleUserBlock');
+            };
 
-            $rootScope.userBlockVisible = ! $rootScope.userBlockVisible;
-            
-          });
+            $rootScope.userBlockVisible = true;
+
+            if(!$rootScope.toggleUserListener) {
+                $rootScope.toggleUserListener = $rootScope.$on('toggleUserBlock', function (/*event, args*/) {
+                    $rootScope.userBlockVisible = !$rootScope.userBlockVisible;
+
+                });
+            }
+
+            $rootScope.userChangePassword = function() {
+                ngDialog.open({
+                    template: 'changePasswordByUser.html',
+                    controller: 'UserChangePasswordController'
+                });
+            }
+
         }
     }
 })();

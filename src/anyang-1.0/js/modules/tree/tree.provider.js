@@ -12,20 +12,84 @@
 
     function treeFactory() {
 
-        function filter(nodes,fn) {
-            if(!fn)
+        function filter(nodes, fn) {
+            if (!fn)
                 return nodes;
-
+            nodes = _.isArray(nodes) ? nodes : [nodes];
             for (var i = 0; i < nodes.length; i++) {
-                if(fn(nodes[i])) {
+                if (fn(nodes[i])) {
 
-                    if(nodes[i].children && nodes[i].children.length>0) {
+                    if (nodes[i].children && nodes[i].children.length > 0) {
                         filter(nodes[i].children, fn);
                     }
                 }
                 else {
                     nodes.splice(i, 1);
                     i--;
+                }
+            }
+        }
+
+        function pick(nodes, fn) {
+            if (!fn)
+                return true;
+            nodes = _.isArray(nodes) ? nodes : [nodes];
+            var result = false;
+            for (var i = 0; i < nodes.length; i++) {
+                var levelResult = false;
+                if (fn(nodes[i])) {
+                    levelResult = true;
+                }
+                else {
+                    //console.log(nodes[i].name);
+                    if (nodes[i].children && nodes[i].children.length > 0) {
+                        //检测子孙
+                        levelResult = pick(nodes[i].children, fn);
+                        if (!levelResult) {
+                            //子孙没找到
+                            nodes.splice(i, 1);
+                            i--;
+                        }
+                    }
+                    else {
+                        //叶子节点则删除自身
+                        nodes.splice(i, 1);
+                        levelResult = false;
+                        i--;
+                    }
+                }
+
+                result = result || levelResult;
+            }
+
+            return result;
+        }
+
+        function attrs(nodes,level) {
+            nodes = _.isArray(nodes) ? nodes : [nodes];
+            if (!level) {
+                level = 1;
+            }
+
+
+            var paddingLeftZero = '';
+            var maxDigitLength = ('' + (nodes.length + 1)).length;
+
+            for (var i = 0; i < nodes.length; i++) {
+                paddingLeftZero = '';
+                var digit = ('' + (i + 1)).length;
+                //console.log(digit);
+                for (var j = digit; j < maxDigitLength; j++) {
+                    paddingLeftZero += '0';
+                }
+
+                nodes[i].attrs = {
+                    level: level,
+                    orderNo: Math.pow(10, level) + parseInt(paddingLeftZero + (i + 1))
+                };
+                //console.log(nodes[i].attrs);
+                if (nodes[i].children && nodes[i].children.length > 0) {
+                    attrs(nodes[i].children, level + 1);
                 }
             }
         }
@@ -37,6 +101,8 @@
 
                 return {
                     filter: filter,
+                    pick: pick,
+                    attrs: attrs,
                     sTree: sTree
                 };
 
@@ -48,16 +114,18 @@
                     this._compare = option.compare || function (node1, node2) {
                             return node1._id === node2._id;
                         };
+                    this.nodeOrderNoBase = option.nodeOrderNoBase || 1;
 
                     this.mode = option.mode || 'default';
                     this.levelSplitChar = option.levelSplitChar || '-';
                     this.expandLevel = option.expandLevel || 1;
-                    if(angular.isUndefined(option.checkCascade)){
+                    if (angular.isUndefined(option.checkCascade)) {
                         this.checkCascade = true;
                     }
                     else {
                         this.checkCascade = option.checkCascade;
                     }
+
 
                     this.expandedIndexes = {};
                     this.checkedIndexes = {};
@@ -66,10 +134,14 @@
                     this.checkedNodes = [];
                     this.checkState = {none: 'none', checked: 'checked', undetermined: 'undetermined'};
 
+
+                    attrs(this.treeData);//增加attrs
+
                     this.addIndex = function ($index) {
                         //console.log('addIndex:'+$index);
                         //console.log(this.expandedIndexes);
-                        var level = ($index + '').split(this.levelSplitChar).length;
+                        var arr = ($index + '').split(this.levelSplitChar);
+                        var level = arr.length;
                         var levelExpanded = level <= this.expandLevel
                         this.expandedIndexes[$index] = levelExpanded;
                         if (this.mode == 'check') {
@@ -105,7 +177,7 @@
                         if (angular.isDefined(this.expandedIndexes[$index])) {
                             this.expandedIndexes[$index] = !this.expandedIndexes[$index];
 
-                            if(this.mode != 'check') {
+                            if (this.mode != 'check') {
                                 this.collapseAllBut($index);
                             }
                         }
@@ -113,7 +185,7 @@
                         return false;
                     }
 
-                    this.expand = function($index) {
+                    this.expand = function ($index) {
                         this._expand($index);
                     }
 
@@ -145,14 +217,14 @@
                         //console.log(angular.element('#' + id + ' .tree-node-selected').size());
                         angular.element('#' + id + ' .tree-node-selected').removeClass('tree-node-selected');
                         this.selectedNode = node;
-                        var target= $event && $event.currentTarget;
+                        var target = $event && $event.currentTarget;
                         angular.element(target).addClass('tree-node-selected');
                         $rootScope.$broadcast('tree:node:select', this);
                         $event && $event.stopPropagation();
                     }
 
 
-                    this.toggleCheck = function ($index, $event,inDirective) {
+                    this.toggleCheck = function ($index, $event, inDirective) {
                         $index += '';
                         if (angular.isDefined(this.checkedIndexes[$index])) {
                             var toState, inputToCheck;
@@ -194,6 +266,8 @@
                             //重新设置checked节点
                             if (!inDirective) {
                                 this.checkedNodes = this._getCheckedNodes();
+
+                                $rootScope.$broadcast('tree:node:checkChange', this);
                             }
                         }
 
@@ -272,8 +346,7 @@
                     }
 
 
-
-                    this.getCheckedNodes = function() {
+                    this.getCheckedNodes = function () {
                         this.checkedNodes = this._getCheckedNodes();
                     }
 
@@ -310,11 +383,11 @@
                         return arrChecked
                     }
 
-                    this.findNode = function($index) {
+                    this.findNode = function ($index) {
                         return this._findNode(this.treeData, $index);
                     }
 
-                    this._findNode = function(nodes,$index) {
+                    this._findNode = function (nodes, $index) {
                         if (!nodes)
                             return null;
                         var arr = $index.split(this.levelSplitChar);
@@ -338,11 +411,11 @@
                         return null;
                     }
 
-                    this.findNodeById = function(_id) {
+                    this.findNodeById = function (_id) {
                         return this._findNodeById(_id, this.treeData);
                     }
 
-                    this._findNodeById = function(_id,nodes,$parentIndex) {
+                    this._findNodeById = function (_id, nodes, $parentIndex) {
                         //$parentIndex = $parentIndex || '';
                         for (var i = 0; i < nodes.length; i++) {
                             if (_id === nodes[i]._id) {
@@ -360,11 +433,11 @@
                         return null;
                     }
 
-                    this.findNodeIndexById = function(_id) {
+                    this.findNodeIndexById = function (_id) {
                         return this._findNodeIndexById(_id, this.treeData);
                     }
 
-                    this._findNodeIndexById = function(_id,nodes,$parentIndex) {
+                    this._findNodeIndexById = function (_id, nodes, $parentIndex) {
 
                         for (var i = 0; i < nodes.length; i++) {
                             var currentIndex = $parentIndex ? $parentIndex + this.levelSplitChar + i : i + '';

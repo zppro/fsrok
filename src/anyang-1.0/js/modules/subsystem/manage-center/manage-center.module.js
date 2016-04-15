@@ -5,5 +5,5 @@
     'use strict';
 
     angular
-        .module('biz.manage-center', []);
+        .module('subsystem.manage-center', []);
 })();

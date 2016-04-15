@@ -20,7 +20,6 @@
         function notifyAlert(msg, opts) {
             if ( msg ) {
                 $timeout(function(){
-                    console.log(msg);
                     $.notify(msg, opts || {});
                 });
             }

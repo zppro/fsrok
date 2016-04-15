@@ -56,8 +56,9 @@
     "koa-statelessauth": "^1.0.2",
     "koa-static": "^1.5.2",
     "log4js": "^0.6.25",
-    "mongoose": "^4.3.0",
-    "rfcore": "0.0.25",
+    "moment": "^2.12.0",
+    "mongoose": "^4.4.11",
+    "rfcore": "^0.1.0",
     "thunkify": "^2.1.2",
     "underscore": "^1.8.3"
   }

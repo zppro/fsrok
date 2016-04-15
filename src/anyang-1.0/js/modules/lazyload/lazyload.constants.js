@@ -18,6 +18,10 @@
                     'vendor/ui-select/dist/select.css']
                 },
                 {
+                    name: 'angularjs-slider', files: ['vendor/angularjs-slider/dist/rzslider.js',
+                    'vendor/angularjs-slider/dist/rzslider.css']
+                },
+                {
                     name: 'ngDialog', files: ['vendor/ng-dialog/js/ngDialog.min.js',
                     'vendor/ng-dialog/css/ngDialog.min.css',
                     'vendor/ng-dialog/css/ngDialog-theme-default.min.css']

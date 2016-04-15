@@ -64,7 +64,12 @@ module.exports = {
                                 }
                             }
                             else {
-                                this.body = app.wrapper.res.ret(yield app.modelFactory().read(modelOption.model_name, modelOption.model_path, _id));
+                                var instancePromise = app.modelFactory().read(modelOption.model_name, modelOption.model_path, _id);
+                                var instance = yield instancePromise;
+                                if(instancePromise.schema.$$skipPaths){
+                                    instance = app._.omit(instance.toObject(),instancePromise.schema.$$skipPaths);
+                                }
+                                this.body = app.wrapper.res.ret(instance);
                             }
                         } catch (e) {
                             self.logger.error(e.message);
@@ -153,6 +158,24 @@ module.exports = {
                             var modelOption = self.getModelOption(this);
                             this.body = app.wrapper.res.ret({totals: (yield app.modelFactory().totals(modelOption.model_name, modelOption.model_path, this.request.body)).length});
                             //this.set('page-totals', 10);response head set
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'bulkInsert',
+                verb: 'post',
+                url: this.service_url_prefix + "/:model/$bulkInsert",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var modelOption = self.getModelOption(this);
+                            yield app.modelFactory().bulkInsert(modelOption.model_name, modelOption.model_path, this.request.body);
+                            this.body = app.wrapper.res.default();
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

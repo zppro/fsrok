@@ -1,7 +1,6 @@
 /**
  * Created by zppro on 15-12-14.
  */
-var _ = require('underscore');
 var mongoose = require('mongoose');
 //module.typeEnums = {"D1000":['A0001', 'A0002', 'A0003']};
 module.isloaded = false;
@@ -22,7 +21,7 @@ module.exports = function(ctx,name) {
             code: {type: String, required: true, maxlength: 30, index: {unique: true}},
             name: {type: String, required: true, maxlength: 30},
             phone: {type: String, maxlength: 20, unique: true, index: true},
-            type: {type: String, enum: _.rest(ctx.dictionary.keys["D1000"])},
+            type: {type: String, enum: ctx._.rest(ctx.dictionary.keys["D1000"])},
             //role: {type: Number, min: 1, max: 9999},// bit flag
             roles: [String],
             system_flag: {type: Boolean, default: false},
@@ -33,6 +32,16 @@ module.exports = function(ctx,name) {
 
         userSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
+            next();
+        })
+
+        userSchema.pre('save', function (next) {
+            console.log('password_hash:');
+            if (!this.password_hash) {
+                //设置默认密码
+                //order.type+[年2月2日2]+6位随机数
+                this.password_hash = ctx.crypto.createHash('md5').update('123456').digest('hex');
+            }
             next();
         });
 

@@ -29,6 +29,12 @@ var ModelFactory = function(conn) {
         },
         one: function (name, path, data) {
             return ModelFactory._one(ModelFactory.getModel(conn, name, path), data);
+        },
+        bulkInsert: function (name, path, data) {
+            return ModelFactory._bulkInsert(ModelFactory.getModel(conn, name, path), data);
+        },
+        distinct : function(name,path,data) {
+            return ModelFactory._distinct(ModelFactory.getModel(conn, name, path), data);
         }
     };
 };
@@ -38,7 +44,6 @@ ModelFactory.getModel = function (conn,name,path) {
     if (conn == null) {
         conn = mongoose.connection;
     }
-
     return conn.model(name, require(path)(this.context, name));
 };
 
@@ -69,6 +74,14 @@ ModelFactory._query =function (model,data) {
             options.skip = (data.page.no - 1) * data.page.size;
         }
 
+        //此处因为mongodb不允许[挑选]、[排除]字段同时存在（_id）不受限
+        if(!data.select && model.schema.$$skipPaths) {
+            var skipSelects = this.context._.map(model.schema.$$skipPaths, function (o) {
+                return '-' + o;
+            }).join(' ');
+            data.select = skipSelects;
+        }
+
         if (data.sort) {
             rows = model.find(data.where, data.select, options).sort(data.sort);
         }
@@ -92,5 +105,26 @@ ModelFactory._one =function (model,data) {
         return model.findOne();
     }
 };
+
+ModelFactory._bulkInsert =function (model,data) {
+    var canInsert = true;
+    if(data.removeWhere) {
+        model.remove(data.removeWhere, function (err) {
+            if (err) {
+                canInsert = false;
+                throw err;
+            }
+        });
+    }
+
+    if(canInsert) {
+        return model.insertMany(data.rows);
+    }
+};
+
+ModelFactory._distinct = function(model,data) {
+    return model.distinct(data.select, data.where);
+};
+
 
 module.exports = ModelFactory;

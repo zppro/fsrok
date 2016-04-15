@@ -9,10 +9,10 @@
     angular
         .module('app.grid')
         .controller('GridController', GridController)
-        ;
+    ;
 
-    GridController.$inject = ['$scope', 'ngDialog','vmh','entryVM'];
-    function GridController($scope, ngDialog,vmh, vm) {
+    GridController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
+    function GridController($scope, ngDialog, vmh, vm) {
 
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;

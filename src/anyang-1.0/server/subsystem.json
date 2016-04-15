@@ -1,30 +1,34 @@
 [
   {
     "_id": "subsystem.ORGANIZATION-PFTA-STANDARD",
-    "name": "Organization-PFTA-Standard",
+    "name": "机构养老云",
     "sref": "app.organization-pfta",
+    "mtype":"business",
     "usertype": ["A0001","A0002"],
-    "menujson": "server/sidebar-menu-organization-pfta.json"
+    "menujson": "menu-organization-pfta.json"
   },
   {
     "_id": "subsystem.COMMUNITY-PFTA-STANDARD",
-    "name": "Community-PFTA-Standard",
+    "name": "社区养老云",
     "sref": "app.community-pfta",
+    "mtype":"business",
     "usertype": ["A0001","A0002"],
-    "menujson": "server/sidebar-menu-community-pfta.json"
+    "menujson": "menu-community-pfta.json"
   },
   {
     "_id": "subsystem.MANAGE-CENTER",
-    "name": "Manage-Center",
+    "name": "管理中心",
     "sref": "app.manage-center",
+    "mtype":"admin",
     "usertype": ["A0001"],
-    "menujson": "server/sidebar-menu-manage-center.json"
+    "menujson": "menu-manage-center.json"
   },
   {
     "_id": "subsystem.DEMO-CENTER",
-    "name": "Demo-Center",
+    "name": "演示中心",
     "sref": "app.demo-center",
+    "mtype":"demo",
     "usertype": ["A0001"],
-    "menujson": "server/sidebar-menu-demo-center.json"
+    "menujson": "menu-demo-center.json"
   }
 ]
