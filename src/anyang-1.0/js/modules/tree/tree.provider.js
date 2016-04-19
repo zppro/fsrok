@@ -65,10 +65,25 @@
             return result;
         }
 
-        function attrs(nodes,level) {
+        function attrs(nodes,level,levelSplitChar,parentOrderNo,parentIndex) {
             nodes = _.isArray(nodes) ? nodes : [nodes];
             if (!level) {
                 level = 1;
+            }
+
+            if (!levelSplitChar) {
+                levelSplitChar = '-';
+            }
+
+            if (!parentOrderNo) {
+                parentOrderNo = 1;
+            }
+
+            if (parentIndex) {
+                parentIndex += levelSplitChar;
+            }
+            else {
+                parentIndex = ''
             }
 
 
@@ -77,22 +92,27 @@
 
             for (var i = 0; i < nodes.length; i++) {
                 paddingLeftZero = '';
+                var currentIndex = parentIndex + i;
                 var digit = ('' + (i + 1)).length;
                 //console.log(digit);
                 for (var j = digit; j < maxDigitLength; j++) {
                     paddingLeftZero += '0';
                 }
 
+                var currentOrderNo = parseInt(parentOrderNo * 10 + paddingLeftZero + (i + 1))
                 nodes[i].attrs = {
                     level: level,
-                    orderNo: Math.pow(10, level) + parseInt(paddingLeftZero + (i + 1))
+                    index: currentIndex,
+                    orderNo: currentOrderNo
                 };
-                //console.log(nodes[i].attrs);
+                //console.log('attr.index:' + nodes[i].attrs.index);
                 if (nodes[i].children && nodes[i].children.length > 0) {
-                    attrs(nodes[i].children, level + 1);
+                    attrs(nodes[i].children, level + 1, levelSplitChar, currentOrderNo, currentIndex);
                 }
             }
         }
+
+
 
         return {
 
@@ -114,7 +134,6 @@
                     this._compare = option.compare || function (node1, node2) {
                             return node1._id === node2._id;
                         };
-                    this.nodeOrderNoBase = option.nodeOrderNoBase || 1;
 
                     this.mode = option.mode || 'default';
                     this.levelSplitChar = option.levelSplitChar || '-';
@@ -173,7 +192,6 @@
                     }
 
                     this.toggle = function ($index, $event) {
-                        //console.log('toggleExpand:'+$index);
                         if (angular.isDefined(this.expandedIndexes[$index])) {
                             this.expandedIndexes[$index] = !this.expandedIndexes[$index];
 

@@ -216,9 +216,8 @@
                     this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
 
                     //计算行数
-                    var rowHeight = 40;
                     var deltaHeight = 35 + 49 + 10.5 + 52;//search.h + thead.h + row.split + panel-footer.h
-                    this.page.size = (this.size.h - deltaHeight) / rowHeight;
+                    this.page.size =Math.floor( (this.size.h - deltaHeight) / this.rowHeight);
                     //console.log((this.size.h - 35 - 49 - 10.5 - 52) );
                     //console.log(this.page.size);
 
@@ -345,7 +344,7 @@
                     this.conditionBeforeQuery && this.conditionBeforeQuery();
 
                     if (self.serverPaging) {
-                        self.rows = modelService.page(self.page, self.searchForm, null, self.sort.column);
+                        self.rows = modelService.page(self.page, self.searchForm,null,  (self.sort.direction > 0 ? '' : '-') + self.sort.column);
                         //服务端totals在查询数据时计算
                         modelService.totals(self.searchForm).$promise.then(function (ret) {
                             self.page.totals = ret.totals;
@@ -437,7 +436,7 @@
                     selectBinding: {},
                     selectFilterObject: {},
                     sort: {
-                        column: option.columnPK || this.pk,
+                        column: option.columnPK || this.pk || '_id',
                         direction: -1,
                         toggle: function (column) {
                             if (column.sortable) {
@@ -455,6 +454,7 @@
                         }
                     },
                     toDetails: option.toDetails || [],
+                    rowHeight: option.rowHeight || 40,
                     columns: option.columns || [],
                     columnFormatters: {},
                     rows: [],

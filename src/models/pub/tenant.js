@@ -27,15 +27,26 @@ module.exports = function(ctx,name) {
             //    history: [{from: {type: Date, required: true}, to: {type: Date}}]
             //},
             validate_util: {type: Date, required: true},
+            //定价模块
+            price_funcs: [{
+                check_in_time: {type: Date, default: Date.now},//最新定价时间
+                func_id: {type: String, required: true},
+                func_name: {type: String, required: true},
+                subsystem_id: {type: String, required: true},
+                subsystem_name: {type: String, required: true},
+                price: {type: Number, default: 0.00},//期间收费价格
+                orderNo: {type: Number, default: 0}//排序序号
+            }],
+            //开通模块（通过订单）
             open_funcs: [{
-                check_in_time: {type: Date, default: Date.now},//预开通时间
+                check_in_time: {type: Date, default: Date.now},//开通时间
                 func_id: {type: String, required: true},
                 func_name: {type: String, required: true},
                 subsystem_id: {type: String, required: true},
                 subsystem_name: {type: String, required: true},
                 charge: {type: Number, default: 0.00},//月费
                 orderNo: {type: Number, default: 0},//排序序号
-                payed: {type: Boolean, default: false},
+                //payed: {type: Boolean, default: false},
                 expired_on: {type: Date, default: ctx.moment('1970-01-01T00:00:00+0000')}
             }]
         });
@@ -49,7 +60,7 @@ module.exports = function(ctx,name) {
             next();
         });
 
-        tenantSchema.$$skipPaths = ['open_funcs'];
+        tenantSchema.$$skipPaths = ['price_funcs', 'open_funcs'];
 
         return mongoose.model(name, tenantSchema, name);
     }

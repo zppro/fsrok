@@ -15,6 +15,7 @@
         $rootScope.$storage = $window.localStorage;
         $rootScope.$translate = $translate;
 
+
         // Uncomment this to disable template cache
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
             if (toState.name.indexOf('page.')!=-1 ) {

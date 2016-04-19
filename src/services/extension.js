@@ -46,8 +46,18 @@ module.exports = {
                             var order_items = order.order_items;
                             for (var i = 0; i < order_items.length; i++) {
                                 var open_func = app._.findWhere(tenant.open_funcs, {func_id: order_items[i].func_id});
-                                open_func.payed = true;
-                                open_func.expired_on = app.moment().add(order.duration, 'M');
+
+                                var isAfter = app.moment().isAfter(open_func.expired_on);
+                                if (isAfter) {
+                                    //已经过期
+                                    console.log('isAfter:true');
+                                    open_func.expired_on = app.moment().add(order.duration, 'M');
+                                }
+                                else {
+                                    //还未过期
+                                    console.log('isAfter:false');
+                                    open_func.expired_on = app.moment(open_func.expired_on).add(order.duration, 'M');
+                                }
                             }
                             yield tenant.save();
                             this.body = app.wrapper.res.ret(orderUpdateData);
@@ -76,8 +86,7 @@ module.exports = {
                             var order_items = order.order_items;
                             for (var i = 0; i < order_items.length; i++) {
                                 var open_func = app._.findWhere(tenant.open_funcs, {func_id: order_items[i].func_id});
-                                open_func.payed = false;
-                                open_func.expired_on = app.moment().add(-1, 'h');
+                                open_func.expired_on = app.moment(open_func.expired_on).subtract(order.duration, 'M');
                             }
                             yield tenant.save();
                             this.body = app.wrapper.res.ret(orderUpdateData);

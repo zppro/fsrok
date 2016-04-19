@@ -6,10 +6,17 @@
 
     angular
         .module('app.core')
+        .controller('AppController', AppController)
         .controller('TopbarController', TopbarController)
         .controller('ModuleHeaderController', ModuleHeaderController)
         .controller('ModuleHeaderForTenantController', ModuleHeaderForTenantController)
     ;
+
+    AppController.$inject = ['$rootScope','Auth'];
+    function AppController($rootScope){
+        //console.log(window.navigator.userLanguage || window.navigator.language);
+        moment.locale($rootScope.localeId.replace('_','-').toLowerCase());
+    }
 
     TopbarController.$inject = ['$rootScope','Auth'];
 

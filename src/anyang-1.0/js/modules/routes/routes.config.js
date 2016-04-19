@@ -37,6 +37,7 @@
                 abstract: true,
                 views: {
                     "main": {
+                        controller: 'AppController',
                         templateUrl: helper.basepath('app.html')
                     },
                     "main-template": {
@@ -433,6 +434,7 @@
                         searchForm: {"type": 'TP'},//养老机构产生的订单
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        rowHeight: 60,
                         columns: [
                             {
                                 label: '所属',
@@ -453,13 +455,15 @@
                                 label: '下单时间',
                                 name: 'check_in_time',
                                 type: 'date',
-                                width: 80
+                                width: 80,
+                                sortable: true
                             },
                             {
                                 label: '开通时间',
                                 name: 'success_on',
                                 type: 'date',
-                                width: 80
+                                width: 80,
+                                sortable: true
                             },
                             {
                                 label: '单价',
@@ -772,6 +776,7 @@
                         searchForm: {"type": 'TA'},//代理产生的订单
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        rowHeight: 60,
                         columns: [
                             {
                                 label: '所属',
@@ -996,6 +1001,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        rowHeight: 60,
                         columns: [
                             {
                                 label: '所属',
@@ -1092,6 +1098,7 @@
                         },
                         //切换客户端还是服务端分页
                         serverPaging: true,
+                        rowHeight: 60,
                         columns: [
                             {
                                 label: '所属',

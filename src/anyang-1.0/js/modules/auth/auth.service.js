@@ -40,7 +40,7 @@
                         return o.func_id == func_id;
                     });
                     if (func) {
-                        return func.payed && moment(func.expired_on).diff(moment()) >= 0;
+                        return moment(func.expired_on).diff(moment()) >= 0;
                     }
                     else {
                         return false;

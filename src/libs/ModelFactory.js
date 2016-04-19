@@ -82,6 +82,7 @@ ModelFactory._query =function (model,data) {
             data.select = skipSelects;
         }
 
+        console.log(data);
         if (data.sort) {
             rows = model.find(data.where, data.select, options).sort(data.sort);
         }

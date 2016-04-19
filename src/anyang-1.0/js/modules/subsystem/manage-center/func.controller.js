@@ -26,7 +26,7 @@
 
             vm.init();
 
-            vmc.chargedFuncs = [];
+            vmc.priceFuncs = [];
             vmc.funcs = {};
             vmc.slider = {
                 value: 0,
@@ -59,7 +59,7 @@
             vmc.onTenantIdChanged = onTenantIdChanged;
             vmc.onSubsystemChanged = onSubsystemChanged;
             vmc.createFunc = createFunc;
-            vmc.totalCharge = totalCharge;
+            vmc.totalPrice = totalPrice;
             vmc.save = save;
 
             function onTenantIdChanged(){
@@ -68,27 +68,26 @@
 
             function onSubsystemChanged() {
 
-                var getTenantOpenFuncsPromise;
+                var getTenantPriceFuncsPromise;
                 if(vm.switches.setTenantOpenFuncs) {
-                    getTenantOpenFuncsPromise = vmh.fetch(tenantService.query({_id: vmc.selectedTenantId}, 'open_funcs'));
+                    getTenantPriceFuncsPromise = vmh.fetch(tenantService.query({_id: vmc.selectedTenantId}, 'price_funcs'));
                 }
 
-                vmh.parallel([vmh.clientData.getJson(vmc.selectedSubsystem.menujson), funcService.query({subsystem_id:vmc.selectedSubsystem._id},'func_id charge','orderNo'), getTenantOpenFuncsPromise]).then(function (results) {
+                vmh.parallel([vmh.clientData.getJson(vmc.selectedSubsystem.menujson), funcService.query({subsystem_id:vmc.selectedSubsystem._id},'func_id price','orderNo'), getTenantPriceFuncsPromise]).then(function (results) {
                     var totalFuncs = results[0];
-                    vmc.chargedFuncs = results[1];
-                    var charegedFuncIds = _.map(vmc.chargedFuncs,function(o){return o.func_id});
-
+                    vmc.priceFuncs = results[1];
+                    var pricedFuncIds = _.map(vmc.priceFuncs,function(o){return o.func_id});
                     if(vm.switches.setTenantOpenFuncs) {
-                        //按租户开通模块情景,需要将totalFuncs按照chargedFuncs进行过滤
+                        //按租户开通模块情景,需要将totalFuncs按照priceFuncs进行过滤
                         vmh.treeFactory.pick(totalFuncs, function (theFunc) {
-                            return _.contains(charegedFuncIds, theFunc._id);
+                            return _.contains(pricedFuncIds, theFunc._id);
                         });
-                        vmc.marketChargedFuncs = vmc.chargedFuncs;
-                        vmc.chargedFuncs = results[2][0].open_funcs;
+                        vmc.marketPriceFuncs = vmc.priceFuncs;
+                        vmc.priceFuncs = results[2][0].price_funcs;
                     }
                     if (totalFuncs.length > 0) {
                         vm.trees = [new vmh.treeFactory.sTree('tree1', totalFuncs, {mode: 'check'})];
-                        vm.trees[0].checkedNodes = _.map(vmc.chargedFuncs, function (o) {
+                        vm.trees[0].checkedNodes = _.map(vmc.priceFuncs, function (o) {
                             return vm.trees[0].findNodeById(o.func_id);
                         }).sort(function (node1, node2) {
                             return node1.attrs.orderNo - node2.attrs.orderNo
@@ -98,7 +97,7 @@
                         vm.trees = [];
 
                         vmc.funcs = {};
-                        totalCharge();
+                        totalPrice();
                     }
                 });
             }
@@ -106,19 +105,19 @@
             function createFunc(node) {
                 //console.log(node);
                 //console.log(node.name + ':' + node.attrs.orderNo);
-                var theOne = _.find(vmc.chargedFuncs, function (o) {
+                var theOne = _.find(vmc.priceFuncs, function (o) {
                     return o.func_id == node._id
                 });
-                var charge = 0, market_charge = 0;
+                var price = 0, market_price = 0;
                 if (theOne) {
-                    market_charge = charge = theOne.charge;
+                    market_price = price = theOne.price;
                 }
                 if (vm.switches.setTenantOpenFuncs) {
-                    var theMarketOne = _.find(vmc.marketChargedFuncs, function (o) {
+                    var theMarketOne = _.find(vmc.marketPriceFuncs, function (o) {
                         return o.func_id == node._id
                     });
                     if (theMarketOne) {
-                        market_charge = theMarketOne.charge;
+                        market_price = theMarketOne.price;
                     }
                 }
 
@@ -127,27 +126,28 @@
                     func_name: node.name,
                     subsystem_id: vmc.selectedSubsystem._id,
                     subsystem_name: vmc.selectedSubsystem.name,
-                    market_charge: market_charge,
-                    charge: charge,
+                    market_price: market_price,
+                    price: price,
                     orderNo: node.attrs.orderNo
                 };
             }
 
-            function totalCharge() {
+            function totalPrice() {
 
-                //console.log('totalCharge:');
+                //console.log('totalPrice:');
                 //console.log(vmc.funcs);
 
                 var totals = 0;
                 for (var k in vmc.funcs) {
-                    totals += vmc.funcs[k].charge;
+                    totals += vmc.funcs[k].price;
                 }
+                //console.log(vmc.funcs);
                 return totals;
             }
 
             function save() {
                 if(vm.switches.setTenantOpenFuncs) {
-                    vmh.exec(tenantService.update(vmc.selectedTenantId, {open_funcs: _.toArray(vmc.funcs)}));
+                    vmh.exec(tenantService.update(vmc.selectedTenantId, {price_funcs: _.toArray(vmc.funcs)}));
                 }
                 else{
                     vmh.exec(funcService.bulkInsert(_.toArray(vmc.funcs), {subsystem_id: vmc.selectedSubsystem._id}));

@@ -23,7 +23,6 @@
 
 
         function init() {
-
             vm.init({removeDialog: ngDialog});
 
             vmh.translate(vm.viewTranslatePath('COMPLETE-ORDER-COMMENT')).then(function (ret) {
@@ -87,9 +86,9 @@
         }
     }
 
-    TenantOrderManageDetailsController.$inject = ['$scope','ngDialog', 'vmh','entityVM'];
+    TenantOrderManageDetailsController.$inject = ['$scope','$interpolate','ngDialog', 'vmh','entityVM'];
 
-    function TenantOrderManageDetailsController($scope,ngDialog, vmh, vm) {
+    function TenantOrderManageDetailsController($scope,$interpolate,ngDialog, vmh, vm) {
 
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
@@ -106,6 +105,10 @@
                 $scope.dialogData = {details: ret};
             });
 
+            vmh.translate([vm.viewTranslatePath('ORDER-ITEM-COMMENT-1'),vm.viewTranslatePath('ORDER-ITEM-COMMENT-2')]).then(function (ret) {
+                vmc.translateOrderItemComment = ret;
+            });
+
             if (vm.selectFilterObject.tenants) {
                 vm.selectBinding.tenants = tenantService.query(vm.selectFilterObject.tenants, '_id name');
             }
@@ -117,15 +120,16 @@
             vm.tab1 = {cid: 'contentTab1'};
             //vm.tab2 = {cid: 'contentTab2'};
 
-            vm.registerFieldConverter('tenantId',fieldConvertToTenantId);
+            vm.registerFieldConverter('tenantId', fieldConvertToTenantId);
 
 
             vmc.onTenantIdChanged = onTenantIdChanged;
             vmc.refundOrder = refundOrder;
+            vmc.orderItemComment = orderItemComment;
 
             vmh.clientData.getJson('subsystem').then(function (items) {
                 var businessSubsystems = _.where(items, {mtype: 'business'});
-                var getMenuPromises = _.map(businessSubsystems,function(subsystem){
+                var getMenuPromises = _.map(businessSubsystems, function (subsystem) {
                     return vmh.clientData.getJson(subsystem.menujson)
                 });
 
@@ -147,13 +151,14 @@
                 vm.model.period_charge = 0;
                 vm.model.order_items = [];
                 for (var i = 0; i < tree.checkedNodes.length; i++) {
-                    var theFunc = _.findWhere(vmc.chargedFuncs, {func_id: tree.checkedNodes[i]._id});
+                    var theFunc = _.findWhere(vmc.pricedFuncs, {func_id: tree.checkedNodes[i]._id});
                     if (theFunc) {
-                        vm.model.period_charge += theFunc.charge;
+                        vm.model.period_charge += theFunc.price;
                         vm.model.order_items.push(_.omit(theFunc, ['_id', 'check_in_time']));
                     }
                 }
             });
+
         }
 
         function fieldConvertToTenantId() {
@@ -164,23 +169,30 @@
         function onTenantIdChanged() {
             if (vm.model.tenantId) {
 
-                vmh.fetch(tenantService.query({_id: vm.model.tenantId}, 'open_funcs')).then(function (currentTenant) {
-                    vmc.chargedFuncs = currentTenant[0].open_funcs;
-                    var charegedFuncIds = _.map(vmc.chargedFuncs, function (o) {
-                        return o.func_id
+                vmh.fetch(tenantService.query({_id: vm.model.tenantId}, 'price_funcs open_funcs')).then(function (currentTenant) {
+                    vmc.pricedFuncs = currentTenant[0].price_funcs;
+                    vmc.open_funcs = currentTenant[0].open_funcs;
+
+                    var pricedFuncIds = _.map(vmc.pricedFuncs, function (o) {
+                        return o.func_id;
+                    });
+
+                    var orderedFuncsIds = _.map(vm.model.order_items,function(o){
+                        return o.func_id;
                     });
 
                     vmh.treeFactory.pick(vmc.totalFuncs, function (theFunc) {
-                        return _.contains(charegedFuncIds, theFunc._id);
+                        return _.contains(vm.readonly ? orderedFuncsIds : pricedFuncIds, theFunc._id);
                     });
 
                     if(vmc.totalFuncs.length>0) {
                         var treeMode = vm.readonly ? 'select' : 'check';
                         vm.trees = [new vmh.treeFactory.sTree('tree1', vmc.totalFuncs, {mode: treeMode})];
-                        _.each(vmc.chargedFuncs, function (o) {
+                        _.each(vmc.pricedFuncs, function (o) {
                             var node = vm.trees[0].findNodeById(o.func_id);
                             if (node) {
-                                node.data = '(￥' + o.charge + ')';
+                                node.template = 'order-item-renderer.html';
+                                node.data = '(￥' + o.price + ')';
                             }
                         });
 
@@ -194,6 +206,22 @@
                 });
 
             }
+        }
+
+        function orderItemComment(func_id) {
+            var ret = '';
+            var open_func = _.findWhere(vmc.open_funcs, {func_id: func_id});
+            if (open_func && open_func.expired_on ) {
+                var expired_on = moment(open_func.expired_on);
+                if (expired_on.year() != 1970) {
+                    ret = vmc.translateOrderItemComment[vm.viewTranslatePath('ORDER-ITEM-COMMENT-1')] + expired_on.format('l');
+                }
+                else {
+                    ret = vmc.translateOrderItemComment[vm.viewTranslatePath('ORDER-ITEM-COMMENT-2')];
+                }
+            }
+            //ret += '本订单生效后将增加'+vm.model.duration+'个月,预计功能开通截止>'+moment(open_func.expired_on).add(vm.model.duration,'M').format('l');
+            return ret;
         }
 
         function refundOrder() {

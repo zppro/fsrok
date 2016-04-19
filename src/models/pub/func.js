@@ -22,7 +22,7 @@ module.exports = function(ctx,name) {
             func_name: {type: String, required: true},
             subsystem_id: {type: String, required: true},
             subsystem_name: {type: String, required: true},
-            charge: {type: Number, default: 0.00},//月费
+            price: {type: Number, default: 0.00},//期间(月度)价格
             orderNo: {type: Number, default: 0}
         });
 

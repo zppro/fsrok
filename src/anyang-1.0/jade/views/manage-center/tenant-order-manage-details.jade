@@ -62,3 +62,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
         button.btn.btn-success(ng-if="!vm.readonly",type="submit") {{'button.SAVE'|translate}}
         button.btn.btn-danger(ng-if="vm.model.order_status=='A1004'",type="button",ng-click="vmc.refundOrder()") {{'button.REFUND-ENTRY'|translate}}
         button.btn.btn-primary(ng-if="vm.readonly",type="button",ng-click="vm.cancel()") {{'button.RETURN'|translate}}
+
+script(type='text/ng-template', id="order-item-renderer.html")
+    span.tree-data-part {{node.data}}
+    span.tree-data-part {{vmc.orderItemComment(node._id)}}

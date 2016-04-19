@@ -1,11 +1,11 @@
 /* ========================================================================
    Component: func-module Created by zppro on 16-4-6.
  ========================================================================== */
-@func-charge-padding: 5px;
-@func-charge-li-height:60px;
-@func-charge-margin-bottom:40px;
+@func-price-padding: 5px;
+@func-price-li-height:60px;
+@func-price-margin-bottom:40px;
 
-.func-charge-totals{
+.func-price-totals{
 
   padding:@padding-base-vertical @padding-base-horizontal;
   > span.currency{
@@ -13,11 +13,11 @@
     padding:0 10px;
   }
 }
-.func-charge {
+.func-price {
   margin:0 auto;
-  padding:@func-charge-padding;
+  padding:@func-price-padding;
   overflow-y: auto;
-  margin-bottom: @func-charge-margin-bottom;
+  margin-bottom: @func-price-margin-bottom;
   ul {
     list-style: none;
     padding-left: 0px;
@@ -25,12 +25,12 @@
 
   }
   li {
-    height: @func-charge-li-height;
+    height: @func-price-li-height;
     cursor: pointer;
     border-bottom: solid 1px @gray-light;
     &.header{
       border-bottom: solid 2px @gray-light;
-      height: @func-charge-li-height/2;
+      height: @func-price-li-height/2;
     }
     .func-item {
       line-height: 55px;

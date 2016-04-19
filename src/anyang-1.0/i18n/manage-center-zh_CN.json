@@ -52,8 +52,8 @@
       "SUM-TITLE": "合计：￥",
       "SUM-PERIOD": "/月",
       "HEADER-FUNC-NAME": "功能模块",
-      "HEADER-MARKET-CHARGE": "市场价",
-      "HEADER-CHARGER": "调价器"
+      "HEADER-MARKET-PRICE": "市场价",
+      "HEADER-PRICER": "调价器"
     },
     "pension-agency-order-manage": {
       "list": {
@@ -63,6 +63,8 @@
       "details": {
         "TITLE": "管理中心-养老机构-订单-详情",
         "REFUND-ORDER-COMMENT":"订单退款后将立即关闭订单所选功能",
+        "ORDER-ITEM-COMMENT-1":"功能开通截止>",
+        "ORDER-ITEM-COMMENT-2":"功能未开通",
         "TAB1": "基本信息",
         "TAB1-LABEL-CODE": "订单编号",
         "TAB1-PLACEHOLDER-CODE": "自动生成..",
@@ -127,8 +129,8 @@
       "SUM-TITLE": "合计：￥",
       "SUM-PERIOD": "/月",
       "HEADER-FUNC-NAME": "功能模块",
-      "HEADER-MARKET-CHARGE": "市场价",
-      "HEADER-CHARGER": "调价器"
+      "HEADER-MARKET-PRICE": "市场价",
+      "HEADER-PRICER": "调价器"
     },
     "agent-order-manage": {
       "list": {
@@ -173,7 +175,7 @@
       "SUM-TITLE": "合计：￥",
       "SUM-PERIOD": "/月",
       "HEADER-FUNC-NAME": "功能模块",
-      "HEADER-CHARGER": "调价器"
+      "HEADER-PRICER": "调价器"
     },
     "order-receipt-confirmation": {
       "list": {

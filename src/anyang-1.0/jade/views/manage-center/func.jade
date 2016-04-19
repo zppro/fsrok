@@ -16,20 +16,20 @@
         .col-xs-1
             button.btn.btn-success(ng-click="vmc.save()") {{'button.SAVE'|translate}}
         .col-xs-11
-            .func-charge-totals {{vm.moduleTranslatePath("SUM-TITLE")|translate}}
-                span.currency {{vmc.totalCharge()}}
+            .func-price-totals {{vm.moduleTranslatePath("SUM-TITLE")|translate}}
+                span.currency {{vmc.totalPrice()}}
                 span {{vm.moduleTranslatePath("SUM-PERIOD")|translate}}
     .row-split
     .row.row-fixed
-        .func-charge
+        .func-price
             ul
                 li.header
                     label.col-md-2 {{vm.moduleTranslatePath("HEADER-FUNC-NAME")|translate}}
-                    label.col-md-1(ng-if="vm.switches.setTenantOpenFuncs") {{vm.moduleTranslatePath("HEADER-MARKET-CHARGE")|translate}}
-                    label.col-md-9.text-center {{vm.moduleTranslatePath("HEADER-CHARGER")|translate}}
+                    label.col-md-1(ng-if="vm.switches.setTenantOpenFuncs") {{vm.moduleTranslatePath("HEADER-MARKET-PRICE")|translate}}
+                    label.col-md-9.text-center {{vm.moduleTranslatePath("HEADER-PRICER")|translate}}
                 li.repeat-modify(ng-repeat='node in vm.trees[0].checkedNodes',ng-init="vmc.createFunc(node)")
                     .col-md-2.func-item {{ node.name}}:
                     .col-md-1.func-item(ng-if="vm.switches.setTenantOpenFuncs")
-                         | {{vmc.funcs[node._id].market_charge}}
+                         | {{vmc.funcs[node._id].market_price}}
                     .col-md-9
-                        rzslider(rz-slider-model='vmc.funcs[node._id].charge',rz-slider-options="vmc.slider.options")
+                        rzslider(rz-slider-model='vmc.funcs[node._id].price',rz-slider-options="vmc.slider.options")

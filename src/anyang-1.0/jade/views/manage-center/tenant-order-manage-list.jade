@@ -26,7 +26,7 @@
                             i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
                 tbody
                     tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
-                        td
+                        td(ng-style="{'height':vm.rowHeight,'maxHeight':vm.rowHeight}")
                             .checkbox.c-checkbox
                                 label
                                     input(type='checkbox' data="trBubble" ng-model="row.checked" )
