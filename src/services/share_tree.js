@@ -24,13 +24,14 @@ module.exports = {
 
         this.actions = [
             {
-                method: 'fetch',
+                method: 'fetch-T1001',//针对比较少的节点，客户端过滤
                 verb: 'get',
-                url: this.service_url_prefix + "/T1001/:select",
+                url: this.service_url_prefix + "/T1001/:model/:select",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            this.body = app.wrapper.res.rows(yield app.modelFactory().query('pub_tenant', '../models/pub/tenant',
+                            var modelOption = app.getModelOption(this);
+                            this.body = app.wrapper.res.rows(yield app.modelFactory().query(modelOption.model_name, modelOption.model_path,
                                 {where: {status: 1}, select: this.params.select || '_id name'}
                             ));
                         } catch (e) {
@@ -42,7 +43,7 @@ module.exports = {
                 }
             },
             {
-                method: 'fetch',
+                method: 'fetch-T1005',
                 verb: 'get',
                 url: this.service_url_prefix + "/T1005/:select",
                 handler: function (app, options) {
@@ -78,6 +79,28 @@ module.exports = {
                             }
 
                             this.body = app.wrapper.res.rows(result);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'fetch-T3001',//针对节点多，且需要服务端过滤
+                verb: 'post',
+                url: this.service_url_prefix + "/T3001/:model",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var modelOption = app.getModelOption(this);
+                            var data = this.request.body;
+                            if (!data.where)
+                                data.where = {status: 1};
+                            if (!data.select)
+                                data.select = '_id name';
+                            this.body = app.wrapper.res.rows(yield app.modelFactory().query(modelOption.model_name, modelOption.model_path, data));
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

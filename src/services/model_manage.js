@@ -28,7 +28,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             this.body = app.wrapper.res.ret(yield app.modelFactory().create(modelOption.model_name, modelOption.model_path, this.request.body));
                         } catch (e) {
                             self.logger.error(e.message);
@@ -46,7 +46,7 @@ module.exports = {
                     return function * (next) {
                         try {
                             var _id = this.params._id;
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             if (_id == '$one') {
                                 //console.log(yield app.modelFactory().one(modelOption.model_name, modelOption.model_path, {
                                 //    where: this.query,
@@ -86,7 +86,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             var ret = yield app.modelFactory().update(modelOption.model_name, modelOption.model_path, this.params._id, this.request.body);
                             this.body = app.wrapper.res.ret(ret);
                         } catch (e) {
@@ -104,7 +104,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             this.body = app.wrapper.res.ret(yield app.modelFactory().delete(modelOption.model_name, modelOption.model_path, this.params._id));
                         } catch (e) {
                             self.logger.error(e.message);
@@ -121,7 +121,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             this.body = app.wrapper.res.rows(yield app.modelFactory().query(modelOption.model_name, modelOption.model_path));
                         } catch (e) {
                             self.logger.error(e.message);
@@ -138,7 +138,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             this.body = app.wrapper.res.rows(yield app.modelFactory().query(modelOption.model_name, modelOption.model_path, this.request.body));
                         } catch (e) {
                             self.logger.error(e.message);
@@ -155,7 +155,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             this.body = app.wrapper.res.ret({totals: (yield app.modelFactory().totals(modelOption.model_name, modelOption.model_path, this.request.body)).length});
                             //this.set('page-totals', 10);response head set
                         } catch (e) {
@@ -173,7 +173,7 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var modelOption = self.getModelOption(this);
+                            var modelOption = app.getModelOption(this);
                             yield app.modelFactory().bulkInsert(modelOption.model_name, modelOption.model_path, this.request.body);
                             this.body = app.wrapper.res.default();
                         } catch (e) {
@@ -187,11 +187,11 @@ module.exports = {
         ];
 
         return this;
-    },
-    getModelOption: function (ctx) {
-        var modelName = ctx.params.model.split('-').join('_');//将 A-B改为A_B
-        var modelPath = '../models/' + modelName.split('_').join('/');
-        return {model_name: modelName, model_path: modelPath};
     }
+    //, getModelOption: function (ctx) {
+    //    var modelName = ctx.params.model.split('-').join('_');//将 A-B改为A_B
+    //    var modelPath = '../models/' + modelName.split('_').join('/');
+    //    return {model_name: modelName, model_path: modelPath};
+    //}
 }.init();
 //.init(option);

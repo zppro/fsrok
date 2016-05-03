@@ -36,7 +36,8 @@
     "PASSWORD-NEED-CHANGED":"新密码不能和旧密码相同;",
     "TERM-AGREE": "必须同意条款;",
     "ALREADY-EXISTS": "已经存在相同的{{item}};",
-    "ORDER-MUST_CHOOSE_ONE_FUNC": "订单必须选择至少一个功能;"
+    "ORDER-MUST_CHOOSE_ONE_FUNC": "订单必须选择至少一个功能;",
+    "ID-NO": "身份证格式不正确;"
   },
   "dialog": {
     "remove": {
@@ -87,8 +88,8 @@
       "ENTER-MANAGE": "入院管理",
       "IN-MANAGE": "在院管理",
       "EXIT-MANAGE": "出院管理",
-      "RECEPTION-MANAGE": "接待管理",
-      "LEAVE-MANAGE": "请假管理",
+      "RECEPTION-MANAGE": "接待管理(暂缓)",
+      "LEAVE-MANAGE": "请假管理(暂缓)",
       "------------": "",
       "FINANCIAL-MANAGE": "财务管理",
       "ENTER-PAYMENT": "入院缴费",
@@ -97,18 +98,18 @@
       "PAYMENT-DETAILS": "交费明细",
       "EXIT-SETTLEMENT": "出院结算",
       "------------": "",
-      "MATERIAL-MANAGE": "物资管理",
-      "INVENTORY-MANAGE": "库存管理",
-      "DONATION-MANAGE": "捐赠管理",
+      "MATERIAL-MANAGE": "物资管理(暂缓)",
+      "INVENTORY-MANAGE": "库存管理(暂缓)",
+      "DONATION-MANAGE": "捐赠管理(暂缓)",
       "------------": "",
-      "KNOWLEDGE-BASE-MANAGE": "知识库管理",
+      "KNOWLEDGE-BASE-MANAGE": "知识库管理(暂缓)",
       "------------": "",
       "SYSTEM-MANAGE": "系统管理",
       "USER-MANAGE": "用户管理",
-      "DEPARTMENT-MANAGE": "部门管理",
+      "DEPARTMENT-MANAGE": "部门管理(暂缓)",
+      "ROOM-MANAGE": "房间管理",
       "DISTRICT-MANAGE": "片区管理",
-      "BED-MANAGE": "床位管理",
-      "LOG": "系统日志"
+      "LOG": "系统日志(暂缓)"
     },
     "manage-center": {
       "PENSION-AGENCY-MANAGE": "养老机构管理",
@@ -136,7 +137,11 @@
       "GRID-BASIC": "网格-基本功能",
       "TREE": "树",
       "TREE-BASIC": "树-基本功能",
-      "TREE-EXTEND": "树-扩展功能"
+      "TREE-EXTEND": "树-扩展功能",
+      "TREE-DIRECTIVE": "树-指令",
+      "TREE-NAV": "树-导航",
+      "TREE-TILE": "树-平铺",
+      "BOX-INPUT": "方框输入框"
     }
   },
   "sidebar": {

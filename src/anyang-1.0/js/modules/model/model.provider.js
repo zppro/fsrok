@@ -31,8 +31,8 @@
                             '_query': {method: 'POST', isArray: true, headers: {'_$resource$_': true}},
                             '_post': {method: 'POST', headers: {'_$resource$_': true}},
                             '_update': {method: 'PUT', headers: {'_$resource$_': true}},
-                            '_save': {method: 'POST'}
-                            //, 'remove': {method: 'DELETE'},
+                            '_save': {method: 'POST'},
+                            '_remove': {method: 'DELETE'}
                             //'delete': {method: 'DELETE'}
                         });
                         this.services[name].save = function (params, successFn, errorFn) {
@@ -40,6 +40,12 @@
                         };
                         this.services[name].update = function (_id, params, successFn, errorFn) {
                             return this._update({_id: _id}, params, successFn, errorFn)
+                        };
+                        this.services[name].disable = function (_id, successFn, errorFn) {
+                            return this._update({_id: _id}, {status: 0}, successFn, errorFn);
+                        };
+                        this.services[name].remove = function (_id, successFn, errorFn) {
+                            return this._remove({_id: _id}, null, successFn, errorFn);
                         };
                         this.services[name].one = function (params, successFn, errorFn) {
                             return this.get(_.extend(params, {_id: '$one'}), successFn, errorFn)
@@ -104,21 +110,21 @@
                         }
                         return promise;
                     },
-                    t: function (id, select, where, forceRefresh) {
-
+                    tmg: function (id, select, where, forceRefresh) {//tmg 本地过滤
                         var promise;
-                        if (forceRefresh || angular.isUndefined(this.shareTree[id])) {
+                        var cacheKey = 'get-'+id
+                        if (forceRefresh || angular.isUndefined(this.shareTree[cacheKey])) {
                             var self = this;
                             if (select && (select.indexOf('_id ') == -1 || select.indexOf(' _id') == -1)) {
                                 select = '_id ' + select;
                             }
                             promise = $http.get(baseUrl + 'tree/' + id + '/' + (select || '_id name')).then(function (nodes) {
-                                self.shareTree[id] = nodes;
-                                return self.shareTree[id];
+                                self.shareTree[cacheKey] = nodes;
+                                return self.shareTree[cacheKey];
                             });
                         }
                         else {
-                            promise = $q.when(this.shareTree[id]);
+                            promise = $q.when(this.shareTree[cacheKey]);
                         }
 
                         return where ? promise.then(function (nodes) {
@@ -139,6 +145,28 @@
                             }
                             return clone;
                         }) : promise;
+                    },
+                    tmp: function (id, select, where, forceRefresh) {//tmg 本地过滤
+                        var promise;
+                        var cacheKey = 'post-' + id + objectHash(where);
+                        if (forceRefresh || angular.isUndefined(this.shareTree[cacheKey])) {
+                            var self = this;
+                            if (select && (select.indexOf('_id ') == -1 || select.indexOf(' _id') == -1)) {
+                                select = '_id ' + select;
+                            }
+                            promise = $http.post(baseUrl + 'tree/' + id, {
+                                where: where,
+                                select: select
+                            }).then(function (nodes) {
+                                self.shareTree[cacheKey] = nodes;
+                                return self.shareTree[cacheKey];
+                            });
+                        }
+                        else {
+                            promise = $q.when(this.shareTree[cacheKey]);
+                        }
+
+                        return promise;
                     }
                 };
             }]

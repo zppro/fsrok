@@ -33,6 +33,7 @@ app.conf = {
         log: path.join(__dirname, 'logs'),
         data: path.join(__dirname, 'data'),
         service: path.join(__dirname, 'services'),
+        debugServices: path.join(__dirname, 'debug-services'),
         static_develop: '../pub-client-develop/',
         static_production: '../pub-client-production/'
     },
@@ -67,6 +68,11 @@ app.conf = {
 console.log('config...');
 // conf
 rfcore.config(app.conf,process.argv);
+
+//去除字符对bool的影响
+app.conf.isProduction = app.conf.isProduction == true || app.conf.isProduction === 'true';
+
+
 //console.log(JSON.stringify(app.conf.db.mongodb));
 
 //ensure dirs
@@ -109,6 +115,7 @@ app._ = _;
 //crypto
 app.crypto = require('crypto');
 
+
 //moment
 app.moment = moment;
 
@@ -120,6 +127,14 @@ app.utcNow  = function() {
     return moment().add(8, 'h');
 };
 
+//解析参数model
+app.getModelOption =  function (ctx) {
+    var modelName = ctx.params.model.split('-').join('_');//将 A-B改为A_B
+    var modelPath = '../models/' + modelName.split('_').join('/');
+    return {model_name: modelName, model_path: modelPath};
+};
+
+app.uid = require('rand-token').uid;
 
 // logger
 //app.use(function *(next){
@@ -136,6 +151,8 @@ app.utcNow  = function() {
 
 //app.data = rfcore.dataP;
 
+
+
 console.log('co...');
 
 co(function*() {
@@ -144,7 +161,6 @@ co(function*() {
     console.log('load dictionary...');
     yield app.wrapper.cb(app.dictionary.readJSON.bind(app.dictionary))('pre-defined/dictionary.json');
 
-    console.log(app.modelVariables);
     //配置数据库
     console.log('configure mongoose...');
     //app.db.mongoose = monoogse;
@@ -156,14 +172,32 @@ co(function*() {
     });
     app.modelFactory = require('./libs/ModelFactory').bind(app);
 
-    console.log('configure logs...');
+
     app.conf.serviceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.service)), function (o) {
         return o.substr(0, o.indexOf('.'))
     });
 
-    //配置日志
-    log4js.configure({
-        appenders: _.map(app.conf.serviceNames, function (o) {
+    if(!app.conf.isProduction){
+        app.conf.debugServiceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.debugServices)), function (o) {
+            return o.substr(0, o.indexOf('.'))
+        });
+    }
+
+
+    console.log('configure logs...');
+    var configAppenders = [];
+    configAppenders = _.union(configAppenders,_.map(app.conf.serviceNames, function (o) {
+        return {
+            type: 'dateFile',
+            filename: path.join(app.conf.dir.log, o + '.js'),
+            pattern: '-yyyy-MM-dd.log',
+            alwaysIncludePattern: true,
+            category: o + '.js'
+        };
+    }));
+
+    if(!app.conf.isProduction){
+        configAppenders = _.union(configAppenders,_.map(app.conf.debugServiceNames, function (o) {
             return {
                 type: 'dateFile',
                 filename: path.join(app.conf.dir.log, o + '.js'),
@@ -171,7 +205,12 @@ co(function*() {
                 alwaysIncludePattern: true,
                 category: o + '.js'
             };
-        })
+        }));
+    }
+
+    //配置日志
+    log4js.configure({
+        appenders: configAppenders
     });
 
     console.log('register router...');
@@ -183,9 +222,20 @@ co(function*() {
         });
     });
 
+    if(!app.conf.isProduction){
+
+        _.each(app.conf.debugServiceNames, function (o) {
+            var service_module = require('./debug-services/' + o);
+            _.each(service_module.actions, function (action) {
+                Router.prototype[action.verb].apply(router, [service_module.name + "_" + action.method, action.url, action.handler(app)]);
+            });
+        });
+    }
+
+
     console.log(app.conf.client.bulidtarget);
     //注册静态文件（客户端文件）
-    if (app.conf.isProduction == true || app.conf.isProduction === 'true') {
+    if (app.conf.isProduction) {
         app.use(koaStatic(app.conf.dir.static_production + app.conf.client.bulidtarget));
     }
     else {
@@ -203,6 +253,7 @@ co(function*() {
     //注意router.use的middleware有顺序
     router.use(koaBody);
     router.use('/services', auth(app), require('./middlewares/t1.js')(app));
+
     //router.use('/services', auth(app, _.union(app.conf.auth.ignorePaths, [])), require('./middlewares/t1.js')(app));
 
     //需要登录访问控制

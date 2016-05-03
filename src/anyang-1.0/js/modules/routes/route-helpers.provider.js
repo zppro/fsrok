@@ -198,7 +198,7 @@
         function buildEntryVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams', '$window', '$q', '$translate', '$timeout', '$http', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $translate, $timeout, $http, modelNode, Notify, GridDemoModelSerivce) {
+            return ['$state', '$stateParams', '$window', '$q', '$translate', '$timeout', '$http', 'Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $translate, $timeout, $http, Auth, modelNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init(initOption) {
@@ -215,9 +215,14 @@
                     //设置treeFilterObject
                     this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
 
+                    var tenant = Auth.getUser().tenant;
+                    if (tenant) {
+                        this.searchForm['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                    }
+
                     //计算行数
                     var deltaHeight = 35 + 49 + 10.5 + 52;//search.h + thead.h + row.split + panel-footer.h
-                    this.page.size =Math.floor( (this.size.h - deltaHeight) / this.rowHeight);
+                    this.page.size = Math.floor((this.size.h - deltaHeight) / this.rowHeight);
                     //console.log((this.size.h - 35 - 49 - 10.5 - 52) );
                     //console.log(this.page.size);
 
@@ -294,7 +299,17 @@
                 }
 
                 function remove() {
+                    return _.bind(_processRemove, this, 'remove')();
+                }
+
+                function disable() {
+                    return _.bind(_processRemove, this, 'disable')();
+                }
+
+                function _processRemove(method) {
                     var self = this;
+                    console.log(method);
+
                     if (self.selectedRows.length == 0) {
 
                         return $translate('notification.SELECT-NONE-WARNING').then(function (ret) {
@@ -306,11 +321,9 @@
                         template: 'removeConfirmDialog.html',
                         className: 'ngdialog-theme-default'
                     }).then(function () {
-                        //没有选中提醒???
-
                         if (option.modelName) {
                             _.each(self.selectedRows, function (row) {
-                                return modelService.remove({_id: row._id}).$promise.then(function () {
+                                return modelService[method](row._id).$promise.then(function () {
                                     var index = _.indexOf(self.rows, row);
                                     if (index != -1) {
                                         self.rows.splice(index, 1);
@@ -344,7 +357,7 @@
                     this.conditionBeforeQuery && this.conditionBeforeQuery();
 
                     if (self.serverPaging) {
-                        self.rows = modelService.page(self.page, self.searchForm,null,  (self.sort.direction > 0 ? '' : '-') + self.sort.column);
+                        self.rows = modelService.page(self.page, self.searchForm, null, (self.sort.direction > 0 ? '' : '-') + self.sort.column);
                         //服务端totals在查询数据时计算
                         modelService.totals(self.searchForm).$promise.then(function (ret) {
                             self.page.totals = ret.totals;
@@ -434,7 +447,7 @@
                     transTo: option.transTo || {},//跳转到另外module设置对象
                     treeFilterObject: option.treeFilterObject || {},
                     selectBinding: {},
-                    selectFilterObject: {},
+                    selectFilterObject: {"common": {}},
                     sort: {
                         column: option.columnPK || this.pk || '_id',
                         direction: -1,
@@ -467,6 +480,7 @@
                     edit: edit,
                     read: read,
                     remove: remove,
+                    disable: disable,
                     query: query,
                     paging: paging,
                     selectAll: selectAll,
@@ -481,7 +495,7 @@
         function buildEntityVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI, modelNode, Notify, GridDemoModelSerivce) {
+            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI','Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI,Auth, modelNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init() {
@@ -491,12 +505,17 @@
 
                     this.size = calcWH($window);
 
+
                     //继承数据处理
                     //设置selectFilterObject
                     this.selectFilterObject = _.defaults(this.selectFilterObject, $state.current.data && $state.current.data.selectFilterObject);
                     //设置treeFilterObject
                     this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
 
+                    var tenant = Auth.getUser().tenant;
+                    if(tenant) {
+                        this.model['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                    }
                     //remote data get
 
                     //
@@ -546,8 +565,6 @@
                     if (option.modelName) {
                         if (self._id_ == 'new') {
                             //create
-
-                            console.log(_.defaults(self.model, self.toListParams, option.model));
                             promise = modelService.save(_.defaults(self.model, self.toListParams, option.model)).$promise;
                         }
                         else {
@@ -662,8 +679,9 @@
                     model: {},//因数据会在view或controller中变化，所以在load里出设置.类似buildEntryVM中的searchForm
                     switches: option.switches || {},
                     transTo: option.transTo || {},//跳转到另外module设置对象
+                    treeFilterObject: option.treeFilterObject || {},
                     selectBinding: {},
-                    selectFilterObject: {},
+                    selectFilterObject: {"common": {}},
                     toList: option.toList || [],
                     size: {w: 0, h: 0},
                     blocker: option.blockUI ? blockUI.instances.get('module-block') : false,
@@ -712,7 +730,8 @@
                     transTo: option.transTo || {},//跳转到另外module设置对象
                     selectBinding: {},
                     selectFilterObject: {},
-                    init: init
+                    init: init,
+                    openDP: openDP
                 };
             }];
         }

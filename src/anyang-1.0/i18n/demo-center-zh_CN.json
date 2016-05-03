@@ -26,6 +26,21 @@
     },
     "tree-extend": {
       "TITLE": "演示中心-树-扩展功能"
+    },
+    "tree-directive": {
+      "TITLE": "演示中心-树-指令"
+    },
+    "tree-nav": {
+      "TITLE": "演示中心-树-导航"
+    },
+    "tree-tile": {
+      "TITLE": "演示中心-树-平铺"
+    },
+    "box-input":{
+      "TITLE": "演示中心-方框输入",
+      "ID_NO": "身份证号",
+      "SEX": "性别",
+      "BIRTHDAY": "出生日期"
     }
   }
 }

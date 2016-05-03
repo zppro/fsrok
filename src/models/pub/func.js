@@ -1,5 +1,6 @@
 /**
  * Created by zppro on 15-12-14.
+ * 管理中心 功能实体
  */
 var _ = require('underscore');
 var mongoose = require('mongoose');

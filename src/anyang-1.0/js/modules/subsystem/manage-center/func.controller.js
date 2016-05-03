@@ -87,9 +87,10 @@
                     }
                     if (totalFuncs.length > 0) {
                         vm.trees = [new vmh.treeFactory.sTree('tree1', totalFuncs, {mode: 'check'})];
-                        vm.trees[0].checkedNodes = _.map(vmc.priceFuncs, function (o) {
+                        console.log(vmc.priceFuncs);
+                        vm.trees[0].checkedNodes = _.compact(_.map(vmc.priceFuncs, function (o) {
                             return vm.trees[0].findNodeById(o.func_id);
-                        }).sort(function (node1, node2) {
+                        })).sort(function (node1, node2) {
                             return node1.attrs.orderNo - node2.attrs.orderNo
                         });
                     }
@@ -154,10 +155,10 @@
                 }
             }
 
-            $scope.$on('tree:node:checkChange', function ($event, tree) {
+            $scope.$on('tree:node:checkChange', function ($event, checkedNodes) {
                 var _funcs = angular.copy(vmc.funcs);
 
-                var checkedNodeIds = _.map(tree.checkedNodes, function (node) {
+                var checkedNodeIds = _.map(checkedNodes, function (node) {
                     return node._id
                 });
 

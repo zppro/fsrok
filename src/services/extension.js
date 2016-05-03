@@ -47,17 +47,34 @@ module.exports = {
                             for (var i = 0; i < order_items.length; i++) {
                                 var open_func = app._.findWhere(tenant.open_funcs, {func_id: order_items[i].func_id});
 
-                                var isAfter = app.moment().isAfter(open_func.expired_on);
-                                if (isAfter) {
-                                    //已经过期
-                                    console.log('isAfter:true');
+                                if(open_func){
+                                    //已经存在的功能
+                                    var isAfter = app.moment().isAfter(open_func.expired_on);
+                                    if (isAfter) {
+                                        //已经过期
+                                        console.log('isAfter:true');
+                                        open_func.expired_on = app.moment().add(order.duration, 'M');
+                                    }
+                                    else {
+                                        //还未过期
+                                        console.log('isAfter:false');
+                                        open_func.expired_on = app.moment(open_func.expired_on).add(order.duration, 'M');
+                                    }
+                                }
+                                else{
+                                    //增加新功能
+
+                                    open_func = app._.omit(order_items[i].toObject(),['_id','check_in_time']);
+                                    console.log(order_items[i]);
+                                    console.log(open_func);
                                     open_func.expired_on = app.moment().add(order.duration, 'M');
+
+
+                                    tenant.open_funcs.push(open_func);
+                                    //console.log(open_func);
+                                    //console.log(tenant.open_funcs);
                                 }
-                                else {
-                                    //还未过期
-                                    console.log('isAfter:false');
-                                    open_func.expired_on = app.moment(open_func.expired_on).add(order.duration, 'M');
-                                }
+
                             }
                             yield tenant.save();
                             this.body = app.wrapper.res.ret(orderUpdateData);

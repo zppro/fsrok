@@ -166,7 +166,15 @@
 
             if(one && !one.hidden) {
                 if (one.formatterData) {
-                    return one.formatterData[rowValue]
+
+                    if(_.isArray(rowValue)){
+                        return _.map(rowValue,function(o){
+                            return one.formatterData[o];
+                        });
+                    }
+                    else{
+                        return one.formatterData[rowValue];
+                    }
                 }
             }
             return rowValue;

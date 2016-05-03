@@ -15,7 +15,7 @@
         function filter(nodes, fn) {
             if (!fn)
                 return nodes;
-            nodes = _.isArray(nodes) ? nodes : [nodes];
+            nodes = angular.isArray(nodes) ? nodes : [nodes];
             for (var i = 0; i < nodes.length; i++) {
                 if (fn(nodes[i])) {
 
@@ -33,7 +33,7 @@
         function pick(nodes, fn) {
             if (!fn)
                 return true;
-            nodes = _.isArray(nodes) ? nodes : [nodes];
+            nodes = angular.isArray(nodes) ? nodes : [nodes];
             var result = false;
             for (var i = 0; i < nodes.length; i++) {
                 var levelResult = false;
@@ -65,8 +65,9 @@
             return result;
         }
 
-        function attrs(nodes,level,levelSplitChar,parentOrderNo,parentIndex) {
-            nodes = _.isArray(nodes) ? nodes : [nodes];
+        function attrs(nodes, level, levelSplitChar, parentOrderNo, parentIndex) {
+
+            nodes = angular.isArray(nodes) ? nodes : [nodes];
             if (!level) {
                 level = 1;
             }
@@ -89,7 +90,7 @@
 
             var paddingLeftZero = '';
             var maxDigitLength = ('' + (nodes.length + 1)).length;
-
+            var totalsOfCurrentLevel = nodes.length;
             for (var i = 0; i < nodes.length; i++) {
                 paddingLeftZero = '';
                 var currentIndex = parentIndex + i;
@@ -107,17 +108,18 @@
                 };
                 //console.log('attr.index:' + nodes[i].attrs.index);
                 if (nodes[i].children && nodes[i].children.length > 0) {
-                    attrs(nodes[i].children, level + 1, levelSplitChar, currentOrderNo, currentIndex);
+                    totalsOfCurrentLevel += attrs(nodes[i].children, level + 1, levelSplitChar, currentOrderNo, currentIndex);
                 }
             }
-        }
 
+            return totalsOfCurrentLevel;
+        }
 
 
         return {
 
             // controller access level
-            $get: ['$q', '$rootScope', function ($q, $rootScope) {
+            $get: ['$injector', '$templateCache', '$q', '$timeout', '$rootScope','$document', function ($injector, $templateCache, $q, $timeout, $rootScope,$document) {
 
                 return {
                     filter: filter,
@@ -126,16 +128,19 @@
                     sTree: sTree
                 };
 
-                function sTree(id, treeData, option) {
+                function sTree(el, treeData, option) {
                     var self = this;
-                    this.id = id;
+                    //私有方法和属性
+                    this._expandedIndexes = {};
+                    this._checkedIndexes = {};
+
+
+                    this.el = angular.isString(el) ? angular.element('#' + el) : el;
                     this.treeData = treeData;
                     option = option || {};
-                    this._compare = option.compare || function (node1, node2) {
-                            return node1._id === node2._id;
-                        };
 
-                    this.mode = option.mode || 'default';
+
+                    this.mode = option.mode || 'default'; //default,check,
                     this.levelSplitChar = option.levelSplitChar || '-';
                     this.expandLevel = option.expandLevel || 1;
                     if (angular.isUndefined(option.checkCascade)) {
@@ -144,73 +149,27 @@
                     else {
                         this.checkCascade = option.checkCascade;
                     }
+                    this.layout = option.layout || 'default'; //default,dropdown
+                    this.height = option.height || 500;
 
-
-                    this.expandedIndexes = {};
-                    this.checkedIndexes = {};
-                    this.inputCheckedIndex = {};
-                    this.selectedNode;
-                    this.checkedNodes = [];
-                    this.checkState = {none: 'none', checked: 'checked', undetermined: 'undetermined'};
-
-
-                    attrs(this.treeData);//增加attrs
-
-                    this.addIndex = function ($index) {
-                        //console.log('addIndex:'+$index);
-                        //console.log(this.expandedIndexes);
-                        var arr = ($index + '').split(this.levelSplitChar);
-                        var level = arr.length;
-                        var levelExpanded = level <= this.expandLevel
-                        this.expandedIndexes[$index] = levelExpanded;
-                        if (this.mode == 'check') {
-                            this.checkedIndexes[$index] = this.checkState.none;
-                            this.inputCheckedIndex[$index] = false;
-                            //console.log(this.checkedIndexes);
-                        }
+                    this.el_ulc = this.el.children('.ul-container')
+                    if(this.layout == 'dropdown') {
+                        this.el_ulc.addClass('tree-hidden').children('ul').height(this.height || 500);
+                    }
+                    else if(this.layout == 'nav'){
+                    }
+                    else if(this.layout == 'tile'){
+                    }
+                    else {
+                        this.el_ulc.height(this.height || 500);
                     }
 
-                    this.isExpanded = function ($index) {
-                        //console.log('isExpandedByIndex:'+$index);
-                        return this.expandedIndexes[$index];
-                    }
-
-                    this.isChecked = function ($index) {
-                        return this.checkedIndexes[$index] == this.checkState.checked;
-                    }
-
-                    this.isUndetermined = function ($index) {
-                        return this.checkedIndexes[$index] == this.checkState.undetermined;
-                    }
-
-                    this.isNone = function ($index) {
-                        return this.checkedIndexes[$index] == this.checkState.none;
-                    }
-
-                    this.inputCheckState = function ($index) {
-                        return this.inputCheckedIndex[$index];
-                    }
-
-                    this.toggle = function ($index, $event) {
-                        if (angular.isDefined(this.expandedIndexes[$index])) {
-                            this.expandedIndexes[$index] = !this.expandedIndexes[$index];
-
-                            if (this.mode != 'check') {
-                                this.collapseAllBut($index);
-                            }
-                        }
-                        $event.stopPropagation();
-                        return false;
-                    }
-
-                    this.expand = function ($index) {
-                        this._expand($index);
-                    }
+                    this.totalNodeCounts = attrs(this.treeData);//增加attrs
 
                     this._expand = function ($index) {
                         var arr = $index.split(this.levelSplitChar);
-                        if (angular.isDefined(this.expandedIndexes[$index])) {
-                            this.expandedIndexes[$index] = true;
+                        if (angular.isDefined(this._expandedIndexes[$index])) {
+                            this._expandedIndexes[$index] = true;
                             //this.collapseAllBut($index);
                         }
                         if (arr.length > 1) {
@@ -219,98 +178,31 @@
                         }
                     }
 
-                    this.collapseAllBut = function ($index) {
-                        $index += '';
-                        for (var i in this.expandedIndexes) {
-                            if ($index < 0 || $index.indexOf(i) < 0)
-                                this.expandedIndexes[i] = false;
-                        }
-                    }
+                    this._UpdateCheckState = function ($index, toState,inputToCheck) {
+                        //设置自身
+                        this._checkedIndexes[$index] = toState;
+                        this.inputCheckedIndex[$index] = inputToCheck;
 
-                    this.select = function (node, $event) {
-                        if (this.mode == 'check' || this._compare(node, this.selectedNode || {})) {
-                            $event && $event.stopPropagation();
-                            return;
-                        }
-                        //console.log(angular.element('#' + id + ' .tree-node-selected').size());
-                        angular.element('#' + id + ' .tree-node-selected').removeClass('tree-node-selected');
-                        this.selectedNode = node;
-                        var target = $event && $event.currentTarget;
-                        angular.element(target).addClass('tree-node-selected');
-                        $rootScope.$broadcast('tree:node:select', this);
-                        $event && $event.stopPropagation();
-                    }
+                        //级联则需要影响子孙和祖先
+                        var arr = $index.split(this.levelSplitChar);
+                        if (this.checkCascade) {
+                            //设置子孙为checked
+                            for (var k in this._checkedIndexes) {
 
-
-                    this.toggleCheck = function ($index, $event, inDirective) {
-                        $index += '';
-                        if (angular.isDefined(this.checkedIndexes[$index])) {
-                            var toState, inputToCheck;
-                            var arr = $index.split(this.levelSplitChar);
-                            //var $elem = angular.element($event.currentTarget);
-                            //console.log($elem);
-                            if (this.checkedIndexes[$index] == this.checkState.checked) {
-                                toState = this.checkState.none;
-                                inputToCheck = false;
-                            }
-                            else {
-                                toState = this.checkState.checked;
-                                inputToCheck = true;
-                            }
-                            //设置自身
-                            this.checkedIndexes[$index] = toState;
-                            this.inputCheckedIndex[$index] = inputToCheck;
-
-
-                            //级联则需要影响子孙和祖先
-                            if (this.checkCascade) {
-                                //设置子孙为checked
-                                for (var k in this.checkedIndexes) {
-                                    if (k.split(this.levelSplitChar).length >= (arr.length + 1) && k.indexOf($index) == 0) {
-                                        this.checkedIndexes[k] = toState;
-                                        this.inputCheckedIndex[k] = inputToCheck;
-                                    }
-                                }
-
-                                //更新祖先
-                                if (arr.length > 1) {
-
-                                    var parentIndex = arr.slice(0, arr.length - 1).join(this.levelSplitChar);
-                                    this._UpdateUndeterminedChecked(parentIndex);
+                                if (k.split(this.levelSplitChar).length >= (arr.length + 1) && (k).indexOf($index + this.levelSplitChar) == 0) {
+                                    this._checkedIndexes[k] = toState;
+                                    this.inputCheckedIndex[k] = inputToCheck;
                                 }
                             }
 
+                            //更新祖先
+                            if (arr.length > 1) {
 
-                            //重新设置checked节点
-                            if (!inDirective) {
-                                this.checkedNodes = this._getCheckedNodes();
-
-                                $rootScope.$broadcast('tree:node:checkChange', this);
+                                var parentIndex = arr.slice(0, arr.length - 1).join(this.levelSplitChar);
+                                this._UpdateUndeterminedChecked(parentIndex);
                             }
                         }
-
-                        $event && $event.stopPropagation();
-                        return false;
                     }
-
-
-                    //this.setNodeChecked = function (nodes) {
-                    //    if (!nodes)
-                    //        return;
-                    //    //var $indexes = [];
-                    //    for (var i = 0; i < nodes.length; i++) {
-                    //        if (this.checkCascade && nodes.children && nodes.children.length > 0) {
-                    //            //在只选择叶子节点下，将这些带有字节点的node去掉
-                    //        }
-                    //        else {
-                    //            //$indexes.push();
-                    //
-                    //            var $index = this.findNodeIndexById(nodes[i]._id);
-                    //            this.toggleCheck($index);
-                    //            console.log(this.checkedIndexes);
-                    //        }
-                    //    }
-                    //}
 
                     this._UpdateUndeterminedChecked = function ($index) {
                         //console.log('_UpdateUndeterminedChecked:' + $index);
@@ -318,18 +210,24 @@
                         var arr = $index.split(this.levelSplitChar);
 
                         var checkedCount = 0, noneCount = 0, matchedCount = 0;
-                        for (var k in this.checkedIndexes) {
+                        for (var k in this._checkedIndexes) {
                             //查找当前节点的直接字节点计算
-                            if (k.split(this.levelSplitChar).length == (arr.length + 1) && (k).indexOf($index) == 0) {
+
+                            if (k.split(this.levelSplitChar).length == (arr.length + 1) && (k).indexOf($index+this.levelSplitChar) == 0) {
+                                //console.log('k.split(this.levelSplitChar).length:'+k.split(this.levelSplitChar).length);
+                                //console.log('(arr.length + 1):'+(arr.length + 1));
+                                //console.log('k:'+k);
+                                //console.log('$index:'+$index);
+                                //console.log('(k).indexOf($index):'+(k).indexOf($index));
                                 matchedCount++;
-                                if (this.checkedIndexes[k] == this.checkState.undetermined) {
+                                if (this._checkedIndexes[k] == this.checkState.undetermined) {
                                     matchedCount = noneCount = checkedCount = 0;
                                     //直接存在undetermined状态
-                                    this.checkedIndexes[$index] = this.checkState.undetermined;
+                                    this._checkedIndexes[$index] = this.checkState.undetermined;
                                     this.inputCheckedIndex[$index] = true;
                                     break;
                                 }
-                                else if (this.checkedIndexes[k] == this.checkState.none) {
+                                else if (this._checkedIndexes[k] == this.checkState.none) {
                                     noneCount++;
                                 }
                                 else {
@@ -341,18 +239,18 @@
                         if (matchedCount > 0) {
                             if (checkedCount > 0 && noneCount > 0) {
                                 //有checked 又有none,则更新为undetermined状态
-                                this.checkedIndexes[$index] = this.checkState.undetermined;
+                                this._checkedIndexes[$index] = this.checkState.undetermined;
                                 this.inputCheckedIndex[$index] = true;
 
                             }
                             else {
-                                this.checkedIndexes[$index] = checkedCount == matchedCount ? this.checkState.checked : this.checkState.none;
+                                this._checkedIndexes[$index] = checkedCount == matchedCount ? this.checkState.checked : this.checkState.none;
                                 this.inputCheckedIndex[$index] = checkedCount == matchedCount;
                             }
                         }
-                        //console.log('this.checkedIndexes['+$index+']:'+this.checkedIndexes[$index]);
+                        //console.log('this._checkedIndexes['+$index+']:'+this._checkedIndexes[$index]);
                         //console.log('matchedCount:'+matchedCount+' checkedCount:'+checkedCount+' noneCount:'+noneCount);
-                        //console.log(this.checkedIndexes);
+                        //console.log(this._checkedIndexes);
                         //递归
                         if (arr.length == 1) {
                             return;
@@ -362,12 +260,6 @@
                             this._UpdateUndeterminedChecked(parentIndex);
                         }
                     }
-
-
-                    this.getCheckedNodes = function () {
-                        this.checkedNodes = this._getCheckedNodes();
-                    }
-
                     this._getCheckedNodes = function (nodes, parentIndex) {
                         if (!nodes)
                             nodes = angular.isArray(this.treeData) ? this.treeData : [this.treeData];
@@ -378,10 +270,11 @@
                         for (var i = 0; i < nodes.length; i++) {
                             var checkIndex = checkIndexPrefix + i;
 
-                            if (this.checkedIndexes[checkIndex] != 'none') {
-                                var hasChildren = nodes[i].children && nodes[i].children.length > 0;
-                                if (this.checkedIndexes[checkIndex] == 'checked') {
+                            var hasChildren = nodes[i].children && nodes[i].children.length > 0;
 
+                            if (this._checkedIndexes[checkIndex] != 'none') {
+
+                                if (this._checkedIndexes[checkIndex] == 'checked') {
                                     if (this.checkCascade) {
                                         //级联的check只允许获得叶子节点
                                         if (!hasChildren) {
@@ -392,19 +285,15 @@
                                         arrChecked.push(nodes[i]);
                                     }
                                 }
-                                if (hasChildren) {
-                                    arrChecked = arrChecked.concat(this._getCheckedNodes(nodes[i].children, checkIndex))
-                                }
+                            }
+
+                            if (hasChildren) {
+                                arrChecked = arrChecked.concat(this._getCheckedNodes(nodes[i].children, checkIndex))
                             }
                         }
 
                         return arrChecked
                     }
-
-                    this.findNode = function ($index) {
-                        return this._findNode(this.treeData, $index);
-                    }
-
                     this._findNode = function (nodes, $index) {
                         if (!nodes)
                             return null;
@@ -428,11 +317,6 @@
                         }
                         return null;
                     }
-
-                    this.findNodeById = function (_id) {
-                        return this._findNodeById(_id, this.treeData);
-                    }
-
                     this._findNodeById = function (_id, nodes, $parentIndex) {
                         //$parentIndex = $parentIndex || '';
                         for (var i = 0; i < nodes.length; i++) {
@@ -450,11 +334,6 @@
                         }
                         return null;
                     }
-
-                    this.findNodeIndexById = function (_id) {
-                        return this._findNodeIndexById(_id, this.treeData);
-                    }
-
                     this._findNodeIndexById = function (_id, nodes, $parentIndex) {
 
                         for (var i = 0; i < nodes.length; i++) {
@@ -474,65 +353,247 @@
                         return null;
                     }
 
+                    //可暴露的方法和属性
+                    this.checkState = {none: 'none', checked: 'checked', undetermined: 'undetermined'};
+                    this.selectedNode;
+                    this.checkedNodes = [];
+                    this.inputCheckedIndex = {};
 
-                    //function isSelected(node) {
-                    //
-                    //    if (!node) return;
-                    //
-                    //    if (!item.sref || item.sref === '#') {
-                    //        var foundActive = false;
-                    //        angular.forEach(item.submenu, function (value) {
-                    //            if (isSelected(value)) foundActive = true;
-                    //        });
-                    //        return foundActive;
-                    //    }
-                    //    else
-                    //        return $state.is(item.sref) || $state.includes(item.sref);
-                    //}
+                    this.getSelectedNode = function(){
+                        return this.selectedNode;
+                    }
+
+                    this.addIndex = function ($index) {
+                        var arr = ($index + '').split(this.levelSplitChar);
+                        var level = arr.length;
+                        var levelExpanded = level <= this.expandLevel;
+                        if(this.layout == 'nav') {
+                            if ($index == 0) {
+                                levelExpanded = true;
+                            }
+                            else {
+                                levelExpanded = false;
+                            }
+                        }
+                        else if(this.layout == 'tile') {
+                            if (level == 1) {
+                                levelExpanded = false;
+                            }
+                        }
+                        this._expandedIndexes[$index] = levelExpanded;
+                        if (this.mode == 'check') {
+                            this._checkedIndexes[$index] = this.checkState.none;
+                            this.inputCheckedIndex[$index] = false;
+                            //console.log(this._checkedIndexes);
+                        }
+                    }
+
+                    this.compare = option.compare || function (node1, node2) {
+                            return node1._id === node2._id;
+                        };
+
+                    this.isExpanded = function ($index) {
+                        //console.log('isExpandedByIndex:'+$index);
+                        return this._expandedIndexes[$index];
+                    }
+
+                    this.isChecked = function ($index) {
+                        return this._checkedIndexes[$index] == this.checkState.checked;
+                    }
+
+                    this.isUndetermined = function ($index) {
+                        return this._checkedIndexes[$index] == this.checkState.undetermined;
+                    }
+
+                    this.isNone = function ($index) {
+                        return this._checkedIndexes[$index] == this.checkState.none;
+                    }
+
+                    this.toggle = function ($index, $event) {
+                        if (angular.isDefined(this._expandedIndexes[$index])) {
+                            this._expandedIndexes[$index] = !this._expandedIndexes[$index];
+                            if (this.mode != 'check') {
+                                if (this.layout != 'tile') {
+                                    this.collapseAllBut($index);
+                                }
+                                else {
+                                    var arr = ($index + '').split(this.levelSplitChar);
+                                    var level = arr.length;
+                                    if (level == 1) {
+                                        this.collapseLevelBut($index);
+                                    }
+                                }
+                            }
+                        }
+
+                        $event.stopPropagation();
+                        return false;
+                    }
+
+                    this.expand = function ($index) {
+                        this._expand($index);
+                    }
+
+                    this.collapseAllBut = function ($index) {
+                        $index += '';
+                        for (var i in this._expandedIndexes) {
+                            if ($index < 0 || $index.indexOf(i) < 0)
+                                this._expandedIndexes[i] = false;
+                        }
+                    }
+
+                    this.collapseLevelBut = function ($index) {
+                        $index += '';
+                        var level = $index.split(this.levelSplitChar).length;
+                        for (var i in this._expandedIndexes) {
+                            var itemLevel = (i + '').split(this.levelSplitChar).length;
+                            if (level < 0 || (level == itemLevel && $index.indexOf(i) < 0))
+                                this._expandedIndexes[i] = false;
+                        }
+                    }
+
+                    this.select = function (node, $event) {
+                        if (this.compare(node, this.selectedNode || {})) {
+                            $event && $event.currentTarget && $event.stopPropagation();
+                            return;
+                        }
+                        //this.mode == 'check' ||
+
+                        //console.log(angular.element('#' + id + ' .tree-node-selected').size());
+
+                        this.el.find('.tree-node-selected').removeClass('tree-node-selected');
+                        //angular.element('#' + id + ' .tree-node-selected').removeClass('tree-node-selected');
+                        this.selectedNode = node;
+
+                        var target = $event && $event.currentTarget;
+                        if(!target)
+                            target = $event;//第二个参数在编程调用时是可以是指定的jquery对象
+                        angular.element(target).addClass('tree-node-selected');
+
+                        $rootScope.$broadcast('tree:node:select', this.selectedNode, this);
+
+                        if($event && $event.currentTarget)
+                            $event && $event.stopPropagation();
+                    }
+
+                    this.toggleCheck = function ($index, $event) {
+                        $index += '';
+                        if (angular.isDefined(this._checkedIndexes[$index])) {
+                            var toState, inputToCheck;
+
+                            //var $elem = angular.element($event.currentTarget);
+                            //console.log($elem);
+                            if (this._checkedIndexes[$index] == this.checkState.checked) {
+                                toState = this.checkState.none;
+                                inputToCheck = false;
+                            }
+                            else {
+                                toState = this.checkState.checked;
+                                inputToCheck = true;
+                            }
+
+                            this._UpdateCheckState($index, toState, inputToCheck);
 
 
-                    //
-                    //this.collapseNode = function(node){
-                    //    node.expanded = false;
-                    //};
-                    //
-                    //this.expandNode = function(node){
-                    //    node.expanded = true;
-                    //};
-                    //
-                    //this.toggleNode = function(node,$event) {
-                    //    console.log(node.name);
-                    //    node.expanded = !node.expanded;
-                    //    $event.stopPropagation();
-                    //}
-                    //
-                    //this.isNodeExpanded = function(node) {
-                    //    return !!node.expanded
-                    //}
-                    //
-                    //this.findNode = function(node,nodes) {
-                    //    if (!nodes)
-                    //        nodes = _.isArray(this.treeData) ? this.treeData : [this.treeData];
-                    //
-                    //    for (var i = 0; i < nodes.length; ++i) {
-                    //        var child = nodes[i];
-                    //        // 如果找到了则直接返回
-                    //        if (self._compare(child, node))
-                    //            return child;
-                    //        // 否则递归查找
-                    //        var finded = self.find(node, child.children);
-                    //        if (finded)
-                    //            return finded;
-                    //    }
-                    //    return null;
-                    //}
-                    //
-                    //this.hasChildren = function(parent, child) {
-                    //    var children = _.isArray(child) ? child : [child];
-                    //    return !!_.find(children, function (child) {
-                    //        return _this.find(child, parent.children);
-                    //    });
-                    //};
+                            //手工动作重新设置checked节点
+                            if ($event && $event.currentTarget) {
+                                this.checkedNodes = this._getCheckedNodes();
+                                $rootScope.$broadcast('tree:node:checkChange', this.checkedNodes, this);
+                            }
+                        }
+                        if ($event && $event.currentTarget)
+                            $event && $event.stopPropagation();
+                        //console.log(this._checkedIndexes);
+                        //console.log(this.inputCheckedIndex);
+                        //return false;
+                    }
+
+                    this.check = function ($index,$event) {
+                        $index += '';
+                        if (angular.isDefined(this._checkedIndexes[$index])) {
+
+                            this._UpdateCheckState($index, this.checkState.checked, true);
+
+                            //手工动作重新设置checked节点
+                            if ($event && $event.currentTarget) {
+                                this.checkedNodes = this._getCheckedNodes();
+                                $rootScope.$broadcast('tree:node:checkChange', this.checkedNodes, this);
+                            }
+                        }
+                        if ($event && $event.currentTarget)
+                            $event && $event.stopPropagation();
+                    }
+
+                    this.unCheck = function ($index,$event) {
+                        $index += '';
+                        if (angular.isDefined(this._checkedIndexes[$index])) {
+
+                            this._UpdateCheckState($index, this.checkState.none, false);
+
+                            //手工动作重新设置checked节点
+                            if ($event && $event.currentTarget) {
+                                this.checkedNodes = this._getCheckedNodes();
+                                $rootScope.$broadcast('tree:node:checkChange', this.checkedNodes, this);
+                            }
+                        }
+                        if ($event && $event.currentTarget)
+                            $event && $event.stopPropagation();
+                    }
+
+
+
+                    this.getCheckedNodes = function () {
+                        this.checkedNodes = this._getCheckedNodes();
+                    }
+
+                    this.findNode = function ($index) {
+                        return this._findNode(this.treeData, $index);
+                    }
+
+                    this.findNodeById = function (_id) {
+                        return this._findNodeById(_id, this.treeData);
+                    }
+
+                    this.findNodeIndexById = function (_id) {
+                        return this._findNodeIndexById(_id, this.treeData);
+                    }
+
+                    //dropdown
+                    this.toggleDropdown = function () {
+                        this.dropdownOpened ? this.closeDropdown() : this.openDropdown();
+                    }
+
+                    this.openDropdown = function () {
+                        if (this.dropdownOpened)
+                            return;
+                        //if (self.height != self.joulc.height()) {
+                        //    this.joulc.height(this.height);
+                        //}
+                        var clientHeight = $document[0].body.clientHeight;
+                        var clientWidth = $document[0].body.clientWidth;
+                        var parentTop = this.el.offset().top;
+                        var parentleft = this.el.offset().left;
+                        var offsetTop = this.el.height();
+                        var offsetLeft = 0;
+                        var deltaHeight = 16;
+                        if (parentTop + offsetTop +  this.height > clientHeight) {
+                            offsetTop = -this.height - deltaHeight;
+                        }
+
+                        if (parentleft + offsetLeft + this.el_ulc.width() > clientWidth) {
+                            offsetLeft = -(clientWidth - this.el_ulc.width());
+                        }
+                        this.el_ulc.css({top: offsetTop, left: offsetLeft}).removeClass('tree-hidden');
+
+                        this.dropdownOpened = true;
+                    }
+
+                    this.closeDropdown = function () {
+                        if (!this.dropdownOpened)
+                            return;
+                        this.el_ulc.addClass('tree-hidden');
+                        this.dropdownOpened = false;
+                    }
                 }
             }]
         };

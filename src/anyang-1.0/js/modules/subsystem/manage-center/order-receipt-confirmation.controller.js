@@ -40,19 +40,19 @@
             }
 
             if(vm.switches.leftTree) {
-                vmh.shareService.t('T1005', 'name type').then(function (treeNodes) {
+                vmh.shareService.tmg('T1005', 'name type').then(function (treeNodes) {
                     vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes)];
                     vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.tenantId);
 
                     vm.query();
                 });
 
-                $scope.$on('tree:node:select', function ($event, tree) {
+                $scope.$on('tree:node:select', function ($event, node) {
                     //console.log(tree.selectedNode);
-                    var selectNodeId = tree.selectedNode._id;
+                    var selectNodeId = node._id;
 
                     if ($scope.$stateParams.tenantId != selectNodeId) {
-                        $scope.$state.go(vm.viewRoute(), {tenantId: tree.selectedNode._id});
+                        $scope.$state.go(vm.viewRoute(), {tenantId: selectNodeId});
                     }
                 });
             }

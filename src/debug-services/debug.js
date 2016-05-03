@@ -9,7 +9,7 @@ module.exports = {
         this.file = __filename;
         this.filename = this.file.substr(this.file.lastIndexOf('/') + 1);
         this.module_name = this.filename.substr(0, this.filename.lastIndexOf('.'));
-        this.service_url_prefix = '/services/' + this.module_name.split('_').join('/');
+        this.service_url_prefix = '/debug-services/' + this.module_name.split('_').join('/');
 
         option = option || {};
 
@@ -40,6 +40,29 @@ module.exports = {
                             }
                             yield tenant.save();
                             this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'test-random-token',//立即过期用户开通的所有功能
+                verb: 'get',
+                url: this.service_url_prefix + "/testRandomToken",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var rows = [];
+                            for (var i = 0; i < 1000; i++) {
+                                rows.push(app.uid(6));
+                            }
+                            console.log(rows.length);
+                            rows = app._.uniq(rows);
+                            console.log(rows.length);
+                            this.body = app.wrapper.res.rows(rows);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

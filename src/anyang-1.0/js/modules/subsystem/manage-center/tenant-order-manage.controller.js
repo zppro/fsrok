@@ -30,16 +30,16 @@
             });
 
             if (vm.switches.leftTree) {
-                vmh.shareService.t('T1001', 'name type', vm.treeFilterObject).then(function (treeNodes) {
+                vmh.shareService.tmp('T3001/pub-tenant', 'name type', vm.treeFilterObject).then(function (treeNodes) {
                     vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes, {mode: 'grid'})];
                     vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.tenantId);
                 });
 
-                $scope.$on('tree:node:select', function ($event, tree) {
+                $scope.$on('tree:node:select', function ($event, node) {
                     //console.log(tree.selectedNode);
-                    var selectNodeId = tree.selectedNode._id;
+                    var selectNodeId = node._id;
                     if ($scope.$stateParams.tenantId != selectNodeId) {
-                        $scope.$state.go(vm.viewRoute(), {tenantId: tree.selectedNode._id});
+                        $scope.$state.go(vm.viewRoute(), {tenantId: selectNodeId});
 
                     }
                 });
@@ -147,11 +147,11 @@
             });
 
 
-            $scope.$on('tree:node:checkChange', function ($event, tree) {
+            $scope.$on('tree:node:checkChange', function ($event, checkedNodes) {
                 vm.model.period_charge = 0;
                 vm.model.order_items = [];
-                for (var i = 0; i < tree.checkedNodes.length; i++) {
-                    var theFunc = _.findWhere(vmc.pricedFuncs, {func_id: tree.checkedNodes[i]._id});
+                for (var i = 0; i < checkedNodes.length; i++) {
+                    var theFunc = _.findWhere(vmc.pricedFuncs, {func_id: checkedNodes[i]._id});
                     if (theFunc) {
                         vm.model.period_charge += theFunc.price;
                         vm.model.order_items.push(_.omit(theFunc, ['_id', 'check_in_time']));

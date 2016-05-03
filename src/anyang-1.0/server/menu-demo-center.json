@@ -27,7 +27,27 @@
         "_id": "menu.demo-center.TREE-EXTEND",
         "name": "树-扩展功能",
         "sref": "app.demo-center.tree-extend"
+      },
+      {
+        "_id": "menu.demo-center.TREE-DIRECTIVE",
+        "name": "树-指令",
+        "sref": "app.demo-center.tree-directive"
+      },
+      {
+        "_id": "menu.demo-center.TREE-NAV",
+        "name": "树-导航",
+        "sref": "app.demo-center.tree-nav"
+      },
+      {
+        "_id": "menu.demo-center.TREE-TILE",
+        "name": "树-平铺",
+        "sref": "app.demo-center.tree-tile"
       }
     ]
+  },
+  {
+    "_id": "menu.demo-center.BOX-INPUT",
+    "name": "方框输入框",
+    "sref": "app.demo-center.box-input"
   }
 ]

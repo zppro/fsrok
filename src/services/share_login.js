@@ -79,6 +79,11 @@ module.exports = {
                                         return;
                                     }
 
+                                    //考虑cookie大小，过滤open_funcs里的字段
+                                    tenant = tenant.toObject();//将bson转为json
+                                    tenant.open_funcs = app._.map(tenant.open_funcs,function(o){
+                                        return app._.pick(o,'func_id','expired_on');
+                                    });
                                 }
 
                                 //日期字符 保证token当日有效

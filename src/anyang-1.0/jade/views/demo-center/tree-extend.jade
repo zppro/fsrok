@@ -14,10 +14,10 @@ script(type='text/ng-template', id="tree-demo-extend-renderer.html")
 .col-xs-3
     .tree.tree-demo#tree1(ng-style="{height:vm.size.h-15}")
         ul
-            li.repeat-modify(ng-repeat='node in vm.trees[0].treeData',ng-include="'tree-demo-extend-renderer.html'",ng-init="tIndex=0;nIndex = $index")
+            li(ng-repeat='node in vm.trees[0].treeData',ng-include="'tree-demo-extend-renderer.html'",ng-init="tIndex=0;nIndex = $index")
     span selected:{{vm.trees[0].selectedNode.name}}
 .col-xs-3
     .tree.tree-demo#tree2(ng-style="{height:vm.size.h-15}")
         ul
-            li.repeat-modify(ng-repeat='node in vm.trees[1].treeData',ng-include="'tree-demo-extend-renderer.html'",ng-init="tIndex=1;nIndex = $index")
+            li(ng-repeat='node in vm.trees[1].treeData',ng-include="'tree-demo-extend-renderer.html'",ng-init="tIndex=1;nIndex = $index")
     span checked:{{vm.trees[1].checkedNodes}}

@@ -202,6 +202,26 @@
   height: auto;
 }
 
+.read-label {
+  margin-bottom: 0;
+  vertical-align: middle;
+  line-height: @line-height-computed;
+}
+.read-control-underline {
+  display: block;
+  width: 100%;
+  //height: @input-height-base; // Make inputs at least the height of their button counterpart (base line-height + padding + border)
+  padding: 0 @padding-base-horizontal;
+  font-size: @font-size-base;
+  line-height: @line-height-computed;
+  color: @input-color;
+  cursor: @cursor-disabled;
+  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+  border: none;
+  background-color: transparent;
+  border-bottom: solid 1px @input-border;
+}
+
 //
 // Form Rounded
 //

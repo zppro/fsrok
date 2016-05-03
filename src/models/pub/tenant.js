@@ -1,4 +1,7 @@
-
+/**
+ * Created by zppro on 16-03-18.
+ * 管理中心 租户实体
+ */
 var mongoose = require('mongoose');
 module.isloaded = false;
 
@@ -8,6 +11,15 @@ module.exports = function(ctx,name) {
     }
     else {
         module.isloaded = true;
+
+        function needRefreshToken(document) {
+            return !document.token || (document.token_expired && ctx.moment(document.token_expired).diff(ctx.moment()) < 0 );
+        }
+
+        function setNewToken(document) {
+            document.token = ctx.uid(8);
+            document.token_expired = ctx.moment().add(3, 'M');
+        }
 
 
         //var open_func_schema = require('./func')(ctx,'pub_func').schema;
@@ -26,6 +38,8 @@ module.exports = function(ctx,name) {
             //    latest: {type: Date},
             //    history: [{from: {type: Date, required: true}, to: {type: Date}}]
             //},
+            token: {type: String, required: true, minlength: 8, maxlength: 8},//租户标识(8位)
+            token_expired: {type: Date},//租户标识过期时间
             validate_util: {type: Date, required: true},
             //定价模块
             price_funcs: [{
@@ -52,15 +66,34 @@ module.exports = function(ctx,name) {
         });
 
         tenantSchema.pre('update', function (next) {
+            this.model.findById(this._compiledUpdate.$set._id).exec().then(function (document) {
+                if (needRefreshToken(document)) {
+                    document.save();
+                }
+
+            });
             this.update({}, {
                 $set: {
                     operated_on: new Date()
                 }
             });
             next();
+
         });
 
+        tenantSchema.pre('validate', function (next) {
+            if (needRefreshToken(this)) {
+                setNewToken(this);
+            }
+            next();
+        });
+
+
         tenantSchema.$$skipPaths = ['price_funcs', 'open_funcs'];
+
+        tenantSchema.methods.needRefreshToken = function(){
+            console.log(this);
+        }
 
         return mongoose.model(name, tenantSchema, name);
     }

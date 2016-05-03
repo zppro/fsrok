@@ -1,5 +1,6 @@
 /**
  * Created by zppro on 15-12-14.
+ * 管理中心 用户实体
  */
 var mongoose = require('mongoose');
 //module.typeEnums = {"D1000":['A0001', 'A0002', 'A0003']};
@@ -33,7 +34,7 @@ module.exports = function(ctx,name) {
         userSchema.pre('update', function (next) {
             this.update({}, {$set: {operated_on: new Date()}});
             next();
-        })
+        });
 
         userSchema.pre('save', function (next) {
             console.log('password_hash:');

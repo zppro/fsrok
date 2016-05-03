@@ -48,8 +48,13 @@
         $scope.vmh = vmh;
     }
 
-    ModuleHeaderForTenantController.$inject = ['$scope','vmh'];
-    function ModuleHeaderForTenantController($scope,vmh) {
+    ModuleHeaderForTenantController.$inject = ['$scope','vmh','Auth'];
+    function ModuleHeaderForTenantController($scope,vmh,Auth) {
         $scope.vmh = vmh;
+        var vm = $scope.vm = {};
+        var user = Auth.getUser();
+        if(user && user.tenant) {
+            vm.tenantName = user.tenant.name;
+        }
     }
 })();

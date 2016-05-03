@@ -41,16 +41,16 @@
             //}
             //console.log(vm.treeFilterObject);
             if (vm.switches.leftTree) {
-                vmh.shareService.t('T1001', 'name type', vm.treeFilterObject).then(function (treeNodes) {
+                vmh.shareService.tmp('T3001/pub-tenant', 'name type', vm.treeFilterObject).then(function (treeNodes) {
                     vm.trees = [new vmh.treeFactory.sTree('tree1', treeNodes, {mode: 'grid'})];
                     vm.trees[0].selectedNode = vm.trees[0].findNodeById($scope.$stateParams.tenantId);
                 });
 
-                $scope.$on('tree:node:select', function ($event, tree) {
+                $scope.$on('tree:node:select', function ($event, node) {
                     //console.log(tree.selectedNode);
-                    var selectNodeId = tree.selectedNode._id;
+                    var selectNodeId = node._id;
                     if ($scope.$stateParams.tenantId != selectNodeId) {
-                        $scope.$state.go(vm.viewRoute(), {tenantId: tree.selectedNode._id});
+                        $scope.$state.go(vm.viewRoute(), {tenantId: selectNodeId});
 
                     }
                 });
@@ -95,6 +95,10 @@
                 vm.selectBinding.tenants = vm.modelNode.services['pub-tenant'].query(vm.selectFilterObject.tenants, '_id name');
             }
             vmh.shareService.d('D1001').then(function (rows) {
+                if(vm.model.type!='A0001') {
+                    //非平台用户管理时角色不能选超级管理员
+                    rows = _.initial(rows);
+                }
                 vm.selectBinding.roles = rows;
             });
 

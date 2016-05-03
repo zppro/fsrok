@@ -30,7 +30,7 @@
                         return;
                     }
                     // 用户登录了，但没有访问当前视图的权限
-                    if (!Auth.isAuthorized(toState.access_level) || !Auth.isPermit(toState.name)) {
+                    if (!Auth.isAuthorized(toState.access_level) || !Auth.isPermit(toState.func_id || (toState.data && toState.data.func_id) || toState.name)) {
                         event.preventDefault();
 
                         $state.go('app.dashboard');
@@ -40,7 +40,6 @@
                         }, 100);
 
                         return;
-
                     }
                     return;
                 } else {
@@ -98,8 +97,9 @@
             });
         // Hook success
         $rootScope.$on('$stateChangeSuccess',
-            function (/*event, toState, toParams, fromState, fromParams*/) {
+            function (event, toState, toParams, fromState, fromParams) {
                 // display new view from top
+                //console.log(toState);
                 $window.scrollTo(0, 0);
                 if($state.current.title){
                     $rootScope.currTitle = $rootScope.app.name + ' - ' + $state.current.title;

@@ -34,7 +34,8 @@
             'app.grid',
             'app.tree',
             'app.demo',
-            'subsystem.manage-center'
+            'subsystem.manage-center',
+            'subsystem.organization-pfta'
         ]);
 })();
 

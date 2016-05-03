@@ -1,5 +1,6 @@
 /**
  * Created by zppro on 15-12-14.
+ * 管理中心 订单实体
  */
 var mongoose = require('mongoose');
 //module.typeEnums = {"D1000":['A0001', 'A0002', 'A0003']};
@@ -24,7 +25,7 @@ module.exports = function(ctx,name) {
             check_in_time: {type: Date, default: Date.now},
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
-            code: {type: String, required: true, maxlength: 30, index: {unique: true}},
+            code: {type: String, required: true, minlength: 12, maxlength: 12, index: {unique: true}},
             period_charge: {type: Number, default: 0.00},//期间费用，默认是一个月的开通模块总费用
             duration: {type: Number, min: 1},//持续期间，N个月
             order_items: [{
@@ -64,10 +65,10 @@ module.exports = function(ctx,name) {
             return this.period_charge * this.duration;
         });
 
-        orderSchema.pre('save', function (next) {
+        orderSchema.pre('validate', function (next) {
             if (this.code == ctx.modelVariables.SERVER_GEN) {
                 //考虑到并发几乎不可能发生，所以将订单编号设定为
-                //order.type+[年2月2日2]+6位随机数
+                //[年2月2日2]+6位随机数
                 this.code = ctx.moment().format('YYMMDD') + ctx.rfcore.util.randomN(6);
             }
             next();

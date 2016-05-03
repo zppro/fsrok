@@ -8,7 +8,7 @@
       {
         "_id": "menu.organization-pfta.ENTER-MANAGE",
         "name": "入院管理",
-        "sref": "app.organization-pfta.oldman-enter-manage"
+        "sref": "app.organization-pfta.enter-manage.list"
 
       },
       {
@@ -99,7 +99,7 @@
       {
         "_id": "menu.organization-pfta.USER-MANAGE",
         "name": "用户管理",
-        "sref": "app.organization-pfta.system-user-manage"
+        "sref": "app.organization-pfta.user-manage.list"
       },
       {
         "_id": "menu.organization-pfta.DEPARTMENT-MANAGE",
@@ -107,14 +107,14 @@
         "sref": "app.organization-pfta.system-department-manage"
       },
       {
-        "_id": "menu.organization-pfta.DISTRICT-MANAGE",
-        "name": "片区管理",
-        "sref": "app.organization-pfta.system-district-manage"
+        "_id": "menu.organization-pfta.ROOM-MANAGE",
+        "name": "房间管理",
+        "sref": "app.organization-pfta.room-manage.list"
       },
       {
-        "_id": "menu.organization-pfta.BED-MANAGE",
-        "name": "床位管理",
-        "sref": "app.organization-pfta.system-bed-manage"
+        "_id": "menu.organization-pfta.DISTRICT-MANAGE",
+        "name": "片区管理",
+        "sref": "app.organization-pfta.district-manage.list"
       },
       {
         "_id": "menu.organization-pfta.LOG",

@@ -4,7 +4,7 @@
     "name": "机构养老云",
     "sref": "app.organization-pfta",
     "mtype":"business",
-    "usertype": ["A0001","A0002"],
+    "usertype": ["A0002"],
     "menujson": "menu-organization-pfta.json"
   },
   {
@@ -12,7 +12,7 @@
     "name": "社区养老云",
     "sref": "app.community-pfta",
     "mtype":"business",
-    "usertype": ["A0001","A0002"],
+    "usertype": ["A0002"],
     "menujson": "menu-community-pfta.json"
   },
   {

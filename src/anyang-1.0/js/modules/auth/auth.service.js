@@ -36,10 +36,11 @@
             isPermit: function (func_id) {
                 this.ensureUser();
                 if(_user && _user.tenant && _user.tenant.open_funcs) {
+
                     var func = _.find(_user.tenant.open_funcs, function (o) {
                         return o.func_id == func_id;
                     });
-                    if (func) {
+                    if (func && angular.isDefined(moment)) {
                         return moment(func.expired_on).diff(moment()) >= 0;
                     }
                     else {
@@ -52,9 +53,7 @@
                 return _user ? true : false;
             },
             getUser: function () {
-                if(_user) {
-                    _user = $cookieStore.get('user');
-                }
+                this.ensureUser();
                 return _user;
             },
             getToken: function () {
