@@ -141,6 +141,7 @@
 
 
                     this.mode = option.mode || 'default'; //default,check,
+                    this.selectNodeFormat = option.selectNodeFormat || '_id';// '_id,name' 或者 'object'
                     this.levelSplitChar = option.levelSplitChar || '-';
                     this.expandLevel = option.expandLevel || 1;
                     if (angular.isUndefined(option.checkCascade)) {
@@ -376,9 +377,8 @@
                             }
                         }
                         else if(this.layout == 'tile') {
-                            if (level == 1) {
-                                levelExpanded = false;
-                            }
+                            //tile不受expandLevel参数影响
+                            levelExpanded = true;
                         }
                         this._expandedIndexes[$index] = levelExpanded;
                         if (this.mode == 'check') {
@@ -389,7 +389,7 @@
                     }
 
                     this.compare = option.compare || function (node1, node2) {
-                            return node1._id === node2._id;
+                            return node1 === node2 || node1._id === node2._id;
                         };
 
                     this.isExpanded = function ($index) {
@@ -413,7 +413,7 @@
                         if (angular.isDefined(this._expandedIndexes[$index])) {
                             this._expandedIndexes[$index] = !this._expandedIndexes[$index];
                             if (this.mode != 'check') {
-                                if (this.layout != 'tile') {
+                                if (this.layout != 'nav' && this.layout != 'tile') {
                                     this.collapseAllBut($index);
                                 }
                                 else {
@@ -453,6 +453,7 @@
                     }
 
                     this.select = function (node, $event) {
+                        console.log(node.name);
                         if (this.compare(node, this.selectedNode || {})) {
                             $event && $event.currentTarget && $event.stopPropagation();
                             return;
@@ -462,13 +463,23 @@
                         //console.log(angular.element('#' + id + ' .tree-node-selected').size());
 
                         this.el.find('.tree-node-selected').removeClass('tree-node-selected');
+                        this.el.find('.tree-node-cascade-selected').removeClass('tree-node-cascade-selected');
                         //angular.element('#' + id + ' .tree-node-selected').removeClass('tree-node-selected');
                         this.selectedNode = node;
 
                         var target = $event && $event.currentTarget;
                         if(!target)
                             target = $event;//第二个参数在编程调用时是可以是指定的jquery对象
+
                         angular.element(target).addClass('tree-node-selected');
+
+                        if(angular.element(target).hasClass('parent-cascade-select')){
+                            console.log('cascade-select:');
+                            //console.log(angular.element(target).parents('.tree-node'));
+                            //this.el.find('.cascade-selectable').addClass('tree-node-cascade-selected')
+                            //console.log(angular.element(target).parents().filter('.tree-group').children('.cascade-selectable'));
+                            angular.element(target).parents().filter('.tree-group').children('.cascade-selectable').addClass('tree-node-cascade-selected')
+                        }
 
                         $rootScope.$broadcast('tree:node:select', this.selectedNode, this);
 

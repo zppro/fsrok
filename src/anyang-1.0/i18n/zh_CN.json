@@ -4,6 +4,8 @@
     "RETURN": "返回",
     "SAVE": "保存",
     "ADD": "新增",
+    "BATCH-ADD": "批量新增",
+    "BATCH-EDIT": "批量修改",
     "EDIT": "修改",
     "READ": "查看",
     "REMOVE": "删除",
@@ -53,7 +55,8 @@
     "SAVE-SUCCESS": "保存成功",
     "REMOVE-SUCCESS": "删除成功",
     "NORMAL-SUCCESS": "操作成功",
-    "SELECT-NONE-WARNING": "没有选中任何记录"
+    "SELECT-NONE-WARNING": "没有选中任何记录",
+    "BATCH-ADD-NONE-WARNING": "选中的批量添加记录都已经存在，请重新选择"
   },
   "dashboard": {
     "WELCOME": "欢迎来到{{appName}}"
@@ -109,6 +112,8 @@
       "DEPARTMENT-MANAGE": "部门管理(暂缓)",
       "ROOM-MANAGE": "房间管理",
       "DISTRICT-MANAGE": "片区管理",
+      "CHARGE-STANDARD": "收费标准",
+      "CHARGE-ITEM-CUSTOMIZED": "收费项目自定义",
       "LOG": "系统日志(暂缓)"
     },
     "manage-center": {
@@ -141,6 +146,7 @@
       "TREE-DIRECTIVE": "树-指令",
       "TREE-NAV": "树-导航",
       "TREE-TILE": "树-平铺",
+      "DROPDOWN": "下拉选择",
       "BOX-INPUT": "方框输入框"
     }
   },

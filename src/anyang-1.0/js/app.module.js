@@ -33,6 +33,7 @@
             'app.model',
             'app.grid',
             'app.tree',
+            'app.dropdown',
             'app.demo',
             'subsystem.manage-center',
             'subsystem.organization-pfta'

@@ -31,8 +31,8 @@
                             '_query': {method: 'POST', isArray: true, headers: {'_$resource$_': true}},
                             '_post': {method: 'POST', headers: {'_$resource$_': true}},
                             '_update': {method: 'PUT', headers: {'_$resource$_': true}},
-                            '_save': {method: 'POST'},
-                            '_remove': {method: 'DELETE'}
+                            '_save': {method: 'POST', headers: {'_$resource$_': true}},
+                            '_remove': {method: 'DELETE', headers: {'_$resource$_': true}}
                             //'delete': {method: 'DELETE'}
                         });
                         this.services[name].save = function (params, successFn, errorFn) {
@@ -72,6 +72,12 @@
                             return this._post({_id: '$bulkInsert'}, {
                                 removeWhere: removeWhere,
                                 rows: rows
+                            }, successFn, errorFn)
+                        };
+                        this.services[name].bulkUpdate = function (conditions,batchModel, successFn, errorFn) {
+                            return this._update({_id: '$bulkUpdate'}, {
+                                conditions: conditions,
+                                batchModel: batchModel
                             }, successFn, errorFn)
                         };
                     }
@@ -187,11 +193,16 @@
             $get: ['$rootScope', '$q', '$http', function ($rootScope, $q, $http) {
 
                 return {
+                    tenantInfo: tenantInfo,
                     completeOrder: completeOrder,
                     refundOrder: refundOrder,
                     userChangePassword: userChangePassword,
                     resetUserPassword: resetUserPassword
                 };
+
+                function tenantInfo(tenantId,select) {
+                    return $http.get(baseUrl + 'tenantInfo/' + tenantId + '/' + select);
+                }
 
                 function completeOrder(orderId) {
                     return $http.post(baseUrl + 'completeOrder/' + orderId);

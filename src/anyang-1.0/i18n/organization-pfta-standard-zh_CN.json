@@ -11,8 +11,8 @@
         "HEAD-LABEL-ENTER_ON":"入院日期",
         "TAB1": "老人信息",
         "TAB2": "食宿信息",
-        "TAB3": "服务项目",
-        "TAB4": "财务信息",
+        "TAB3": "护理与服务",
+        "TAB4": "费用信息",
         "TAB1-LABEL-ELDERLY-NAME": "老人姓名",
         "TAB1-PLACEHOLDER-ELDERLY-NAME": "张三",
         "TAB1-LABEL-ELDERLY-ID_NO": "身份证号",
@@ -27,7 +27,21 @@
         "TAB1-LABEL-ELDERLY-INHABIT_STATUS": "居住状况",
         "TAB1-LABEL-ELDERLY-FINANCIAL_STATUS": "经济状况",
         "TAB1-LABEL-ELDERLY-HOBBIES": "爱好特长",
-        "TAB1-LABEL-ELDERLY-MEDICAL_HISTORIES": "过往病史"
+        "TAB1-LABEL-ELDERLY-MEDICAL_HISTORIES": "过往病史",
+        "TAB1-LABEL-REMARK":"备注",
+        "TAB1-PLACEHOLDER-REMARK":"补充说明一些情况",
+        "TAB1-PLACEHOLDER-ELDERLY-FAMILY-MEMBER-NAME": "家属姓名",
+        "TAB1-PLACEHOLDER-ELDERLY-FAMILY-MEMBER-PHONE": "联系电话",
+        "TAB1-PLACEHOLDER-ELDERLY-FAMILY-MEMBER-ADDRESS": "联系地址",
+        "TAB2-BOARD-INFO":"伙食",
+        "TAB2-ROOM-INFO":"床位",
+        "TAB3-NURSING-INFO":"护理信息",
+        "TAB3-CUSTOM-SERVICE-INFO":"特色服务",
+        "TAB4-CHARGE-ITEM":"收费项目",
+        "TAB4-CHARGE-PERIOD-PRICE-SUM":"费用小计",
+        "TAB4-PERIOD-VALUE-IN-ADVANCE":"预收",
+        "TAB4-PERIOD-OF-MONTH":"{{period_value}}月",
+        "TAB4-CHARGE-TOTALS":"费用总计"
       }
     },
     "user-manage": {
@@ -59,10 +73,34 @@
         "TAB1": "基本信息",
         "TAB1-LABEL-DISTRICT_ID":"所在片区",
         "TAB1-PLACEHOLDER-DISTRICT_ID":"请选择一个片区..",
+        "TAB1-LABEL-FLOOR": "所在楼层",
+        "TAB1-LABEL-NUMBER-IN-FLOOR": "楼层房间号",
         "TAB1-LABEL-NAME": "房间名称",
         "TAB1-PLACEHOLDER-NAME": "1201..",
         "TAB1-LABEL-CAPACITY": "床位数量",
-        "TAB1-PLACEHOLDER-CAPACITY": "6.."
+        "TAB1-PLACEHOLDER-CAPACITY": "4..",
+        "TAB1-LABEL-FLAG-COLLECTION": "标志集合",
+        "TAB1-LABEL-STOP_FLAG": "停用"
+      },
+      "details-batch-add": {
+        "TITLE": "机构养老云-系统管理-房间-批量添加",
+        "TAB1": "批量添加信息",
+        "TAB1-LABEL-DISTRICT_ID":"所在片区",
+        "TAB1-PLACEHOLDER-DISTRICT_ID":"请选择一个片区..",
+        "TAB1-LABEL-FLOOR": "所在楼层",
+        "TAB1-LABEL-NUMBER-IN-FLOOR": "楼层房间号",
+        "TAB1-LABEL-CAPACITY": "床位数量",
+        "TAB1-PLACEHOLDER-CAPACITY": "4..",
+        "TAB1-LABEL-FLAG-COLLECTION": "标志集合",
+        "TAB1-LABEL-STOP_FLAG": "停用"
+      },
+      "details-batch-edit": {
+        "TITLE": "机构养老云-系统管理-房间-批量编辑",
+        "TAB1": "批量编辑信息",
+        "TAB1-LABEL-CAPACITY": "床位数量",
+        "TAB1-PLACEHOLDER-CAPACITY": "4..",
+        "TAB1-LABEL-FLAG-COLLECTION": "标志集合",
+        "TAB1-LABEL-STOP_FLAG": "停用"
       }
     },
     "district-manage": {
@@ -74,6 +112,73 @@
         "TAB1": "基本信息",
         "TAB1-LABEL-NAME": "片区名称",
         "TAB1-PLACEHOLDER-NAME": "A区南楼.."
+      }
+    },
+    "charge-standard": {
+      "TITLE": "机构养老云-系统管理-收费标准",
+      "HEADER-ITEM_NAME": "收费项目",
+      "HEADER-PERIOD_PRICE": "收费价格",
+      "HEADER-PRICER": "调价器",
+      "HEADER-PERIOD": "收费周期"
+    }
+  },
+  "charge-item": {
+    "organization-pfta": {
+      "ROOM-S1": "床位费",
+      "room-s1": {
+        "SINGLE-ROOM": "单人间",
+        "DOUBLE-ROOM": "双人间",
+        "TRIPLE-ROOM": "三人间",
+        "DOMITORY-ROOM": "多人间"
+      },
+      "BOARD-S1": "伙食费",
+      "board-s1":{
+        "NUTRITION":"营养餐"
+      },
+      "NURSING-S1": "护理费",
+      "nursing-s1":{
+        "SELF-CARE":"自理老人",
+        "DEVICE-AIDED":"介助老人(半失能/半失智)",
+        "NURSING-CARD":"介护老人(失能/失智)"
+      },
+      "OTHER-S1": "其他费用",
+      "other-s1":{
+        "DEPOSIT":"押金/保证金",
+        "SHARE-BILLS":"水/电费",
+        "HEATING-COOLING":"空调/暖气费"
+      },
+      "ROOM-S1": "床位费",
+      "room-s2": {
+        "SINGLE-ROOM": "单人间",
+        "DOUBLE-ROOM": "双人间",
+        "TRIPLE-ROOM": "三人间",
+        "FOUR-ROOM": "四人间",
+        "FIVE-ROOM": "五人间",
+        "SIX-ROOM": "六人间",
+        "DOMITORY-ROOM": "多人间"
+      },
+      "BOARD-S2": "伙食费",
+      "board-s2":{
+        "ONE":"一类",
+        "TWO":"二类",
+        "THREE":"三类",
+        "FOUR":"四类"
+      },
+      "NURSING-S2": "护理费",
+      "nursing-s2":{
+        "GRADE-FOUR":"四级(全自理)",
+        "GRADE-THREE":"三级(半自理)",
+        "GRADE-TWO":"二级(半护理)",
+        "GRADE-ONE":"一级(全护理)",
+        "GRADE-SPECIAL":"特级(全卧床)"
+      },
+      "OTHER-S2": "其他费用",
+      "other-s2":{
+        "DEPOSIT":"押金/保证金",
+        "WATER":"水费",
+        "ELECTRIC":"电费",
+        "COOLING":"空调费",
+        "HEATING":"暖气费"
       }
     }
   }

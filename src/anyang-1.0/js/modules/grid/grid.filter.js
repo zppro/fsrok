@@ -15,6 +15,7 @@
         .filter('revertNumber',revertNumber)
         .filter('formatter',formatter)
         .filter('boolFilter',boolFilter)
+        .filter('diFilter',diFilter)
         .filter('orFilter',orFilter)
     ;
 
@@ -58,6 +59,9 @@
         return GridUtils.boolFilter;
     }
 
+    function diFilter(GridUtils){
+        return GridUtils.diFilter;
+    }
 
     function orFilter(GridUtils) {
         return GridUtils.orFilter;

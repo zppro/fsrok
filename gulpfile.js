@@ -65,7 +65,8 @@ var source = {
     less: {
         watch: [paths.src_client + 'less/**/*', '!' + paths.src_client + 'less/themes/*'],
         app: paths.src_client + 'less/*.*',
-        themes: paths.src_client + 'less/themes/*'
+        themes: paths.src_client + 'less/themes/*',
+        subsystem: paths.src_client + 'less/subsystem/*.*'
     },
     scripts: {
         watch: [paths.src_client + 'js/**/*', '!' + paths.src_client + 'js/custom/**/*'],
@@ -249,11 +250,25 @@ gulp.task('styles:less:themes', function() {
         ;
 });
 
+// Styles:less subsystem
+gulp.task('styles:less:subsystem', function() {
+    log('Building less app subsystem styles..');
+    return gulp.src(source.less.subsystem)
+        .pipe($plugins.if(isProduction, $plugins.sourcemaps.init()))
+        .pipe($plugins.less())
+        .on('error', handleError)
+        .pipe($plugins.if(isProduction, $plugins.minifyCss()))
+        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write()))
+        .pipe(gulp.dest(isProduction ? build.production.styles : build.develop.styles))
+        .pipe($plugins.livereload())
+        ;
+});
 
 gulp.task('styles',[
     'styles:less:app',
     'styles:less:app-rtl',
-    'styles:less:themes'
+    'styles:less:themes',
+    'styles:less:subsystem'
 ]);
 
 // JS APP
@@ -332,7 +347,7 @@ gulp.task('watch', function() {
     gulp.watch(serverdata.watch,['server']);
     gulp.watch(source.i18n.watch, ['i18n']);
     gulp.watch(source.jade.watch, ['jade']);
-    gulp.watch(source.less.watch, ['styles:less:app', 'styles:less:app-rtl']);
+    gulp.watch(source.less.watch, ['styles:less:app', 'styles:less:app-rtl','styles:less:subsystem']);
     gulp.watch(source.scripts.watch, ['scripts:app']);
 
 });

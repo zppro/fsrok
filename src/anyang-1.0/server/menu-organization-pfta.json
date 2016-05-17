@@ -117,6 +117,16 @@
         "sref": "app.organization-pfta.district-manage.list"
       },
       {
+        "_id": "menu.organization-pfta.CHARGE-STANDARD",
+        "name": "收费标准",
+        "sref": "app.organization-pfta.charge-standard"
+      },
+      {
+        "_id": "menu.organization-pfta.CHARGE-ITEM-CUSTOMIZED",
+        "name": "自定义收费项目",
+        "sref": "app.organization-pfta.charge-item-customized.list"
+      },
+      {
         "_id": "menu.organization-pfta.LOG",
         "name": "系统日志",
         "sref": "app.organization-pfta.system-log"

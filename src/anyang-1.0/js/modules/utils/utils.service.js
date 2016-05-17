@@ -232,7 +232,8 @@
             age: age,
             vtab: vtab,
             vinput: vinput,
-            isPhone: isPhone
+            isPhone: isPhone,
+            changeProperyName: changeProperyName
         };
 
         function age(birthday) {
@@ -261,6 +262,21 @@
         }
 
 
+        function changeProperyName(o,pairs) {
+            if (!o)
+                return;
+            if (!angular.isArray(o)) {
+                o = [o];
+            }
+            angular.forEach(o, function (item) {
+                for (var i = 0; i < pairs.length; i++) {
+                    if(!(pairs[i].n in item)){
+                        item[pairs[i].n] = item[pairs[i].o];
+                        delete item[pairs[i].o];
+                    }
+                }
+            });
+        }
 
     }
 

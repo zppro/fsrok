@@ -29,6 +29,25 @@ module.exports = {
 
         this.actions = [
             {
+                method: 'tenantInfo',
+                verb: 'get',
+                url: this.service_url_prefix + "/tenantInfo/:_id/:select",//:select需要提取的字段域用逗号分割 e.g. name,type
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenant = yield app.modelFactory().read(tenantModelOption.model_name, tenantModelOption.model_path, this.params._id);
+                            var ret = app._.pick(tenant.toObject(),this.params.select.split(','));
+                            this.body = app.wrapper.res.ret(ret);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            /**********************订单相关*****************************/
+            {
                 method: 'completeOrder',//完成订单
                 verb: 'post',
                 url: this.service_url_prefix + "/completeOrder/:_id",
@@ -175,6 +194,7 @@ module.exports = {
                     };
                 }
             }
+            /*************************************************************/
         ];
 
         return this;

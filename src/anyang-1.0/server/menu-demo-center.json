@@ -46,6 +46,11 @@
     ]
   },
   {
+    "_id": "menu.demo-center.DROPDOWN",
+    "name": "下拉选择",
+    "sref": "app.demo-center.dropdown"
+  },
+  {
     "_id": "menu.demo-center.BOX-INPUT",
     "name": "方框输入框",
     "sref": "app.demo-center.box-input"

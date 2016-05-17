@@ -33,6 +33,9 @@ var ModelFactory = function(conn) {
         bulkInsert: function (name, path, data) {
             return ModelFactory._bulkInsert(ModelFactory.getModel(conn, name, path), data);
         },
+        bulkUpdate: function (name, path, data) {
+            return ModelFactory._bulkUpdate(ModelFactory.getModel(conn, name, path), data);
+        },
         distinct : function(name,path,data) {
             return ModelFactory._distinct(ModelFactory.getModel(conn, name, path), data);
         }
@@ -120,6 +123,13 @@ ModelFactory._bulkInsert =function (model,data) {
     if(canInsert) {
         return model.insertMany(data.rows);
     }
+};
+
+ModelFactory._bulkUpdate = function (model,data) {
+    if (data && data.conditions && data.batchModel) {
+        return model.update(data.conditions, data.batchModel, {multi: true});
+    }
+    return {error: {code: 'E59999', message: 'params error'}}
 };
 
 ModelFactory._distinct = function(model,data) {

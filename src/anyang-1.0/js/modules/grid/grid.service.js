@@ -88,9 +88,10 @@
             width: width,
             toggleOrderClass: toggleOrderClass,
             noResultsColspan: noResultsColspan,
-            revertNumber:revertNumber,
+            revertNumber: revertNumber,
             formatter: formatter,
             boolFilter: boolFilter,
+            diFilter: diFilter,
             orFilter: orFilter
         };
 
@@ -182,6 +183,17 @@
 
         function boolFilter(rowValue){
             return {"1": "是", "0": "否", "true": "是", "false": "否"}[rowValue];
+        }
+
+        function diFilter(rowValue,di) {
+            if (_.isArray(rowValue)) {
+                return _.map(rowValue, function (o) {
+                    return di[o] || (_.findWhere(di, {value: rowValue}) || {}).name;
+                });
+            }
+            else {
+                return di[rowValue] || (_.findWhere(di, {value: rowValue}) || {}).name;
+            }
         }
 
 

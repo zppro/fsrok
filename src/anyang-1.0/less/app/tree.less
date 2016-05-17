@@ -54,7 +54,7 @@
     padding-left: 0.8em;
     margin: 0.25em 0;
     //background-color: red;
-    > div.tree-node {
+    > .tree-node {
       //width: 150%;
 
       > i {
@@ -88,6 +88,14 @@
     }
     > div.tree-node:hover {
       background: #E2E2E2;
+    }
+
+    .cascade-selectable{
+      //可被级联选取的样式
+    }
+    .tree-node-cascade-selected {
+      //级联选取后的样式
+      background-color: orange!important;
     }
 
     .tree-group-head {
@@ -124,6 +132,9 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    > span {
+      cursor: default !important;
+    }
   }
 }
 
@@ -198,6 +209,7 @@
   li{padding:0;margin: 0;}
   .row {
     margin: 0;
+    border-top: solid 1px @tree-border;
     border-bottom: solid 1px @tree-border;
   }
   > .ul-container {
@@ -213,18 +225,37 @@
             color: black;
           }
         }
+        .col-border-right{
+          border-right: solid 1px @tree-border;
+        }
+        .col-border-left {
+          border-left: solid 1px @tree-border;
+        }
         .tree-item {
+          border-right: solid 1px @tree-border;
           width: 24px;
-          padding:0 5px;
-
+          padding: 5px;
+          display: table;
+          height: 74px;
+          .vertical-middle {
+            display: table-cell;
+            vertical-align: middle;
+            > span{
+              display: block;
+              width: 14px;
+              word-wrap: break-word;
+              font-size: 14px;
+              letter-spacing: 5px;
+            }
+          }
         }
         .tree-item-children {
           border-left: solid 1px @tree-border;
+          background-color: @btn-primary-bg;
           padding:0;
           li {
             width: 64px;
             height:64px;
-            line-height: 64px;
             text-align: center;
             float: left;
             margin-left:5px;
@@ -234,9 +265,16 @@
             margin-bottom:5px;
           }
           .tree-sub-item {
+            width:100%;
+            height:100%;
+            display: table;
             background-color: @btn-primary-bg;
             cursor: pointer;
             color:white;
+            .vertical-middle {
+              display: table-cell;
+              vertical-align: middle;
+            }
           }
           .tree-sub-item:hover {
             background-color: darken(@btn-primary-bg, 10%);

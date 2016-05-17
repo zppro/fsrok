@@ -62,6 +62,16 @@ module.exports = function(ctx,name) {
                 orderNo: {type: Number, default: 0},//排序序号
                 //payed: {type: Boolean, default: false},
                 expired_on: {type: Date, default: ctx.moment('1970-01-01T00:00:00+0000')}
+            }],
+            //收费(标准+项目)
+            charge_standard: {type: String, required: true},
+            charge_items: [{
+                check_in_time: {type: Date, default: Date.now},
+                item_id: {type: String, required: true},
+                item_name: {type: String, required: true},
+                period_price: {type: Number, default: 0.00},
+                period: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])},
+                orderNo: {type: Number, default: 0}
             }]
         });
 
@@ -89,7 +99,7 @@ module.exports = function(ctx,name) {
         });
 
 
-        tenantSchema.$$skipPaths = ['price_funcs', 'open_funcs'];
+        tenantSchema.$$skipPaths = ['price_funcs', 'open_funcs','charge_items'];
 
         tenantSchema.methods.needRefreshToken = function(){
             console.log(this);

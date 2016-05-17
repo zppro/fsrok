@@ -145,6 +145,27 @@
 
             return ['$timeout', '$q', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'shareNode','extensionNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', function ($timeout, $q, $translate, $http, Browser, blockUI, cfpLoadingBar, shareNode,extensionNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
 
+                function promiseWrapper() {
+                    if (arguments.length > 0) {
+                        if (angular.isFunction(arguments[0])) {
+                            var fn = arguments[0];
+                            var caller;
+                            if (arguments.length > 1) {
+                                caller = arguments[1];
+                            }
+                            return $q.when(true).then(function () {
+                                fn.apply(caller, Array.prototype.slice.call(arguments, 2));
+                            });
+                        }
+                        else {
+                            return $q.when(arguments[0]);
+                        }
+                    }
+                    else {
+                        return $q.when(true);
+                    }
+                }
+
                 function exec(promise) {
                     var self = this;
                     self.blocker.start();
@@ -176,6 +197,7 @@
                     browser: Browser,
                     loadingBar: cfpLoadingBar,
                     blocker: blockUI.instances.get('module-block'),
+                    promiseWrapper:promiseWrapper,
                     exec: exec,
                     fetch: fetch,
                     parallel: parallel,
@@ -200,6 +222,10 @@
             var arrNames = name.split('.');
             return ['$state', '$stateParams', '$window', '$q', '$translate', '$timeout', '$http', 'Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $translate, $timeout, $http, Auth, modelNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
+
+                function getParam(name) {
+                    return $stateParams[name];
+                }
 
                 function init(initOption) {
                     var self = this;
@@ -291,6 +317,23 @@
                     }, this.toDetailsParams));
                 }
 
+                function batchAdd(){
+                    $state.go(this.moduleRoute('details-batch-add'), this.toDetailsParams);
+                }
+
+                function batchEdit() {
+
+                    var self = this;
+                    if (self.selectedRows.length == 0) {
+                        return $translate('notification.SELECT-NONE-WARNING').then(function (ret) {
+                            Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + ret + '</div>', 'warning');
+                        });
+                    }
+
+                    var selectedIds = _.map(self.selectedRows, function(o){return o._id});
+                    $state.go(this.moduleRoute('details-batch-edit'), _.defaults(this.toDetailsParams, {selectedIds: selectedIds}));
+                }
+
                 function read(id) {
                     $state.go(this.moduleRoute('details'), _.defaults({
                         action: 'read',
@@ -308,8 +351,6 @@
 
                 function _processRemove(method) {
                     var self = this;
-                    console.log(method);
-
                     if (self.selectedRows.length == 0) {
 
                         return $translate('notification.SELECT-NONE-WARNING').then(function (ret) {
@@ -472,12 +513,15 @@
                     columnFormatters: {},
                     rows: [],
                     size: {w: 0, h: 0},
+                    getParam:getParam,
                     init: init,
                     removeDialog: ['ngDialog', function (ngDialog) {
                         return ngDialog;
                     }],
                     add: add,
                     edit: edit,
+                    batchAdd:batchAdd,
+                    batchEdit:batchEdit,
                     read: read,
                     remove: remove,
                     disable: disable,
@@ -495,7 +539,7 @@
         function buildEntityVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI','Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI,Auth, modelNode, Notify, GridDemoModelSerivce) {
+            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI, Auth, modelNode, Notify, GridDemoModelSerivce) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
                 function init() {
@@ -512,10 +556,18 @@
                     //设置treeFilterObject
                     this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
 
-                    var tenant = Auth.getUser().tenant;
-                    if(tenant) {
-                        this.model['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                    var user = Auth.getUser();
+                    if(user) {
+                        this.operated_by = this.model['operated_by'] = user._id;
+                        this.operated_by_name = this.model['operated_by_name'] = user.name;
+                        var tenant = user.tenant;
+                        if (tenant) {
+
+                            this.tenantId = this.model['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                            console.log(this.model);
+                        }
                     }
+
                     //remote data get
 
                     //
@@ -527,6 +579,10 @@
 
                     //初始化只读模式下模型实体字段转换器
                     this.fieldConverters = {};
+                }
+
+                function getParam(name) {
+                    return $stateParams[name];
                 }
 
                 function cancel() {
@@ -559,12 +615,24 @@
                     }
                 }
 
+                function loadWhenBatchAdd() {
+                    return $q.when(_.defaults(this.model, this.toListParams, option.model));
+                }
+
+                function loadWhenBatchEdit() {
+                    if (($stateParams.selectedIds || []).length == 0) {
+                        this.cancel();
+                    }
+                }
+
                 function save() {
                     var promise;
                     var self = this;
+                    console.log('save model...');
                     if (option.modelName) {
                         if (self._id_ == 'new') {
                             //create
+                            console.log(self.model);
                             promise = modelService.save(_.defaults(self.model, self.toListParams, option.model)).$promise;
                         }
                         else {
@@ -605,6 +673,48 @@
                             self.blocker.stop();
                         }
 
+                    });
+                }
+
+                function saveWhenBatchAdd(batchModels) {
+                    if (batchModels.length == 0) {
+                        return $translate('notification.BATCH-ADD-NONE-WARNING').then(function (ret) {
+                            Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + ret + '</div>', 'warning');
+                        });
+                    }
+                    var self = this;
+                    var promise = this.modelService.bulkInsert(batchModels).$promise;
+                    if (self.blocker) {
+                        self.blocker.start();
+                    }
+                    return $q.all([$translate('notification.SAVE-SUCCESS'), promise]).then(function (ret) {
+                        Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                        $state.go(self.moduleRoute('list'), self.toListParams);
+                        console.log('--------------end success----------------')
+                    }).finally(function () {
+
+                        if (self.blocker) {
+                            self.blocker.stop();
+                        }
+
+                    });
+                }
+
+                function saveWhenBatchEdit(conditions,batchModel) {
+                    var self = this;
+                    var promise = this.modelService.bulkUpdate(conditions, batchModel).$promise;
+                    if (self.blocker) {
+                        self.blocker.start();
+                    }
+                    return $q.all([$translate('notification.SAVE-SUCCESS'), promise]).then(function (ret) {
+                        Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                        $state.go(self.moduleRoute('list'), self.toListParams);
+                        console.log('--------------end success----------------')
+                    }).finally(function () {
+
+                        if (self.blocker) {
+                            self.blocker.stop();
+                        }
                     });
                 }
 
@@ -685,10 +795,15 @@
                     toList: option.toList || [],
                     size: {w: 0, h: 0},
                     blocker: option.blockUI ? blockUI.instances.get('module-block') : false,
+                    getParam:getParam,
                     init: init,
                     cancel: cancel,
                     load: load,
+                    loadWhenBatchAdd: loadWhenBatchAdd,
+                    loadWhenBatchEdit: loadWhenBatchEdit,
                     save: save,
+                    saveWhenBatchAdd: saveWhenBatchAdd,
+                    saveWhenBatchEdit: saveWhenBatchEdit,
                     notExist: notExist,
                     openDP: openDP
                 };
@@ -698,15 +813,31 @@
         function buildInstanceVM(name,option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'modelNode', 'Notify', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI, modelNode, Notify) {
+            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'modelNode', 'Notify','Auth', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI, modelNode, Notify,Auth) {
                 //var modelService = modelNode.services[option.modelName];
 
+                function getParam(name) {
+                    return $stateParams[name];
+                }
 
                 function init() {
                     this.size = calcWH($window);
 
                     //设置selectFilterObject
                     this.selectFilterObject = _.defaults(this.selectFilterObject, $state.current.data && $state.current.data.selectFilterObject);
+
+                    var user = Auth.getUser();
+                    if(user) {
+                        this.operated_by = this.model['operated_by'] = user._id;
+                        this.operated_by_name = this.model['operated_by_name'] = user.name;
+
+                        var tenant = user.tenant;
+
+                        if (tenant) {
+                            this.tenantId = this.model['tenantId'] = tenant._id;
+                        }
+                    }
+
                     //remote data get
 
                     //需要的对象传入，2 通过init(option)传入到entry
@@ -728,8 +859,10 @@
                     blocker: option.blockUI ? blockUI.instances.get('module-block') : false,
                     switches: option.switches || {},
                     transTo: option.transTo || {},//跳转到另外module设置对象
+                    model: {},
                     selectBinding: {},
                     selectFilterObject: {},
+                    getParam:getParam,
                     init: init,
                     openDP: openDP
                 };
@@ -777,6 +910,7 @@
 
         function moduleTranslatePath() {
             //去掉_system_
+            //console.log(_.union([this._subsystem_, this._module_], Array.prototype.slice.call(arguments, 0)).join('.'));
             return _.union([this._subsystem_, this._module_], Array.prototype.slice.call(arguments, 0)).join('.');
         }
 

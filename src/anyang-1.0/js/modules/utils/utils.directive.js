@@ -137,7 +137,7 @@
         }
 
         function showValue(val,$spanArray,inputType,tip) {
-            console.log(tip);
+            //console.log(tip);
             var valLength = Number(val.length);
             for (var i = 0; i < valLength; i++) {
                 var $span = $spanArray.eq(i);
@@ -182,7 +182,7 @@
                 .on('blur',function() {
                     jqLite(this).parent('.virbox').find('span').removeClass('focus');
                 })
-                .on('keyup',function() {
+                .on('keyup',function(event) {
                     var $spanArray = jqLite(this).parent('.virbox').find('span');
                     $spanArray.html('');
                     var val = jqLite(this).val();
@@ -194,12 +194,21 @@
                         jqLite(this).val('');
                         var $spanArray = jqLite(this).parent('.virbox').find('span');
                         $spanArray.html('');
-
                         $timeout(function(){
                             scope.value = '';
                         });
                     }
+                    else if(event.which == 8){
+                        var $spanArray = jqLite(this).parent('.virbox').find('span').html('');
+                        var self = this;
+                        $timeout(function(){
+                            var val = jqLite(self).val();
+                            showValue(val,$spanArray,attrs.type,'keydown');
+                        });
+                    }
+
                     if (event.which >= 35 && event.which <= 40) {
+
                         return false;
                     }
                     if(inputType == 'number' && (event.which < 48 || event.which > 57)){

@@ -182,6 +182,23 @@
                     }
                 }
             })
+            .state('app.demo-center.dropdown', {
+                url: '/dropdown',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('demo-center/dropdown.html'),
+                        controller: 'DemoDropdownController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.demo-center.dropdown')
+                        }
+                    }
+                }
+            })
             .state('app.demo-center.box-input', {
                 url: '/box-input',
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,

@@ -36,6 +36,10 @@
     "tree-tile": {
       "TITLE": "演示中心-树-平铺"
     },
+    "dropdown": {
+      "TITLE": "演示中心-下拉选择",
+      "DEFAULT-PLACEHOLDER": "请选择"
+    },
     "box-input":{
       "TITLE": "演示中心-方框输入",
       "ID_NO": "身份证号",

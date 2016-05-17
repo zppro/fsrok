@@ -15,6 +15,7 @@
         .controller('DemoTreeDirectiveController', DemoTreeDirectiveController)
         .controller('DemoTreeNavController', DemoTreeNavController)
         .controller('DemoTreeTileController', DemoTreeTileController)
+        .controller('DemoDropdownController', DemoDropdownController)
         .controller('DemoBoxInputController', DemoBoxInputController)
     ;
 
@@ -299,6 +300,34 @@
 
     }
 
+    DemoDropdownController.$inject = ['$scope','vmh', 'instanceVM'];
+
+    function DemoDropdownController($scope, vmh, vm) {
+
+        $scope.vm = vm;
+
+        init();
+
+
+        function init() {
+            vm.init();
+
+            console.log('123');
+
+            vm.dropdownDataPromise = vmh.shareService.d('D1015').then(function(items){
+                console.log('then in controller');
+                vm.period = items[2].value;
+                return items;
+            });
+
+            vm.onSelect = onSelect;
+        }
+
+        function onSelect(item){
+            vm.selected = 'callback received ' + angular.toJson(item);
+        }
+
+    }
 
     DemoBoxInputController.$inject = ['$scope','vmh', 'instanceVM'];
 

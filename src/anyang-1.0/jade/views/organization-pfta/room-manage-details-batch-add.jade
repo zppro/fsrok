@@ -18,24 +18,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-FLOOR') | translate}}:
                         .col-md-10
-                            .btn-group
-                                label.btn.btn-primary(ng-disabled="!vm.model.districtId||vm.diableFloor(floor)",ng-repeat='floor in vm.selectBinding.floors',ng-class="{active: floor == vm.model.floor}")
-                                    input(ng-disabled="!vm.model.districtId||vm.diableFloor(floor)",type='radio',class="hidden",name="floor" ng-model="vm.model.floor" ng-value="floor",ng-change='vm.genRoomName()',required='')
-                                    |{{floor}}F
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'floor','required')") {{ "validator.REQUIRED" | translate}}
+                            rzslider(rz-slider-model='vm.model.floor_from',rz-slider-high="vm.model.floor_to",rz-slider-options="vm.slider.floor_options")
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NUMBER-IN-FLOOR') | translate}}:
                         .col-md-10
-                            .btn-group
-                                label.btn.btn-primary(ng-disabled="!vm.model.districtId||vm.diableNumberInFloor(number_in_floor)",ng-repeat='number_in_floor in vm.selectBinding.numbers_in_floor',ng-class="{active: number_in_floor == vm.model.number_in_floor}")
-                                    input(ng-disabled="!vm.model.districtId||vm.diableNumberInFloor(number_in_floor)",type='radio',class="hidden",name="number_in_floor" ng-model="vm.model.number_in_floor" ng-value="number_in_floor",ng-change='vm.genRoomName()',required='')
-                                    |{{number_in_floor}}#
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'number_in_floor','required')") {{ "validator.REQUIRED" | translate}}
-                    fieldset: .form-group
-                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-NAME') | translate}}:
-                        .col-md-10
-                            input.form-control(readonly,type='text', name='name',ng-model='vm.model.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-NAME")|translate}}' ,required='')
-                            span.text-danger(ng-show="utils.vinput(this.theForm,'name','required')") {{ "validator.REQUIRED" | translate}}
+                            rzslider(rz-slider-model='vm.model.number_in_floor_from',rz-slider-high="vm.model.number_in_floor_to",rz-slider-options="vm.slider.number_in_floor_options")
                     fieldset: .form-group
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-CAPACITY') | translate}}:
                         .col-md-10

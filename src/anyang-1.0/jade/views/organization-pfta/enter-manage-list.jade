@@ -26,7 +26,9 @@
                            input(type='checkbox' data="trBubble" ng-model="row.checked" )
                            span.fa.fa-check(data="trBubble")
                   td.text-left {{::row.code}}
+                  td.text-left {{::row.elderly_summary}}
                   td {{::row.enter_on|date:'yyyy-MM-dd'}}
+                  td.text-right {{::row.deposit|currency}}
                   td {{row.current_register_step|formatter:'current_register_step':vm.columns}}
                   td
                      .btn-group

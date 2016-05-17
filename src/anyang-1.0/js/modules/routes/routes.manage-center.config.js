@@ -25,6 +25,7 @@
                 template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div>',
                 resolve: {
                     vmh: helper.buildVMHelper()
+                    , deps: helper.resolveFor2('subsystem.manage-center')
                 }
             })
             .state('app.manage-center.pension-agency-account-manage', {

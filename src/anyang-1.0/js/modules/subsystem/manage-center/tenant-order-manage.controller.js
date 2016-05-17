@@ -167,6 +167,7 @@
         }
 
         function onTenantIdChanged() {
+
             if (vm.model.tenantId) {
 
                 vmh.fetch(tenantService.query({_id: vm.model.tenantId}, 'price_funcs open_funcs')).then(function (currentTenant) {

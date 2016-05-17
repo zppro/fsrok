@@ -24,6 +24,7 @@
                 template: '<div class="module-header-wrapper" data-ui-view="module-header"></div><div class="module-content-wrapper" data-ui-view="module-content"></div>',
                 resolve: {
                     vmh: helper.buildVMHelper()
+                    , deps: helper.resolveFor2('subsystem.organization-pfta')
                 }
             })
             .state('app.organization-pfta.enter-manage', {
@@ -62,10 +63,24 @@
                                 sortable: true
                             },
                             {
+                                label: '老人',
+                                name: 'elderly_summary',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
                                 label: '入院日期',
                                 name: 'enter_on',
                                 type: 'date',
-                                width: 80,
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '预付款',
+                                name: 'deposit',
+                                type: 'number',
+                                width: 60,
                                 sortable: true
                             },
                             {
@@ -79,7 +94,7 @@
                                 label: '',
                                 name: 'actions',
                                 sortable: false,
-                                width: 60
+                                width: 40
                             }
                         ]
                     })
@@ -94,7 +109,9 @@
                     entityVM: helper.buildEntityVM('app.organization-pfta.enter-manage.details', {
                         modelName: 'pfta-enter',
                         model: {
-                            enter_on: new Date()
+                            code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN,
+                            enter_on: new Date(),
+                            period_value_in_advance: 1
                         },
                         blockUI: true
                     })
@@ -311,6 +328,26 @@
                                 sortable: true
                             },
                             {
+                                label: '所在层',
+                                name: 'floor',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '床位数量',
+                                name: 'capacity',
+                                type: 'string',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '停用',
+                                name: 'stop_flag',
+                                type: 'bool',
+                                width: 40
+                            },
+                            {
                                 label: '',
                                 name: 'actions',
                                 sortable: false,
@@ -329,6 +366,40 @@
                 controller: 'RoomManageDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM('app.organization-pfta.room-manage.details', {
+                        modelName: 'pfta-room',
+                        model: {
+                            capacity: 1
+                        },
+                        blockUI: true,
+                        toList: ['districtId']
+                    })
+                }
+            })
+            .state('app.organization-pfta.room-manage.details-batch-add', {
+                url: '/details-batch-add/:districtId',
+                templateUrl: helper.basepath('organization-pfta/room-manage-details-batch-add.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'RoomManageDetailsBatchAddController',
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.room-manage.details-batch-add', {
+                        modelName: 'pfta-room',
+                        model: {
+                            capacity: 1
+                        },
+                        blockUI: true,
+                        toList: ['districtId']
+                    }),
+                    deps: helper.resolveFor2('angularjs-slider')
+                }
+            })
+            .state('app.organization-pfta.room-manage.details-batch-edit', {
+                url: '/details-batch-edit/:districtId',
+                templateUrl: helper.basepath('organization-pfta/room-manage-details-batch-edit.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'RoomManageDetailsBatchEditController',
+                params:{selectedIds:null},
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.room-manage.details-batch-edit', {
                         modelName: 'pfta-room',
                         model: {
                             capacity: 1
@@ -395,6 +466,27 @@
                         , blockUI: true
                     })
                     //, deps: helper.resolveFor2('ui.select')
+                }
+            })
+            .state('app.organization-pfta.charge-standard', {
+                url: '/charge-standard',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('organization-pfta/charge-standard.html'),
+                        controller: 'ChargeStandardController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.organization-pfta.charge-standard'),
+                            deps: helper.resolveFor2('angularjs-slider')
+                        }
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.CHARGE-STANDARD'//业务系统使用
                 }
             })
             .state('app.organization-pfta.system-log', {

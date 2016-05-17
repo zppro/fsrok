@@ -2,7 +2,8 @@
  * elderly Created by zppro on 16-4-21.
  * Target:老人实体
  */
-
+var mongoose = require('mongoose');
+module.isloaded = false;
 
 module.exports = function(ctx,name) {
     if (module.isloaded) {
@@ -37,8 +38,25 @@ module.exports = function(ctx,name) {
             financial_status: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1011"])},
             hobbies:[String],//字典D1013
             medical_histories:[String],//字典D1014
-            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true},
-            remark: {type: String,maxLength:400}
+            board_summary: {type: String, required: true},
+            room_value: {
+                districtId: {type: String, required: true},
+                roomId: {type: String, required: true},
+                bed_no: {type: Number, required: true, min: 1}
+            },
+            room_summary: {type: String, required: true},//districtName-roomName-bedNo
+            nursing_summary: {type: String, required: true},
+            charge_standard: {type: String, required: true},
+            charge_items:[{
+                item_id: {type: String, required: true},
+                item_name: {type: String, required: true},
+                period_price: {type: Number, default: 0.00},
+                period: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])}
+            }],
+            live_in_flag: {type: Boolean, default: false},//在院标志,只有该标志为true才是有效的入住老人,正式入院后改为true,出院后又改为false
+            enter_code:{type: String, minlength: 21, maxlength: 21},//入院登记号,正式入院后从入院单中复制过来
+            remark: {type: String,maxLength:400},//正式入院后从入院单中复制过来
+            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true}
         });
 
         elderlySchema.pre('update', function (next) {
@@ -48,19 +66,12 @@ module.exports = function(ctx,name) {
 
         elderlySchema.pre('validate', function (next) {
             //身份证检测
-            if (this.code == ctx.modelVariables.SERVER_GEN) {
-                //考虑到并发几乎不可能发生，所以将订单编号设定为
-                //order.type+[年2月2日2]+6位随机数
-
-                if (this.tenantId) {
-                    var tenant = require('./tenant')(ctx, 'pub_tenant').findById(this.tenantId);
-                    tenant.needRefreshToken();
-                }
-                this.code = tenant.token + '-' + ctx.moment().format('YYMMDD') + ctx.rfcore.util.randomN(6);
-            }
+            //console.log(this);
             next();
         });
 
-        return mongoose.model(name, enterSchema, name);
+        elderlySchema.$$skipPaths = ['family_members', 'room_value','charge_items'];
+
+        return mongoose.model(name, elderlySchema, name);
     }
 }

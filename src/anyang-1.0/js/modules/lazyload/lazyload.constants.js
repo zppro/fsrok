@@ -26,7 +26,9 @@
                     'vendor/ng-dialog/css/ngDialog.min.css',
                     'vendor/ng-dialog/css/ngDialog-theme-default.min.css']
                 },
-                {name: 'locale_zh-cn', files: ['vendor/angular-i18n/angular-locale_zh-cn.js']}
+                {name: 'locale_zh-cn', files: ['vendor/angular-i18n/angular-locale_zh-cn.js']},
+                {name:'subsystem.manage-center',files:['app/css/manage-center.css']},
+                {name:'subsystem.organization-pfta',files:['app/css/organization-pfta.css']}
             ]
         })
     ;

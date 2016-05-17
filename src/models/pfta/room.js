@@ -18,7 +18,10 @@ module.exports = function(ctx,name) {
             operated_on: {type: Date, default: Date.now},
             status: {type: Number, min: 0, max: 1, default: 1},
             name: {type: String, required: true, maxlength: 30},
+            floor: {type: Number, min: -99, max: 99},
+            number_in_floor: {type: Number, min: 1, max: 99},
             capacity: {type: Number, required: true, min: 1},
+            stop_flag: {type: Boolean, default: false},
             districtId: {type: mongoose.Schema.Types.ObjectId, required: true},
             tenantId: {type: mongoose.Schema.Types.ObjectId, required: true}
         });

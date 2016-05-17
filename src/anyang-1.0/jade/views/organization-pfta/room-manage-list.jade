@@ -31,6 +31,9 @@
                            span.fa.fa-check(data="trBubble")
                   td.text-left {{::row.districtId|formatter:'districtId':vm.columns}}
                   td.text-left {{::row.name}}
+                  td {{::row.floor}}F
+                  td.text-right {{::row.capacity}}
+                  td {{::row.stop_flag|boolFilter}}
                   td
                      .btn-group
                         a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
@@ -46,5 +49,9 @@
                            i.glyphicon.glyphicon-plus
                         a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable()")
                            i.glyphicon.glyphicon-minus
+                        a.btn.btn-primary.btn-sm(title="{{'button.BATCH-ADD'|translate}}",ng-click="vm.batchAdd()")
+                           | {{'button.BATCH-ADD'|translate}}
+                        a.btn.btn-primary.btn-sm(title="{{'button.BATCH-EDIT'|translate}}",ng-click="vm.batchEdit()")
+                           | {{'button.BATCH-EDIT'|translate}}
                .col-md-8
                   pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

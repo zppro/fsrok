@@ -66,9 +66,10 @@ module.exports = {
                             else {
                                 var instancePromise = app.modelFactory().read(modelOption.model_name, modelOption.model_path, _id);
                                 var instance = yield instancePromise;
-                                if(instancePromise.schema.$$skipPaths){
-                                    instance = app._.omit(instance.toObject(),instancePromise.schema.$$skipPaths);
-                                }
+                                //if(instancePromise.schema.$$skipPaths){
+                                //    instance = app._.omit(instance.toObject(),instancePromise.schema.$$skipPaths);
+                                //}
+
                                 this.body = app.wrapper.res.ret(instance);
                             }
                         } catch (e) {
@@ -176,6 +177,29 @@ module.exports = {
                             var modelOption = app.getModelOption(this);
                             yield app.modelFactory().bulkInsert(modelOption.model_name, modelOption.model_path, this.request.body);
                             this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'bulkUpdate',
+                verb: 'put',
+                url: this.service_url_prefix + "/:model/$bulkUpdate",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var modelOption = app.getModelOption(this);
+                            var ret = yield app.modelFactory().bulkUpdate(modelOption.model_name, modelOption.model_path, this.request.body);
+                            if (ret.error) {
+                                this.body = app.wrapper.res.error(ret.error)
+                            }
+                            else {
+                                this.body = app.wrapper.res.default();
+                            }
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
