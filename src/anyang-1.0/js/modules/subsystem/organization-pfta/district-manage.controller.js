@@ -40,7 +40,7 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
 
             vm.doSubmit = doSubmit;

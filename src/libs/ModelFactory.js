@@ -8,46 +8,102 @@ var ModelFactory = function(conn) {
         conn = mongoose.connection;
     }
     ModelFactory.context = this;
+
     return {
         create: function (name, path, data) {
             return ModelFactory._create(ModelFactory.getModel(conn, name, path), data);
         },
+        model_create: function (model, data) {
+            return ModelFactory._create(model, data);
+        },
         read: function (name, path, id) {
             return ModelFactory._read(ModelFactory.getModel(conn, name, path), id);
+        },
+        model_read: function (model, id) {
+            return ModelFactory._read(model, id);
         },
         update: function (name, path, id, data) {
             return ModelFactory._update(ModelFactory.getModel(conn, name, path), id, data);
         },
+        model_update: function (model, id, data) {
+            return ModelFactory._update(model, id, data);
+        },
         delete: function (name, path, id) {
             return ModelFactory._delete(ModelFactory.getModel(conn, name, path), id);
+        },
+        model_delete: function (model, id) {
+            return ModelFactory._delete(model, id);
         },
         query: function (name, path, data) {
             return ModelFactory._query(ModelFactory.getModel(conn, name, path), data);
         },
+        model_query: function (model, data) {
+            return ModelFactory._query(model, data);
+        },
         totals: function (name, path, data) {
             return ModelFactory._query(ModelFactory.getModel(conn, name, path), {where: data, select: '_id'});
+        },
+        model_totals: function (model, data) {
+            return ModelFactory._query(model, {where: data, select: '_id'});
         },
         one: function (name, path, data) {
             return ModelFactory._one(ModelFactory.getModel(conn, name, path), data);
         },
+        model_one: function (model, data) {
+            return ModelFactory._one(model, data);
+        },
         bulkInsert: function (name, path, data) {
             return ModelFactory._bulkInsert(ModelFactory.getModel(conn, name, path), data);
+        },
+        model_bulkInsert: function (model, data) {
+            return ModelFactory._bulkInsert(model, data);
         },
         bulkUpdate: function (name, path, data) {
             return ModelFactory._bulkUpdate(ModelFactory.getModel(conn, name, path), data);
         },
-        distinct : function(name,path,data) {
+        model_bulkUpdate: function (model, data) {
+            return ModelFactory._bulkUpdate(model, data);
+        },
+        bulkDelete: function (name, path, where) {
+            return ModelFactory._bulkDelete(ModelFactory.getModel(conn, name, path), where);
+        },
+        model_bulkDelete: function (model, where) {
+            return ModelFactory._bulkDelete(model, where);
+        },
+        distinct: function (name, path, data) {
             return ModelFactory._distinct(ModelFactory.getModel(conn, name, path), data);
+        },
+        model_distinct: function (model, data) {
+            return ModelFactory._distinct(model, data);
         }
     };
 };
 
+ModelFactory.models = {};
+
+ModelFactory.loadModel = function(modelStructureLevelObject) {
+    if (!modelStructureLevelObject.hasOwnProperty('name') && !modelStructureLevelObject.hasOwnProperty('path')) {
+        for (var key in modelStructureLevelObject) {
+
+            ModelFactory.loadModel.bind(this)(modelStructureLevelObject[key]);
+        }
+    }
+    else {
+        ModelFactory.models[modelStructureLevelObject.relative_name] = require('../models/' + modelStructureLevelObject.relative_path)(this, modelStructureLevelObject.relative_name);
+    }
+}
 
 ModelFactory.getModel = function (conn,name,path) {
-    if (conn == null) {
-        conn = mongoose.connection;
+    var model = ModelFactory.models[name];
+    if (!model) {
+        console.log('dynamic load model ' + name);
+        model = require(path)(this.context, name);
     }
-    return conn.model(name, require(path)(this.context, name));
+    return model;
+    //if (conn == null) {
+    //    conn = mongoose.connection;
+    //}
+    //return conn.model(name, require(path)(this.context, name));
 };
 
 ModelFactory._create =function (model,data) {
@@ -132,9 +188,27 @@ ModelFactory._bulkUpdate = function (model,data) {
     return {error: {code: 'E59999', message: 'params error'}}
 };
 
+//非常危险，防止误删除
+ModelFactory._bulkDelete = function (model,where) {
+    where = where || {};
+    return model.remove(where);
+};
+
+
 ModelFactory._distinct = function(model,data) {
     return model.distinct(data.select, data.where);
 };
+
+//对数组类型子文档的增加和删除
+//model.findByIdAndUpdate(23, {
+//    '$pull': {
+//        'contacts':{ '_id': new ObjectId(someStringValue) }
+//    },
+//    '$push'?
+//});
+
+//对数组类型子文档的修改
+//schemaModel.update({name:'loong'},{$set:{‘arraySubDoc.$’:{age:26}}});
 
 
 module.exports = ModelFactory;

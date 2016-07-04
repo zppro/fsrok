@@ -27,7 +27,29 @@
   }
   &.panel-grid {
     margin-bottom: 0px;
+    .panel-heading-normal {
+      background-color: @brand-primary !important;
+      font-weight: bold;
+      font-size: 16px;
+      > a {
+        padding: 15px 0px;  // Adding padding here improves mobile touch
+        color: #fff !important;
+        margin:0px 5px;
+        text-decoration: none;
+        .transition(padding .5s ease);
+      }
+      + .panel-collapse:after {
+        content: "";
+        display: block;
+        width: 60%;
+        margin: 0 auto;
+        height: 0;
+        border-bottom: 1px solid #e1e2e3;
+      }
+    }
   }//added by zppro 2016.3.1
+
+
 }
 
 .panel-flat {

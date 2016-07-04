@@ -17,6 +17,14 @@ script(type="text/ng-template", id="normalConfirmDialog.html")
     .text-center
         button.btn.btn-warning.mr(type='button', ng-click='confirm("ok")') {{'button.CONFIRM'|translate}}
         button.btn.btn-default(type='button', ng-click="closeThisDialog('cancel')") {{'button.CANCEL'|translate}}
+script(type="text/ng-template", id="customConfirmDialog.html")
+    div
+        h4.mt0 {{'dialog.normal.TITLE'|translate}}
+        p
+            | {{message|translate}}
+    .text-center
+        button.btn.btn-warning.mr(type='button', ng-click='confirm("ok")') {{'button.CONFIRM'|translate}}
+        button.btn.btn-default(type='button', ng-click="closeThisDialog('cancel')") {{'button.CANCEL'|translate}}
 script(type='text/ng-template', id="tree-directive-default-renderer.html")
     .ul-container
         ul
@@ -60,7 +68,7 @@ script(type='text/ng-template', id="dropdown-default-renderer.html")
 script(type="text/ng-template", id="changePasswordByUser.html")
     form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
         .ngdialog-message
-            h3.mt0 重设密码
+            h3.mt0 {{ 'sidebar.reset-password.TITLE' | translate}}
         .ngdialog-input
                 .row
                     label.col-md-3.control-label {{ 'sidebar.reset-password.LABEL-OLD-PASSWORD' | translate}}:
@@ -92,3 +100,32 @@ script(type="text/ng-template", id="changePasswordByUser.html")
                 .col-md-9
                 .col-md-3
                     button.btn.btn-success(type='submit') {{ "button.SAVE" | translate}}
+script(type='text/ng-template', id="tree-room-tile-renderer.html")
+    .ul-container
+        ul
+            li(ng-repeat='node in $tree.treeData',ng-include="'tree-room-tile-district-renderer.html'",ng-init="nIndex = $index;")
+script(type='text/ng-template', id="tree-room-tile-district-renderer.html")
+    .tree-group.no-select(s-tree-node)
+        .tree-group-head.cascade-selectable
+            i(class="{{node.icon}}", ng-if="node.icon")
+            span {{node.name}}
+            span(ng-if="node.template" ng-include="node.template")
+        ul.tree-group-content(ng-if="node.children",ng-show="$tree.isExpanded(nIndex)")
+            li(ng-repeat='node in node.children',ng-include="'tree-room-tile-floor-renderer.html'",ng-init="nIndex = (nIndex+$tree.levelSplitChar+$index)")
+script(type='text/ng-template', id="tree-room-tile-floor-renderer.html")
+    .tree-group.row.no-select(s-tree-node)
+        .col-md-1.tree-item.cascade-selectable
+            .vertical-middle.floor
+                span {{node.name}}
+        .col-md-11.tree-item-children
+            ul(ng-if="node.children",ng-show="$tree.isExpanded(nIndex)")
+                li(ng-repeat='node in node.children',ng-include="'tree-room-tile-room-renderer.html'",ng-init="nIndex = (nIndex+$tree.levelSplitChar+$index);roomCapacity=node.capacity")
+script(type='text/ng-template', id="tree-room-tile-room-renderer.html")
+    .tree-group.no-select(s-tree-node)
+        .tree-sub-item.room-head.cascade-selectable
+            span {{node.name}}
+        ul.room-body
+            li(ng-class="{'single-bed':roomCapacity==1,'double-beds':roomCapacity>1 && roomCapacity<3,'four-beds':roomCapacity>=3 && roomCapacity<5,'six-beds':roomCapacity>=5 && roomCapacity<7}",ng-repeat='node in node.children',ng-include="'tree-room-tile-bed-renderer.html'",ng-init="nIndex = (nIndex+$tree.levelSplitChar+$index)")
+script(type='text/ng-template', id="tree-room-tile-bed-renderer.html")
+    .tree-node.room-bed.parent-cascade-select(s-tree-node,ng-class='{"disabled":node.props.disabled }',title="{{$tree.treeNodeFunc(node)}}") {{roomCapacity == 1 ? '单间' : node.name}}
+        .elderly-name(ng-if="node.props.disabled") {{$tree.treeNodeFunc(node)}}

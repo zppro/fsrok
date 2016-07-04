@@ -59,7 +59,7 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
             vm.selectBinding.districts = vm.modelNode.services['pfta-district'].query(_.defaults(vm.selectFilterObject.districts, vm.selectFilterObject.common), '_id name');
 
@@ -199,7 +199,7 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
             vm.maxFloors = 10;
             vm.maxNumbersInFloor = 16;
@@ -308,7 +308,7 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
             vm.doSubmit = doSubmit;
             vm.tab1 = {cid: 'contentTab1'};

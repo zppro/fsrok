@@ -41,6 +41,9 @@
 
                         return;
                     }
+                    $rootScope.$fromState = fromState;
+                    $rootScope.$fromParams = fromParams;
+
                     return;
                 } else {
                     event.preventDefault();

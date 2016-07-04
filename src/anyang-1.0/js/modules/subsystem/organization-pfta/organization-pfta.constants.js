@@ -12,9 +12,11 @@
         .module('subsystem.organization-pfta')
         .constant('ORG_PFTA_CHARGE_ITEM', {
             'ROOM': ORG_PFTA_CHARGE_ITEM_PREFIX + 'ROOM',
-            'BOARD': ORG_PFTA_CHARGE_ITEM_PREFIX+'BOARD',
-            'NURSING': ORG_PFTA_CHARGE_ITEM_PREFIX+'NURSING',
-            'OTHER': ORG_PFTA_CHARGE_ITEM_PREFIX+'OTHER'
+            'BOARD': ORG_PFTA_CHARGE_ITEM_PREFIX + 'BOARD',
+            'NURSING': ORG_PFTA_CHARGE_ITEM_PREFIX + 'NURSING',
+            'OTHER': ORG_PFTA_CHARGE_ITEM_PREFIX + 'OTHER',
+            'EXIT$ITEM_RETURN': 'EXIT-ITEM_RETURN',
+            'EXIT$SETTLEMENT': 'EXIT-SETTLEMENT'
         })
       ;
 

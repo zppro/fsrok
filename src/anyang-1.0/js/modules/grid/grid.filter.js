@@ -13,6 +13,7 @@
         .filter('width',width)
         .filter('orderClass',orderClass)
         .filter('revertNumber',revertNumber)
+        .filter('calcAge',calcAge)
         .filter('formatter',formatter)
         .filter('boolFilter',boolFilter)
         .filter('diFilter',diFilter)
@@ -24,7 +25,11 @@
     hide.$inject = ['GridUtils'];
     width.$inject = ['GridUtils'];
     orderClass.$inject = ['GridUtils'];
+    revertNumber.$inject = ['GridUtils'];
+    calcAge.$inject = ['GridUtils'];
     formatter.$inject = ['GridUtils'];
+    boolFilter.$inject = ['GridUtils'];
+    diFilter.$inject = ['GridUtils'];
     orFilter.$inject = ['GridUtils'];
 
     function paging(GridUtils) {
@@ -49,6 +54,10 @@
 
     function revertNumber(GridUtils){
         return GridUtils.revertNumber;
+    }
+
+    function calcAge(GridUtils){
+        return GridUtils.calcAge;
     }
 
     function formatter(GridUtils){

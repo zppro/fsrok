@@ -1,3 +1,9 @@
 {
-  "SERVER_GEN": "server-gen"
+  "SERVER_GEN": "server-gen",
+  "SEQUENCE_DEFS": {
+    "ENTER_TO_TENANT": "enter$tenant",
+    "BOOKING_TO_TENANT": "booking$tenant",
+    "TENANT_ACCOUNT": "pub_tenantJournalAccount$voucher_no",
+    "ELDERLY_ACCOUNT": "pub_elderly$journal_account$voucher_no"
+  }
 }

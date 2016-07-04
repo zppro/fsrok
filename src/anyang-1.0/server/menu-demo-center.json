@@ -54,5 +54,10 @@
     "_id": "menu.demo-center.BOX-INPUT",
     "name": "方框输入框",
     "sref": "app.demo-center.box-input"
+  },
+  {
+    "_id": "menu.demo-center.PROMISE",
+    "name": "Promise",
+    "sref": "app.demo-center.promise"
   }
 ]

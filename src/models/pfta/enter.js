@@ -19,26 +19,26 @@ module.exports = function(ctx,name) {
             operated_by: {type: mongoose.Schema.Types.ObjectId},
             operated_by_name: {type: String},
             status: {type: Number, min: 0, max: 1, default: 1},
-            code: {type: String, required: true, minlength: 21, maxlength: 21, index: {unique: true}},
+            code: {type: String,required: true, minlength: 6, maxlength: 6},
             enter_on: {type: Date, default: Date.now},
-            elderlyId:{type: mongoose.Schema.Types.ObjectId, required: true},
+            elderlyId:{type: mongoose.Schema.Types.ObjectId, required: true,ref:'pub_elderly'},
             agent_info:{
                 name:{type:String,maxlength:20},
+                id_no: {type: String, minlength: 18, maxlength: 18},
                 sex:{type: String, minlength: 1, maxlength: 1, enum: ctx._.rest(ctx.dictionary.keys["D1006"])},
                 relation_with:{type:String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1012"])},
                 phone: {type: String,maxlength: 20},
                 address:{type:String, maxlength: 100}
             },
-            current_register_step: {type: String, required: true, enum: ctx._.rest(ctx.dictionary.keys["D3000"])},
+            current_register_step: {type: String,  minlength: 5, maxlength: 5,required: true, enum: ctx._.rest(ctx.dictionary.keys["D3000"])},
             elderly_summary: {type: String},
             board_info:{type: String},
             room_info:{type: String},
             nursing_info:{type: String},
             sum_period_price:{type: Number, default: 0.00},//期间费用汇总计算列
             period_value_in_advance:{type: Number,default:0},//预收区间
-            //deposit:{type: Number, default: 0.00},//押金,预收款
             remark: {type: String,maxLength:400},
-            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true}
+            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true,ref:'pub_tenant'}
         }, {
             toObject: {
                 virtuals: true
@@ -49,7 +49,7 @@ module.exports = function(ctx,name) {
         });
 
         enterSchema.virtual('deposit').get(function () {
-            return this.sum_period_price * this.period_value_in_advance;
+            return this.sum_period_price * this.period_value_in_advance;//押金,预收款
         });
 
         enterSchema.pre('update', function (next) {
@@ -63,14 +63,21 @@ module.exports = function(ctx,name) {
                 //order.type+[年2月2日2]+6位随机数
                 var self = this;
                 if (this.tenantId) {
-                    var tenantModel = require('../pub/tenant')(ctx, 'pub_tenant');
-                    tenantModel.findById(this.tenantId,function(err,tenant){
 
-                        tenant.needRefreshToken();
-                        self.code = tenant.token + '-' + ctx.moment().format('YYMMDD') + ctx.rfcore.util.randomN(6);
-
+                    ctx.sequenceFactory.getSequenceVal(ctx.modelVariables.SEQUENCE_DEFS.ENTER_TO_TENANT,this.tenantId).then(function(ret){
+                        self.code = ret;
+                        console.log(self);
                         next();
                     });
+
+                    //var tenantModel = require('../pub/tenant')(ctx, 'pub_tenant');
+                    //tenantModel.findById(this.tenantId,function(err,tenant){
+                    //
+                    //    tenant.needRefreshToken();
+                    //    self.code = tenant.token + '-' + ctx.moment().format('YYMMDD') + ctx.util.randomN(6);
+                    //
+                    //    next();
+                    //});
                 }
                 else{
                     next();

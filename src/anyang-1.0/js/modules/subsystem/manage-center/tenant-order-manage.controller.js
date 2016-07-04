@@ -99,7 +99,7 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
             vmh.translate(vm.viewTranslatePath('REFUND-ORDER-COMMENT')).then(function (ret) {
                 $scope.dialogData = {details: ret};

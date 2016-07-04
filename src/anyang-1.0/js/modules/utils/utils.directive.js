@@ -63,7 +63,15 @@
 
         function link(scope, element, attrs, ngModel) {
             ngModel.$validators.IDNo = function (value) {
-                return IDNo2Utils.isIDNo(value);
+                var ret = false;
+                ret = IDNo2Utils.isIDNo(value);
+
+                var option = scope.$eval(attrs.idNo2) || {};
+                if(option.successEvent && ret) {
+                    scope.$emit('idNo2:parseSuccess', value);
+                }
+
+                return ret;
             };
         }
     }
@@ -148,28 +156,19 @@
                     $span.html(val[i]);
                 }
             }
-
         }
 
+        function unbindEvents(element) {
+            element.parent('.virbox').off('click');
+            element
+                .off('blur')
+                .off('keyup')
+                .off('keydown');
+        }
 
-        var directive = {
-            link: link,
-            restrict: 'A',
-            scope: {value: '=ngModel'}
-        };
-        return directive;
-
-        function link(scope, element, attrs) {
-            var length = attrs.maxlength || 6;
-            var arrVirboxSpan = [];
-            var inputType = attrs.type.toLowerCase();
-            for(var i=0;i<length;i++) {
-                arrVirboxSpan.push('<span></span>')
-            }
-            element.addClass('realbox').wrap('<div class="virbox"></div>');
-            jqLite(arrVirboxSpan.join('')).insertAfter(element);
+        function bindEvents(scope,element,inputType) {
             element.parent('.virbox')
-                .on('click',function() {
+                .on('click', function () {
                     var $input = jqLite(this).find('.realbox');
 
                     $input.focus();
@@ -179,31 +178,31 @@
                 });
 
             element
-                .on('blur',function() {
+                .on('blur', function () {
                     jqLite(this).parent('.virbox').find('span').removeClass('focus');
                 })
-                .on('keyup',function(event) {
+                .on('keyup', function (event) {
                     var $spanArray = jqLite(this).parent('.virbox').find('span');
                     $spanArray.html('');
                     var val = jqLite(this).val();
-                    showValue(val,$spanArray,attrs.type,'keyup');
+                    showValue(val, $spanArray, inputType, 'keyup');
                 })
-                .on('keydown',function(event) {
-                    if(event.which == 46){
+                .on('keydown', function (event) {
+                    if (event.which == 46) {
                         //清空
                         jqLite(this).val('');
                         var $spanArray = jqLite(this).parent('.virbox').find('span');
                         $spanArray.html('');
-                        $timeout(function(){
+                        $timeout(function () {
                             scope.value = '';
                         });
                     }
-                    else if(event.which == 8){
+                    else if (event.which == 8) {
                         var $spanArray = jqLite(this).parent('.virbox').find('span').html('');
                         var self = this;
-                        $timeout(function(){
+                        $timeout(function () {
                             var val = jqLite(self).val();
-                            showValue(val,$spanArray,attrs.type,'keydown');
+                            showValue(val, $spanArray, inputType, 'keydown');
                         });
                     }
 
@@ -211,19 +210,58 @@
 
                         return false;
                     }
-                    if(inputType == 'number' && (event.which < 48 || event.which > 57)){
+                    if (inputType == 'number' && (event.which < 48 || event.which > 57)) {
                         return false;
                     }
 
                     return true;
                 });
+        }
+
+
+        var directive = {
+            link: link,
+            restrict: 'A',
+            scope: {value: '=ngModel',readonly:'=boxReadonly'}
+        };
+        return directive;
+
+        function link(scope, element, attrs) {
+
+            var length = attrs.maxlength || 6;
+            var arrVirboxSpan = [];
+            var inputType = attrs.type.toLowerCase();
+            for(var i=0;i<length;i++) {
+                arrVirboxSpan.push('<span></span>')
+            }
+            element.addClass('realbox').wrap('<div class="virbox"></div>');
+            jqLite(arrVirboxSpan.join('')).insertAfter(element);
+
+            if(!scope.readonly){
+                bindEvents(scope,element,inputType);
+            }
+            else{
+                unbindEvents(element);
+            }
 
             scope.$watch('value', function (newValue, oldValue) {
-                showValue(element.val(),element.parent('.virbox').find('span'),attrs.type,'watch-value');
+                showValue(element.val(),element.parent('.virbox').find('span'),inputType,'watch-value');
+            });
+
+            scope.$watch('readonly', function (newValue, oldValue) {
+                if (newValue != oldValue) {
+                    console.log('lll');
+                    console.log('newValue:' + newValue);
+                    console.log('oldValue:' + oldValue);
+                    if (!newValue) {
+                        bindEvents(scope,element, inputType);
+                    }
+                    else {
+                        unbindEvents(element);
+                    }
+                }
             });
             //console.log(element.val());
-
-
 
         }
     }

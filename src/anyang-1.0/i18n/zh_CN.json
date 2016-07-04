@@ -4,10 +4,15 @@
     "RETURN": "返回",
     "SAVE": "保存",
     "ADD": "新增",
+    "REFRESH":"刷新",
     "BATCH-ADD": "批量新增",
     "BATCH-EDIT": "批量修改",
     "EDIT": "修改",
+    "CHANGE": "变更",
     "READ": "查看",
+    "AUDIT": "审核",
+    "AUDIT-TRUE": "审核通过",
+    "AUDIT-FALSE": "审核不通过",
     "REMOVE": "删除",
     "CONFIRM": "确定",
     "USER": "管理用户",
@@ -15,10 +20,21 @@
     "OPEN-FUNCS": "开通功能模块",
     "ORDER": "管理订单",
     "ORDER-SUBMIT": "提交订单",
+    "CONFIRM-RECEIPT": "确认收款",
     "CONFIRM-ORDER-RECEIPT": "确认收款",
     "CONFIRM-ORDER-REFUND": "确认退款",
     "ORDER-COMPLETE":"完成订单",
-    "REFUND-ENTRY":"申请退款"
+    "REFUND-ENTRY":"申请退款",
+    "EXIT-ENTRY":"申请出院",
+    "EXIT-SETTLEMENT":"出院结算",
+    "CHARGE-LIST":"费用清单",
+    "BOOKING":"记账"
+  },
+  "label":{
+    "AUTO-GEN":"自动生成",
+    "TOTAL1":"合计",
+    "TEXT-SEARCHING":"查找匹配项...",
+    "TEXT-NO-RESULTS":"未找到匹配项"
   },
   "grid": {
     "LABEL-SEARACH": "关键字",
@@ -39,7 +55,8 @@
     "TERM-AGREE": "必须同意条款;",
     "ALREADY-EXISTS": "已经存在相同的{{item}};",
     "ORDER-MUST_CHOOSE_ONE_FUNC": "订单必须选择至少一个功能;",
-    "ID-NO": "身份证格式不正确;"
+    "ID-NO": "身份证格式不正确;",
+    "SERVER-SIDE-CHECK":"后端验证错误：{{item}};"
   },
   "dialog": {
     "remove": {
@@ -56,7 +73,15 @@
     "REMOVE-SUCCESS": "删除成功",
     "NORMAL-SUCCESS": "操作成功",
     "SELECT-NONE-WARNING": "没有选中任何记录",
-    "BATCH-ADD-NONE-WARNING": "选中的批量添加记录都已经存在，请重新选择"
+    "BATCH-ADD-NONE-WARNING": "选中的批量添加记录都已经存在，请重新选择",
+    "NO-CHANGE": "当前数据没有变化",
+    "BOOKING-SUCCESS": "记账成功",
+    "DISABLE-RECHARGE-SUCCESS": "撤销充值成功",
+    "CHANGE-RECHARGE-BOOKING-AMOUNT-SUCCESS": "修改充值记账金额成功"
+  },
+  "confirm": {
+    "SUBMIT": "确定要提交么？",
+    "BOOKING": "确定要记账么？"
   },
   "dashboard": {
     "WELCOME": "欢迎来到{{appName}}"
@@ -95,13 +120,14 @@
       "LEAVE-MANAGE": "请假管理(暂缓)",
       "------------": "",
       "FINANCIAL-MANAGE": "财务管理",
-      "ENTER-PAYMENT": "入院缴费",
-      "RECHARGE": "账户充值",
-      "ARREARAGE-MANAGE": "欠费管理",
-      "PAYMENT-DETAILS": "交费明细",
-      "EXIT-SETTLEMENT": "出院结算",
+      "ENTER-PAYMENT": "老人入院缴费",
+      "RECHARGE": "老人账户充值",
+      "ARREARAGE-MANAGE": "老人欠费管理",
+      "EXIT-SETTLEMENT": "老人出院结算",
+      "ORG-RECEIPTS-AND-DISBURSEMENTS-DETAILS": "机构收支明细",
       "------------": "",
-      "MATERIAL-MANAGE": "物资管理(暂缓)",
+      "MATERIAL-MANAGE": "物资管理",
+      "EXIT-ITEM-RETURN":"出院物品归还",
       "INVENTORY-MANAGE": "库存管理(暂缓)",
       "DONATION-MANAGE": "捐赠管理(暂缓)",
       "------------": "",
@@ -147,12 +173,14 @@
       "TREE-NAV": "树-导航",
       "TREE-TILE": "树-平铺",
       "DROPDOWN": "下拉选择",
-      "BOX-INPUT": "方框输入框"
+      "BOX-INPUT": "方框输入框",
+      "PROMISE": "Promise"
     }
   },
   "sidebar": {
     "WELCOME": "欢迎",
     "reset-password":{
+      "TITLE":"重设密码",
       "LABEL-OLD-PASSWORD":"旧密码",
       "LABEL-NEW-PASSWORD":"新密码",
       "LABEL-RE-NEW-PASSWORD":"确认新密码",

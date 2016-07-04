@@ -152,6 +152,9 @@ now {
   background-color: orange;
   border-color: orange;
 }
+.cursor-not-allowed {
+  cursor:none;
+}
 
 // FORMS
 
@@ -209,6 +212,11 @@ fieldset {
   }
 }
 
+.table-white {
+  > tbody > tr {
+    background-color: @table-bg-accent;
+  }
+}
 
 .progress {
   .box-shadow(0 0 0 #000);
@@ -324,4 +332,7 @@ fieldset {
 .navbar,
 .navbar .dropdown-menu {
   filter: none !important;
+}
+.text-120 {
+  font-size: @font-size-base * 1.2;
 }

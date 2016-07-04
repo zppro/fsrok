@@ -14,12 +14,12 @@
       {
         "_id": "menu.organization-pfta.IN-MANAGE",
         "name": "在院管理",
-        "sref": "app.organization-pfta.oldman-in-manage"
+        "sref": "app.organization-pfta.in-manage.list"
       },
       {
         "_id": "menu.organization-pfta.EXIT-MANAGE",
         "name": "出院管理",
-        "sref": "app.organization-pfta.oldman-exit-manage"
+        "sref": "app.organization-pfta.exit-manage.list"
       },
       {
         "_id": "menu.organization-pfta.RECEPTION-MANAGE",
@@ -41,28 +41,28 @@
     "children": [
       {
         "_id": "menu.organization-pfta.ENTER-PAYMENT",
-        "name": "入院缴费",
-        "sref": "app.organization-pfta.financial-enter-payment"
+        "name": "老人入院缴费",
+        "sref": "app.organization-pfta.financial-enter-payment.list"
       },
       {
         "_id": "menu.organization-pfta.RECHARGE",
-        "name": "账户充值",
-        "sref": "app.organization-pfta.financial-recharge"
+        "name": "老人账户充值",
+        "sref": "app.organization-pfta.financial-recharge.list"
       },
       {
         "_id": "menu.organization-pfta.ARREARAGE-MANAGE",
-        "name": "欠费管理",
+        "name": "老人欠费管理",
         "sref": "app.organization-pfta.financial-arrearage-manage"
       },
       {
-        "_id": "menu.organization-pfta.PAYMENT-DETAILS",
-        "name": "交费明细",
-        "sref": "app.organization-pfta.financial-payment-details"
+        "_id": "menu.organization-pfta.EXIT-SETTLEMENT",
+        "name": "老人出院结算",
+        "sref": "app.organization-pfta.financial-exit-settlement.list"
       },
       {
-        "_id": "menu.organization-pfta.EXIT-SETTLEMENT",
-        "name": "出院结算",
-        "sref": "app.organization-pfta.financial-exit-settlement"
+        "_id": "menu.organization-pfta.ORG-RECEIPTS-AND-DISBURSEMENTS-DETAILS",
+        "name": "机构收支明细",
+        "sref": "app.organization-pfta.financial-org-receipts-and-disbursements-details.list"
       }
     ]
   },
@@ -73,14 +73,44 @@
     "icon": "icon-folder",
     "children": [
       {
+        "_id": "menu.organization-pfta.EXIT-ITEM-RETURN",
+        "name": "出院物品归还",
+        "sref": "app.organization-pfta.material-exit-item-return.list"
+      },
+      {
+        "_id": "menu.organization-pfta.EX-WAREHOUSE-MANAGE",
+        "name": "出库管理",
+        "sref": "app.organization-pfta.material-ex-warehouse-manage.list"
+      },
+      {
+        "_id": "menu.organization-pfta.IM-WAREHOUSE-MANAGE",
+        "name": "入库管理",
+        "sref": "app.organization-pfta.material-im-warehouse-manage.list"
+      },
+      {
         "_id": "menu.organization-pfta.INVENTORY-MANAGE",
         "name": "库存管理",
-        "sref": "app.organization-pfta.material-inventory-manage"
+        "sref": "app.organization-pfta.material-inventory-manage.list"
+      },
+      {
+        "_id": "menu.organization-pfta.INVENTORY-ACCOUNT",
+        "name": "库存清单",
+        "sref": "app.organization-pfta.material-inventory-account.list"
       },
       {
         "_id": "menu.organization-pfta.DONATION-MANAGE",
         "name": "捐赠管理",
-        "sref": "app.organization-pfta.material-donation-manage"
+        "sref": "app.organization-pfta.material-donation-manage.list"
+      },
+      {
+        "_id": "menu.organization-pfta.FIX-ASSERTS-MANAGE",
+        "name": "固定资产管理",
+        "sref": "app.organization-pfta.material-fix-asserts-manage.list"
+      },
+      {
+        "_id": "menu.organization-pfta.ITEM-CATALOG-MANAGE",
+        "name": "物资品类管理",
+        "sref": "app.organization-pfta.material-item-catalog-manage.list"
       }
     ]
   },

@@ -4,7 +4,104 @@
     angular
         .module('app.grid')
         .service('GridDemoModelSerivce', GridDemoModelSerivce)
-        .service('GridUtils',GridUtils);
+        .service('GridUtils',GridUtils)
+        .factory('GridFactory',GridFactory)
+    ;
+
+    GridFactory.$inject = ['modelNode','$q','$filter'];
+    function GridFactory(modelNode,$q,$filter) {
+        return {
+            buildGrid: function (option) {
+                return new Grid(option,modelNode,$q,$filter);
+            }
+        }
+    }
+
+
+    function Grid(option,modelNode,$q,$filter) {
+        var self = this;
+        this.page = angular.extend({size: 9, no: 1}, option.page);
+        this.sort = {
+            column: option.sortColumn || '_id',
+            direction: option.sortDirection ||-1,
+            toggle: function (column) {
+                if (column.sortable) {
+                    if (this.column === column.name) {
+                        this.direction = -this.direction || -1;
+                    } else {
+                        this.column = column.name;
+                        this.direction = -1;
+                    }
+
+                    self.paging();
+                }
+            }
+        };
+        this.searchForm = option.searchForm;
+        this.rows = [];
+        this.rawData = [];
+        this.modelling = false;
+
+        //必须有的
+        this.model = option.model;
+
+        if (angular.isString(this.model)) {
+            this.model = modelNode.services[this.model];
+        }
+
+        if (!this.model)
+            this.model = angular.noop;
+
+        var promise;
+        if (angular.isFunction(this.model)) {
+            this.model = this.model();
+        }
+
+        promise = $q.when(this.model).then(function (ret) {
+
+            if (angular.isArray(ret)) {
+                self.rawData = ret;
+            }
+            else {
+                self.modelling = true;
+            }
+
+            self.setData = setData;
+            self.query = query;
+            self.paging = paging;
+
+            return self;
+        });
+
+        return promise;
+
+
+        function setData(data) {
+            self.rawData = data;
+        }
+
+
+        function query(param) {
+            var queryParam = angular.extend({}, self.searchForm, param);
+            if (self.modelling) {
+                self.rows = self.model.page(self.page, queryParam, null, (self.sort.direction > 0 ? '' : '-') + self.sort.column);
+                //服务端totals在查询数据时计算
+                self.model.totals(queryParam).$promise.then(function (ret) {
+                    self.page.totals = ret.totals;
+                });
+            }
+            else {
+                if (self.rawData)
+                    self.rows = $filter('filter')(self.rawData, queryParam);
+            }
+        }
+
+        function paging() {
+            if (this.modelling) {
+                this.query();
+            }
+        }
+    }
 
     GridDemoModelSerivce.$inject = ['Utils'];
     function GridDemoModelSerivce(Utils) {
@@ -79,8 +176,8 @@
         }
     }
 
-    GridUtils.$inject = ['$filter'];
-    function GridUtils($filter) {
+    GridUtils.$inject = ['$filter','ViewUtils'];
+    function GridUtils($filter,ViewUtils) {
         return {
             paging: paging,
             totals: totals,
@@ -89,6 +186,7 @@
             toggleOrderClass: toggleOrderClass,
             noResultsColspan: noResultsColspan,
             revertNumber: revertNumber,
+            calcAge: calcAge,
             formatter: formatter,
             boolFilter: boolFilter,
             diFilter: diFilter,
@@ -161,6 +259,9 @@
             return num;
         }
 
+        function calcAge(rowValue) {
+            return ViewUtils.age(rowValue)
+        }
 
         function formatter(rowValue, columnName, columns) {
             var one = _.findWhere(columns, {name: columnName});

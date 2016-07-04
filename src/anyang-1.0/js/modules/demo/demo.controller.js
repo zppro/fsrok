@@ -17,6 +17,7 @@
         .controller('DemoTreeTileController', DemoTreeTileController)
         .controller('DemoDropdownController', DemoDropdownController)
         .controller('DemoBoxInputController', DemoBoxInputController)
+        .controller('DemoPromiseController',DemoPromiseController)
     ;
 
     DemoGridBasicController.$inject = ['$scope', 'ngDialog', 'vmh', 'entryVM'];
@@ -315,7 +316,6 @@
             console.log('123');
 
             vm.dropdownDataPromise = vmh.shareService.d('D1015').then(function(items){
-                console.log('then in controller');
                 vm.period = items[2].value;
                 return items;
             });
@@ -346,6 +346,34 @@
                 vm.selectBinding.sex = sexes;
             });
 
+        }
+
+    }
+
+    DemoPromiseController.$inject = ['$scope','vmh', 'instanceVM'];
+    function DemoPromiseController($scope, vmh, vm) {
+
+        $scope.vm = vm;
+
+        init();
+
+
+        function init() {
+            vm.init();
+
+            var p1 = vmh.q.when(true);
+            var p2 = vmh.q.when(false).then(function (ret) {
+                return vmh.q.when(true);
+            });
+
+            var f = function () {
+                return vmh.debugService.tenantInfo('56cedebf7768e0eb161e1787','name');
+            };
+
+            var p3 = f();
+            vmh.q.all([p1, p2,p3]).then(function (ret) {
+                console.log(ret);
+            });
         }
 
     }

@@ -86,7 +86,7 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
             vmh.shareService.d('D1001').then(function (rows) {
                 vm.selectBinding.roles = _.initial(rows);

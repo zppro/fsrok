@@ -89,7 +89,7 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
             if (vm.selectFilterObject.tenants) {
                 vm.selectBinding.tenants = vm.modelNode.services['pub-tenant'].query(vm.selectFilterObject.tenants, '_id name');

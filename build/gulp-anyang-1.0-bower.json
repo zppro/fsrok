@@ -13,5 +13,7 @@
   "src/{{target}}/bower_components/ng-dialog/css/ngDialog.min.css",
   "src/{{target}}/bower_components/ng-dialog/css/ngDialog-theme-default.min.css",
   "src/{{target}}/bower_components/angularjs-slider/dist/rzslider.js",
-  "src/{{target}}/bower_components/angularjs-slider/dist/rzslider.css"
+  "src/{{target}}/bower_components/angularjs-slider/dist/rzslider.css",
+  "src/{{target}}/bower_components/angucomplete-alt/angucomplete-alt.js",
+  "src/{{target}}/bower_components/angucomplete-alt/angucomplete-alt.css"
 ]

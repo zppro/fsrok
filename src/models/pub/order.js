@@ -47,7 +47,7 @@ module.exports = function(ctx,name) {
             success_on: {type: Date},
             refund_on: {type: Date},
             failure_on: {type: Date, default: failure_on_default},//失效时间在下单之后的两个礼拜
-            tenantId: {type: mongoose.Schema.Types.ObjectId}
+            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pub_tenant'}
         }, {
             toObject: {
                 virtuals: true
@@ -69,7 +69,7 @@ module.exports = function(ctx,name) {
             if (this.code == ctx.modelVariables.SERVER_GEN) {
                 //考虑到并发几乎不可能发生，所以将订单编号设定为
                 //[年2月2日2]+6位随机数
-                this.code = ctx.moment().format('YYMMDD') + ctx.rfcore.util.randomN(6);
+                this.code = ctx.moment().format('YYMMDD') + ctx.util.randomN(6);
             }
             next();
         });

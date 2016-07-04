@@ -143,7 +143,7 @@
 
         function buildVMHelper() {
 
-            return ['$timeout', '$q', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'shareNode','extensionNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', function ($timeout, $q, $translate, $http, Browser, blockUI, cfpLoadingBar, shareNode,extensionNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
+            return ['$timeout', '$q', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'shareNode', 'extensionNode', 'debugNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', function ($timeout, $q, $translate, $http, Browser, blockUI, cfpLoadingBar, shareNode, extensionNode, debugNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
 
                 function promiseWrapper() {
                     if (arguments.length > 0) {
@@ -190,6 +190,35 @@
                     }));
                 }
 
+                function alertWarning(message,needTranslate) {
+                    if (needTranslate) {
+                        $translate(message).then(function (ret) {
+                            Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + ret + '</div>', 'warning');
+                        });
+                    }
+                    else {
+                        Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + message + '</div>', 'warning');
+                    }
+                }
+
+                function alertSuccess(message,needTranslate) {
+                    if (message) {
+                        if (needTranslate) {
+                            $translate(message).then(function (ret) {
+                                Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret + '</div>', 'success');
+                            });
+                        }
+                        else {
+                            Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + message + '</div>', 'success');
+                        }
+                    }
+                    else {
+                        $translate('notification.SAVE-SUCCESS').then(function (ret) {
+                            Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret + '</div>', 'success');
+                        });
+                    }
+                }
+
                 return {
                     q: $q,
                     timeout: $timeout,
@@ -197,12 +226,13 @@
                     browser: Browser,
                     loadingBar: cfpLoadingBar,
                     blocker: blockUI.instances.get('module-block'),
-                    promiseWrapper:promiseWrapper,
+                    promiseWrapper: promiseWrapper,
                     exec: exec,
                     fetch: fetch,
                     parallel: parallel,
                     shareService: shareNode,
                     extensionService: extensionNode,
+                    debugService: debugNode,
                     clientData: clientData,
                     treeFactory: treeFactory,
                     notify: Notify,
@@ -212,7 +242,9 @@
                     utils: {
                         g: GridUtils,
                         v: ViewUtils
-                    }
+                    },
+                    alertWarning: alertWarning,
+                    alertSuccess: alertSuccess
                 };
             }];
         }
@@ -241,9 +273,14 @@
                     //设置treeFilterObject
                     this.treeFilterObject = _.defaults(this.treeFilterObject, $state.current.data && $state.current.data.treeFilterObject);
 
-                    var tenant = Auth.getUser().tenant;
-                    if (tenant) {
-                        this.searchForm['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                    var user = Auth.getUser();
+                    if(user) {
+                        this.operated_by = user._id;
+                        this.operated_by_name = user.name;
+                        var tenant = user.tenant;
+                        if (tenant) {
+                            this.searchForm['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                        }
                     }
 
                     //计算行数
@@ -310,11 +347,11 @@
                     }, this.toDetailsParams));
                 }
 
-                function edit(id) {
+                function edit(id,params) {
                     $state.go(this.moduleRoute('details'), _.defaults({
                         action: 'edit',
                         _id: id
-                    }, this.toDetailsParams));
+                    }, this.toDetailsParams,params));
                 }
 
                 function batchAdd(){
@@ -334,22 +371,22 @@
                     $state.go(this.moduleRoute('details-batch-edit'), _.defaults(this.toDetailsParams, {selectedIds: selectedIds}));
                 }
 
-                function read(id) {
+                function read(id,params) {
                     $state.go(this.moduleRoute('details'), _.defaults({
                         action: 'read',
                         _id: id
-                    }, this.toDetailsParams));
+                    }, this.toDetailsParams, params));
                 }
 
-                function remove() {
-                    return _.bind(_processRemove, this, 'remove')();
+                function remove(relatedAction) {
+                    return _.bind(_processRemove, this, 'remove',relatedAction)();
                 }
 
-                function disable() {
-                    return _.bind(_processRemove, this, 'disable')();
+                function disable(relatedAction) {
+                    return _.bind(_processRemove, this, 'disable', relatedAction)();
                 }
 
-                function _processRemove(method) {
+                function _processRemove(method,relatedAction) {
                     var self = this;
                     if (self.selectedRows.length == 0) {
 
@@ -364,17 +401,26 @@
                     }).then(function () {
                         if (option.modelName) {
                             _.each(self.selectedRows, function (row) {
-                                return modelService[method](row._id).$promise.then(function () {
-                                    var index = _.indexOf(self.rows, row);
-                                    if (index != -1) {
-                                        self.rows.splice(index, 1);
-                                    }
+                                var actionPromise;
+                                if(relatedAction && angular.isFunction(relatedAction)) {
+                                    actionPromise = relatedAction(row);
+                                }
+                                else {
+                                    actionPromise = $q.when(true);
+                                }
+                                actionPromise.then(function(ret) {
+                                    modelService[method](row._id).$promise.then(function () {
+                                        var index = _.indexOf(self.rows, row);
+                                        if (index != -1) {
+                                            self.rows.splice(index, 1);
+                                        }
+                                    });
                                 });
+                                return actionPromise;
                             })
                         }
                         else {
                             _.each(self.selectedRows, function (row) {
-                                console.log(self.rows.length);
                                 var index = _.indexOf(self.rows, row);
                                 if (index != -1) {
                                     self.rows.splice(index, 1);
@@ -423,11 +469,13 @@
                 function selectAll($event) {
                     if ($event.target.tagName == "INPUT" && $event.target.type == "checkbox") {
                         var $checkbox = angular.element($event.target);
+                        this.selectedRows = [];
                         if ($checkbox.prop('checked')) {
-                            this.selectedRows = this.paged;
-                        }
-                        else {
-                            this.selectedRows = [];
+                            for(var i = 0;i<this.paged.length;i++) {
+                                if (!this.paged[i].unselectable) {
+                                    this.selectedRows.push(this.paged[i]);
+                                }
+                            }
                         }
                         //console.log(this.selectedRows);
                     }
@@ -539,11 +587,12 @@
         function buildEntityVM(name, option) {
             option = option || {};
             var arrNames = name.split('.');
-            return ['$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce', function ($state, $stateParams, $window, $q, $timeout, $translate, blockUI, Auth, modelNode, Notify, GridDemoModelSerivce) {
+            return ['$rootScope','$state', '$stateParams', '$window', '$q', '$timeout', '$translate', 'blockUI', 'Auth', 'modelNode', 'Notify', 'GridDemoModelSerivce','GridFactory', function ($rootScope,$state, $stateParams, $window, $q, $timeout, $translate, blockUI, Auth, modelNode, Notify, GridDemoModelSerivce,GridFactory) {
                 var modelService = option.modelName ? modelNode.services[option.modelName] : GridDemoModelSerivce;
 
-                function init() {
+                function init(initOption) {
                     var self = this;
+
                     this.readonly = this._action_ == 'read';
                     //this.model = option.model;
 
@@ -562,9 +611,7 @@
                         this.operated_by_name = this.model['operated_by_name'] = user.name;
                         var tenant = user.tenant;
                         if (tenant) {
-
                             this.tenantId = this.model['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
-                            console.log(this.model);
                         }
                     }
 
@@ -579,6 +626,22 @@
 
                     //初始化只读模式下模型实体字段转换器
                     this.fieldConverters = {};
+
+                    //依赖lazyload的模块：1Controller注入，2 通过init(option)传入到entry
+                    this.removeDialog = initOption.removeDialog;
+
+                }
+
+                function addSubGrid(gridId,option) {
+                    var self = this;
+                    if (!self.subGrid[gridId]) {
+                        return GridFactory.buildGrid(option).then(function (grid) {
+                            self.subGrid[gridId] = grid;
+                            console.log(grid);
+                            return grid;
+                        });
+                    }
+                    return $q.when(self.subGrid[gridId]);
                 }
 
                 function getParam(name) {
@@ -586,7 +649,40 @@
                 }
 
                 function cancel() {
+                    //$state.go(this.moduleRoute('list'), this.toListParams);
+                    console.log($rootScope.$fromState);
+
+                    if($rootScope.$fromState){
+                        $state.go($rootScope.$fromState, $rootScope.$fromParams);
+                    }
+                    else{
+                        this.toListView();
+                    }
+                }
+
+                function returnBack() {
+                    //$state.go(this.moduleRoute('list'), this.toListParams);
+                    console.log($rootScope.$fromState);
+
+                    if($rootScope.$fromState){
+                        console.log('returnBack to fromState');
+                        $state.go($rootScope.$fromState, $rootScope.$fromParams);
+                    }
+                    else{
+                        console.log('returnBack ToListView');
+                        this.toListView();
+                    }
+                }
+
+                function toListView(){
                     $state.go(this.moduleRoute('list'), this.toListParams);
+                }
+
+                function toEditView(){
+                    $state.go(this.moduleRoute('details'), {
+                        action: 'edit',
+                        _id: this._id_
+                    });
                 }
 
                 function load() {
@@ -595,6 +691,15 @@
                         this.model = _.defaults(this.model, this.toListParams, option.model);
                         return $q.when(this.model);
                     }
+
+                    var autoSetTab = self.getParam('autoSetTab');
+                    if(autoSetTab && self[autoSetTab]) {
+                        //console.log('autoSetTab:' + autoSetTab);
+                        self[autoSetTab].active = true;
+                        self.autoSetTab = autoSetTab;
+                        self.autoSetTabOnLoad = true;
+                    }
+
 
                     this.model = _.defaults((option.modelName ? modelService.get({_id: this._id_}) : modelService.find(this._id_)), option.model);
                     //loading效果
@@ -625,7 +730,7 @@
                     }
                 }
 
-                function save() {
+                function save(manuallyTransfer) {
                     var promise;
                     var self = this;
                     console.log('save model...');
@@ -665,7 +770,12 @@
 
                     return $q.all([$translate('notification.SAVE-SUCCESS'), promise]).then(function (ret) {
                         Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
-                        $state.go(self.moduleRoute('list'), self.toListParams);
+                        //$state.go(self.moduleRoute('list'), self.toListParams);
+                        if(!manuallyTransfer) {
+                            self.returnBack();
+                        }
+
+                        return ret[1];
                         console.log('--------------end success----------------')
                     }).finally(function () {
 
@@ -689,7 +799,8 @@
                     }
                     return $q.all([$translate('notification.SAVE-SUCCESS'), promise]).then(function (ret) {
                         Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
-                        $state.go(self.moduleRoute('list'), self.toListParams);
+                        //$state.go(self.moduleRoute('list'), self.toListParams);
+                        self.toListView();
                         console.log('--------------end success----------------')
                     }).finally(function () {
 
@@ -708,12 +819,50 @@
                     }
                     return $q.all([$translate('notification.SAVE-SUCCESS'), promise]).then(function (ret) {
                         Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
-                        $state.go(self.moduleRoute('list'), self.toListParams);
+                        //$state.go(self.moduleRoute('list'), self.toListParams);
+                        self.toListView();
                         console.log('--------------end success----------------')
                     }).finally(function () {
 
                         if (self.blocker) {
                             self.blocker.stop();
+                        }
+                    });
+                }
+
+                function remove(relatedAction) {
+                    return _.bind(_processRemove, this, 'remove',relatedAction)();
+                }
+
+                function disable(relatedAction) {
+                    return _.bind(_processRemove, this, 'disable', relatedAction)();
+                }
+
+                function _processRemove(method,relatedAction) {
+                    if(!this.removeDialog)
+                        return;
+                    var self = this;
+                    var promise = self.removeDialog.openConfirm({
+                        template: 'removeConfirmDialog.html',
+                        className: 'ngdialog-theme-default'
+                    }).then(function () {
+                        var actionPromise;
+                        if(relatedAction && angular.isFunction(relatedAction)) {
+                            actionPromise = relatedAction(self.model);
+                        }
+                        else {
+                            actionPromise = $q.when(true);
+                        }
+                        actionPromise.then(function() {
+                            return modelService[method](self.model._id).$promise;
+                        });
+                        return actionPromise;
+                    });
+
+                    return $q.all([$translate('notification.REMOVE-SUCCESS'), promise]).then(function (ret) {
+                        if(ret[1]) {
+                            Notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                            self.cancel();
                         }
                     });
                 }
@@ -786,6 +935,7 @@
                     modelService: modelService,
                     name: name || 'no-entityName',
                     pk: option.pk || '_id',
+                    removeDialog: null,
                     model: {},//因数据会在view或controller中变化，所以在load里出设置.类似buildEntryVM中的searchForm
                     switches: option.switches || {},
                     transTo: option.transTo || {},//跳转到另外module设置对象
@@ -795,17 +945,24 @@
                     toList: option.toList || [],
                     size: {w: 0, h: 0},
                     blocker: option.blockUI ? blockUI.instances.get('module-block') : false,
-                    getParam:getParam,
+                    getParam: getParam,
+                    toListView: toListView,
+                    toEditView: toEditView,
                     init: init,
                     cancel: cancel,
+                    returnBack: returnBack,
                     load: load,
                     loadWhenBatchAdd: loadWhenBatchAdd,
                     loadWhenBatchEdit: loadWhenBatchEdit,
                     save: save,
                     saveWhenBatchAdd: saveWhenBatchAdd,
                     saveWhenBatchEdit: saveWhenBatchEdit,
+                    remove: remove,
+                    disable: disable,
                     notExist: notExist,
-                    openDP: openDP
+                    openDP: openDP,
+                    addSubGrid: addSubGrid,
+                    subGrid: {}
                 };
             }];
         };
@@ -820,7 +977,7 @@
                     return $stateParams[name];
                 }
 
-                function init() {
+                function init(initOption) {
                     this.size = calcWH($window);
 
                     //设置selectFilterObject

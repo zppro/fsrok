@@ -9,6 +9,7 @@
         .provider('modelNode', ModelNode)
         .provider('shareNode', ShareNode)
         .provider('extensionNode', ExtensionNode)
+        .provider('debugNode',DebugNode)
         .provider('clientData',ClientData)
     ;
 
@@ -194,6 +195,28 @@
 
                 return {
                     tenantInfo: tenantInfo,
+                    roomStatusInfo: roomStatusInfo,
+                    updateRoomStatusInfo: updateRoomStatusInfo,
+                    submitApplicationToExit: submitApplicationToExit,
+                    submitToAuditItemReturn: submitToAuditItemReturn,
+                    submitToAuditSettlement: submitToAuditSettlement,
+                    submitToConfirmExit: submitToConfirmExit,
+                    advancePaymentItemsWhenExitSettlement: advancePaymentItemsWhenExitSettlement,
+                    chargeItemsRecordedWhenExitSettlement: chargeItemsRecordedWhenExitSettlement,
+                    chargeItemsUnRecordedWhenExitSettlement: chargeItemsUnRecordedWhenExitSettlement,
+                    exitSettlement: exitSettlement,
+                    completeExit: completeExit,
+                    completeEnter: completeEnter,
+                    disableEnterRelatedAction: disableEnterRelatedAction,
+                    checkBeforeAddEnter: checkBeforeAddEnter,
+                    queryElderly: queryElderly,
+                    elderlyInfo: elderlyInfo,
+                    changeElderlyRoomBed: changeElderlyRoomBed,
+                    changeElderlyChargeItem: changeElderlyChargeItem,
+                    checkCanChangeBookingOrUnbookingRecharge: checkCanChangeBookingOrUnbookingRecharge,
+                    bookingRecharge: bookingRecharge,
+                    disableRechargeAndUnbooking: disableRechargeAndUnbooking,
+                    changeRechargeBookingAmount: changeRechargeBookingAmount,
                     completeOrder: completeOrder,
                     refundOrder: refundOrder,
                     userChangePassword: userChangePassword,
@@ -202,6 +225,114 @@
 
                 function tenantInfo(tenantId,select) {
                     return $http.get(baseUrl + 'tenantInfo/' + tenantId + '/' + select);
+                }
+
+                function roomStatusInfo(tenantId) {
+                    return $http.get(baseUrl + 'roomStatusInfo/' + tenantId);
+                }
+
+                function updateRoomStatusInfo(tenantId,roomId,bed_no,elderlyId) {
+                    return $http.post(baseUrl + 'updateRoomStatusInfo', {
+                        tenantId: tenantId,
+                        roomId: roomId,
+                        bed_no: bed_no,
+                        elderlyId: elderlyId
+                    });
+                }
+
+                function submitApplicationToExit(elderlyId,data) {
+                    return $http.post(baseUrl + 'submitApplicationToExit/' + elderlyId, data);
+                }
+
+                function submitToAuditItemReturn(exitId){
+                    return $http.post(baseUrl + 'submitToAuditItemReturn/' + exitId);
+                }
+
+                function submitToAuditSettlement(exitId,data){
+                    return $http.post(baseUrl + 'submitToAuditSettlement/' + exitId, data);
+                }
+
+                function submitToConfirmExit(exitId,data){
+                    return $http.post(baseUrl + 'submitToConfirmExit/' + exitId, data);
+                }
+
+                function advancePaymentItemsWhenExitSettlement(exitId){
+                    return $http.get(baseUrl + 'advancePaymentItemsWhenExitSettlement/' + exitId);
+                }
+
+                function chargeItemsRecordedWhenExitSettlement(exitId){
+                    return $http.get(baseUrl + 'chargeItemsRecordedWhenExitSettlement/' + exitId);
+                }
+
+                function chargeItemsUnRecordedWhenExitSettlement(exitId){
+                    return $http.get(baseUrl + 'chargeItemsUnRecordedWhenExitSettlement/' + exitId);
+                }
+
+                function exitSettlement(exitId,data) {
+                    return $http.post(baseUrl + 'exitSettlement/' + exitId, data);
+                }
+
+                function completeExit(exitId, data) {
+                    return $http.post(baseUrl + 'completeExit/' + exitId, data);
+                }
+
+                function completeEnter(enterId) {
+                    return $http.post(baseUrl + 'completeEnter/' + enterId);
+                }
+
+                function disableEnterRelatedAction(enterId){
+                    return $http.post(baseUrl + 'disableEnterRelatedAction/' + enterId);
+                }
+
+                function checkBeforeAddEnter(id_no,tenantId) {
+                    return $http.get(baseUrl + 'checkBeforeAddEnter/' + tenantId + '/' + id_no);
+                }
+
+                function queryElderly(tenantId,keyword,where,select,sort) {
+                    return $http.post(baseUrl + 'q/elderly', {tenantId: tenantId, keyword: keyword,  data: {
+                        where: where,
+                        select: select,
+                        sort: sort
+                    }});
+                }
+
+                function elderlyInfo(elderlyId,select) {
+                    return $http.get(baseUrl + 'elderlyInfo/' + elderlyId + '/' + select);
+                }
+
+                function changeElderlyRoomBed(tenantId,elderlyId,roomId,bed_no) {
+                    return $http.post(baseUrl + 'changeElderlyRoomBed', {
+                        tenantId: tenantId,
+                        elderlyId: elderlyId,
+                        roomId: roomId,
+                        bed_no: bed_no
+                    });
+                }
+
+                function changeElderlyChargeItem(tenantId,elderlyId,charge_item_catalog_id,old_charge_item_id,new_charge_item) {
+                    return $http.post(baseUrl + 'changeElderlyChargeItem', {
+                        tenantId: tenantId,
+                        elderlyId: elderlyId,
+                        charge_item_catalog_id: charge_item_catalog_id,
+                        old_charge_item_id: old_charge_item_id,
+                        new_charge_item: new_charge_item
+                    });
+                }
+
+                function checkCanChangeBookingOrUnbookingRecharge(rechargeId){
+                    return $http.get(baseUrl + 'checkCanChangeBookingOrUnbookingRecharge/' + rechargeId);
+                }
+
+                function bookingRecharge(rechargeId,data){
+                    return $http.post(baseUrl + 'bookingRecharge/' + rechargeId, data);
+                }
+
+                function disableRechargeAndUnbooking(rechargeId,data){
+                    return $http.post(baseUrl + 'disableRechargeAndUnbooking/' + rechargeId, data);
+                }
+
+                function changeRechargeBookingAmount(rechargeId,data){
+                    return $http.post(baseUrl + 'changeRechargeBookingAmount/' + rechargeId, data);
                 }
 
                 function completeOrder(orderId) {
@@ -218,6 +349,30 @@
 
                 function resetUserPassword(userId) {
                     return $http.post(baseUrl + 'resetUserPassword/' + userId);
+                }
+            }]
+        };
+
+        function setBaseUrl(url) {
+            baseUrl = url;
+        }
+    }
+
+    function DebugNode() {
+        var baseUrl;
+        return {
+            // provider access level
+            setBaseUrl: setBaseUrl,
+
+            // controller access level
+            $get: ['$rootScope', '$q', '$http', function ($rootScope, $q, $http) {
+
+                return {
+                    tenantInfo: tenantInfo
+                };
+
+                function tenantInfo(tenantId, select) {
+                    return $http.get(baseUrl + 'tenantInfo/' + tenantId + '/' + select);
                 }
             }]
         };

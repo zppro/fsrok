@@ -10,9 +10,9 @@
         .controller('TenantAccountManageDetailsController', TenantAccountManageDetailsController)
     ;
 
-    TenantAccountManageDetailsController.$inject = ['$scope','vmh','entityVM'];
+    TenantAccountManageDetailsController.$inject = ['$scope','ngDialog', 'vmh','entityVM'];
 
-    function TenantAccountManageDetailsController($scope, vmh, vm) {
+    function TenantAccountManageDetailsController($scope, ngDialog, vmh, vm) {
 
 
         var vm = $scope.vm = vm;
@@ -23,7 +23,7 @@
         init();
 
         function init() {
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
             vmh.shareService.d('D1002').then(function(rows) {
                 vm.selectBinding.tenantTypes = _.filter(rows, function (row) {

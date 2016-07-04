@@ -72,7 +72,13 @@ module.exports = function(ctx,name) {
                 period_price: {type: Number, default: 0.00},
                 period: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])},
                 orderNo: {type: Number, default: 0}
-            }]
+            }],
+            general_ledger:{type: Number, default: 0.00},//一般在通过流水月结转
+            subsidiary_ledger: {
+                self: {type: Number, default: 0.00},//主账户
+                gov_subsidy: {type: Number, default: 0.00}, //政府补助账户
+                social_donation: {type: Number, default: 0.00}//社会捐赠账户
+            }
         });
 
         tenantSchema.pre('update', function (next) {
@@ -99,7 +105,7 @@ module.exports = function(ctx,name) {
         });
 
 
-        tenantSchema.$$skipPaths = ['price_funcs', 'open_funcs','charge_items'];
+        tenantSchema.$$skipPaths = ['price_funcs', 'open_funcs','charge_items','subsidiary_ledger'];
 
         tenantSchema.methods.needRefreshToken = function(){
             console.log(this);

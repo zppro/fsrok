@@ -216,6 +216,23 @@
                     }
                 }
             })
+            .state('app.demo-center.promise', {
+                url: '/promise',
+                access_level: AUTH_ACCESS_LEVELS.ADMIN,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/module-header.html'),
+                        controller: 'ModuleHeaderController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('demo-center/promise.html'),
+                        controller: 'DemoPromiseController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.demo-center.promise')
+                        }
+                    }
+                }
+            })
         ;
 
     } // routesConfig

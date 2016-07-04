@@ -23,10 +23,46 @@ module.exports = {
         }
 
         var tenantModelOption = {model_name: 'pub_tenant', model_path: '../models/pub/tenant'};
+        var tenantJournalAccountModelOption = {model_name: 'pub_tenantJournalAccount', model_path: '../models/pub/tenantJournalAccount'};
         var districtModelOption = {model_name: 'pfta_district', model_path: '../models/pfta/district'};
+        var elderlyModelOption = {model_name: 'pub_elderly', model_path: '../models/pub/elderly'};
+        var enterModelOption = {model_name: 'pfta_enter', model_path: '../models/pfta/enter'};
         var roomModelOption = {model_name: 'pfta_room', model_path: '../models/pfta/room'};
+        var roomStatusModelOption = {model_name: 'pfta_roomStatus', model_path: '../models/pfta/roomStatus'};
+        var roomStatusChangeHistoryModelOption = {model_name: 'pfta_roomStatusChangeHistory', model_path: '../models/pfta/roomStatusChangeHistory'};
 
         this.actions = [
+            {
+                method: 'testEach',
+                verb: 'get',
+                url: this.service_url_prefix + "/testEach",//:select需要提取的字段域用逗号分割 e.g. name,type
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var elderlyId = '573b1592820aeb8d211bc357';
+                            var elderly = yield app.modelFactory().read(elderlyModelOption.model_name, elderlyModelOption.model_path, elderlyId);
+                            if (!elderly) {
+                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                yield next;
+                                return;
+                            }
+                            var item_id = 'charge-item.organization-pfta.nursing-s1.SELF-CARE';
+                            var charge_item = app._.findWhere(elderly.charge_items, {item_id: item_id});
+                            if (charge_item) {
+                                console.log(charge_item);
+                            }
+                            else {
+                                console.log('not found');
+                            }
+                            this.body = app.wrapper.res.ret(charge_item);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
             {
                 method: 'tenantInfo',
                 verb: 'get',
@@ -38,6 +74,50 @@ module.exports = {
                             var ret = app._.pick(tenant.toObject(),this.params.select.split(','));
                             console.log(ret);
                             this.body = app.wrapper.res.ret(ret);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'enterInfoWithPopulate',
+                verb: 'get',
+                url: this.service_url_prefix + "/enterInfoWithPopulate/:_id",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+
+                            var enter = yield app.modelFactory().read(enterModelOption.model_name, enterModelOption.model_path, this.params._id)
+                                .populate('tenantId','-_id name').populate('elderlyId','-_id name');
+
+                            console.log(enter.toObject());
+                            this.body = app.wrapper.res.ret(enter);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'roomStatusInfoWithPopulate',
+                verb: 'get',
+                url: this.service_url_prefix + "/roomStatusInfoWithPopulate/:tenantId",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+
+                            var roomStatuses = yield app.modelFactory().model_query(app.models['pfta_roomStatus'], {where: {tenantId: this.params.tenantId}})
+                                .populate('tenantId', '-_id name')
+                                .populate({
+                                    path: 'occupied.elderlyId',
+                                    select: 'name'
+                                });
+                            this.body = app.wrapper.res.rows(roomStatuses);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -186,8 +266,222 @@ module.exports = {
                         yield next;
                     };
                 }
+            },
+            {
+                method: 'clearEnter',//构建区域-房间树
+                verb: 'delete',
+                url: this.service_url_prefix + "/restore-enter-to-uncomplete",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var enterId = '573b1592820aeb8d211bc35d';
+                            var tenantJournalAccountItemId = '5743d1da0cd9136520d74dd7';
+                            var roomStatusId = '5743d1da0cd9136520d74dd5';
+                            var roomStatusChangeHistoryId = '5743d1da0cd9136520d74dd6';
+
+                            var enter = yield app.modelFactory().read(enterModelOption.model_name, enterModelOption.model_path, enterId);
+                            if(!enter){
+                                this.body = app.wrapper.res.error({message: '无法找到入院记录!'});
+                                yield next;
+                                return;
+                            }
+
+                            var tenant = yield app.modelFactory().read(tenantModelOption.model_name, tenantModelOption.model_path, enter.tenantId);
+                            if(!tenant){
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+
+                            var elderly = yield app.modelFactory().read(elderlyModelOption.model_name, elderlyModelOption.model_path, enter.elderlyId);
+                            if(!elderly){
+                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                yield next;
+                                return;
+                            }
+
+
+                            //1、重置租户明细账
+
+                            var tenantJournalAccountItem = yield app.modelFactory().read(tenantJournalAccountModelOption.model_name,tenantJournalAccountModelOption.model_path,tenantJournalAccountItemId);
+                            tenant.subsidiary_ledger.self -= tenantJournalAccountItem.amount;
+                            tenant.save();
+                            //2、删除租户流水记录
+                            yield app.modelFactory().delete(tenantJournalAccountModelOption.model_name,tenantJournalAccountModelOption.model_path,tenantJournalAccountItemId);
+
+
+                            //删除房间状态变化信息和房间状态变化历史
+                            yield app.modelFactory().delete(roomStatusModelOption.model_name,roomStatusModelOption.model_path,'5743c9089d03a6791cf8e1d1');
+                            yield app.modelFactory().delete(roomStatusChangeHistoryModelOption.model_name,roomStatusChangeHistoryModelOption.model_path,'5743c9089d03a6791cf8e1d2');
+
+                            //老人恢复到未入住状态
+                            elderly.live_in_flag = false;
+                            elderly.enter_code = undefined;
+                            elderly.enter_on = undefined;
+                            elderly.remark = undefined;
+                            //老人流水删除及明细账清空
+                            elderly.subsidiary_ledger.self = 0;
+                            elderly.journal_account = [];
+                            yield elderly.save();
+
+                            //入院记录恢复到财务确认收款
+                            enter.current_register_step = 'A0005';
+                            yield enter.save();
+
+                            this.body = app.wrapper.res.rows(rows);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'transferRoomStatusHistory',//构建区域-房间树
+                verb: 'post',
+                url: this.service_url_prefix + "/transferRoomStatusHistory",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var districts = yield app.modelFactory().model_query(app.models["pfta_district"]);
+                            var rows =  yield app.modelFactory().model_query(app.models["pfta_roomStatusChangeHistory"],{select:'-_id'})
+                                .populate('elderlyId','name id_no').populate('roomId','_id districtId floor name');
+
+                            var dictOfDistrict = {};
+                            for(var i=0;i<districts.length;i++) {
+                                var district = districts[i].toObject();
+                                dictOfDistrict[district._id] = district.name;
+                            }
+
+                            for(var i=0;i<rows.length;i++) {
+                                var row = rows[i].toObject();
+
+                                var entity = {
+                                    check_in_time: row.check_in_time,
+                                    roomId: row.roomId._id,
+                                    room_summary: dictOfDistrict[row.roomId.districtId] + "-"+ row.roomId.floor+'F-'+row.roomId.name+'-'+row.bed_no+'#床',
+                                    elderlyId: row.elderlyId._id,
+                                    elderly_summary: row.elderlyId.name + ' ' + row.elderlyId.id_no,
+                                    in_flag: row.in_flag,
+                                    tenantId: row.tenantId
+                                };
+
+
+                                //console.log(entity);
+                                yield app.modelFactory().model_create(app.models["pfta_roomOccupancyChangeHistory"], entity);
+                            }
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'testCopyBirthday',
+                verb: 'post',
+                url: this.service_url_prefix + "/testCopyBirthday",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var elderly = yield app.modelFactory().model_read(app.models["pub_elderly"],'573b1592820aeb8d211bc357');
+                            var exit = yield app.modelFactory().model_read(app.models["pfta_exit"],'57678c195b4198b123c146d3');
+
+                            exit.elderly_birthday = elderly.birthday;
+                            yield exit.save();
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'modifyNormalFlag',
+                verb: 'post',
+                url: this.service_url_prefix + "/modifyNormalFlag",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            //var tenantJournalAccounts = yield app.modelFactory().model_query(app.models["pub_tenantJournalAccount"]);
+                            //for (var i = 0; i < tenantJournalAccounts.length; i++) {
+                            //    tenantJournalAccounts[i].red_flag = false;
+                            //    tenantJournalAccounts[i].normal_flag = undefined;
+                            //    yield tenantJournalAccounts[i].save();
+                            //}
+                            //var elderlys = yield app.modelFactory().model_query(app.models["pub_elderly"], {where: {status: 1}});
+                            //for (var i = 0; i < elderlys.length; i++) {
+                            //
+                            //    var journal_accounts = elderlys[i].journal_account;
+                            //
+                            //    for (var j = 0; j < journal_accounts.length; j++) {
+                            //        journal_accounts[j].red_flag = false;
+                            //        journal_accounts[j].normal_flag = undefined;
+                            //    }
+                            //    yield elderlys[i].save();
+                            //}
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'initTenantBIZData',
+                verb: 'post',
+                url: this.service_url_prefix + "/initTenantBIZData/:_id",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+
+                            tenant.general_ledger = 0;
+                            tenant.subsidiary_ledger && (tenant.subsidiary_ledger.self = tenant.subsidiary_ledger.gov_subsidy = tenant.subsidiary_ledger.social_donation = 0);
+
+                            yield tenant.save();
+
+                            yield app.modelFactory().model_bulkDelete(app.models['pub_tenantJournalAccount'], {tenantId: this.params._id});
+
+                            yield app.modelFactory().model_bulkDelete(app.models['pub_elderly'], {tenantId: tenant._id});
+
+                            yield app.modelFactory().model_bulkDelete(app.models['pfta_roomStatus'], {tenantId: tenant._id});
+
+                            yield app.modelFactory().model_bulkDelete(app.models['pfta_roomOccupancyChangeHistory'], {tenantId: tenant._id});
+
+                            yield app.modelFactory().model_bulkDelete(app.models['pfta_recharge'], {tenantId: tenant._id});
+
+                            yield app.modelFactory().model_bulkDelete(app.models['pfta_exit'], {tenantId: tenant._id});
+
+                            yield app.modelFactory().model_bulkDelete(app.models['pfta_enter'], {tenantId: tenant._id});
+
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
             }
+
         ];
+
 
         return this;
     }

@@ -22,8 +22,8 @@ module.exports = function(ctx,name) {
             number_in_floor: {type: Number, min: 1, max: 99},
             capacity: {type: Number, required: true, min: 1},
             stop_flag: {type: Boolean, default: false},
-            districtId: {type: mongoose.Schema.Types.ObjectId, required: true},
-            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true}
+            districtId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pfta_district'},
+            tenantId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pub_tenant'}
         });
 
         roomSchema.pre('update', function (next) {

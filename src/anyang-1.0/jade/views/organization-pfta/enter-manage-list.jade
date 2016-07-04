@@ -19,9 +19,9 @@
                      | {{column.label}}
                      i.glyphicon(ng-if="column.name === vm.sort.column && vm.sort.direction",ng-class="vm.sort.direction|orderClass")
             tbody
-               tr(ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
+               tr(ng-init="row.unselectable = row.current_register_step!='A0001' ",ng-repeat="row in vm.rows|filter:vm.filter|orderBy:vm.sort.column:vm.sort.direction===-1|paging:vm" , ng-click="vm.selectRow($event,row)",ng-dblclick="vm.dblclickRow(row.id)")
                   td
-                     .checkbox.c-checkbox
+                     .checkbox.c-checkbox(ng-if="!row.unselectable")
                         label
                            input(type='checkbox' data="trBubble" ng-model="row.checked" )
                            span.fa.fa-check(data="trBubble")
@@ -31,9 +31,18 @@
                   td.text-right {{::row.deposit|currency}}
                   td {{row.current_register_step|formatter:'current_register_step':vm.columns}}
                   td
-                     .btn-group
+                     .btn-group(ng-if="row.current_register_step!='A0001'")
+                        a.btn.btn-primary.btn-xs(title="{{'button.READ'|translate}}",ng-click="vm.read(row._id)")
+                           i.glyphicon.glyphicon-search
+                     .btn-group(ng-if="row.current_register_step=='A0001'")
                         a.btn.btn-primary.btn-xs(title="{{'button.EDIT'|translate}}",ng-click="vm.edit(row._id)")
                            i.glyphicon.glyphicon-pencil
+                     .btn-group(ng-if="row.current_register_step=='A0001'")
+                        a.btn.btn-primary.btn-xs(title="{{vm.viewTranslatePath('SUBMIT-ENTER-FINANCIAL-AUDIT')|translate}}",ng-click="vm.submitEnter(row)")
+                           i.glyphicon.glyphicon-open
+                     .btn-group(ng-if="row.current_register_step=='A0005'")
+                        a.btn.btn-primary.btn-xs(title="{{vm.viewTranslatePath('COMPLETE-ENTER')|translate}}",ng-click="vm.completeEnter(row)")
+                           i.glyphicon.glyphicon-saved
                tr(ng-if="vm.paged.length==0")
                   td(colspan="{{utils.noResultsColspan(vm)}}") {{ 'grid.NO-RESULTS' | translate}}
          .panel-footer
@@ -43,7 +52,7 @@
                      .btn-group
                         a.btn.btn-primary.btn-sm(title="{{'button.ADD'|translate}}",ng-click="vm.add()")
                            i.glyphicon.glyphicon-plus
-                        a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable()")
+                        a.btn.btn-primary.btn-sm(title="{{'button.REMOVE'|translate}}",ng-click="vm.disable(vm.disableEnterRelatedAction)")
                            i.glyphicon.glyphicon-minus
                .col-md-8
                   pagination.pagination-sm.pull-right(total-items="vm.page.totals",ng-model="vm.page.no",max-size="5",items-per-page="vm.page.size",boundary-links="true" ,ng-change="vm.paging()")

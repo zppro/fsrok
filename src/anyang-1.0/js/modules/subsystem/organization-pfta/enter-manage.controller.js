@@ -1,6 +1,6 @@
 /**
- * system-district-manage.controller Created by zppro on 16-4-19.
- * Target:租户管理片区
+ * enter-manage.controller Created by zppro on 16-4-19.
+ * Target:老人入院管理
  */
 
 (function() {
@@ -24,7 +24,49 @@
 
         function init() {
             vm.init({removeDialog: ngDialog});
+
+            vm.disableEnterRelatedAction = disableEnterRelatedAction;
+            vm.submitEnter = submitEnter;
+            vm.completeEnter = completeEnter;
+
             vm.query();
+        }
+
+        function disableEnterRelatedAction(row){
+            return vmh.extensionService.disableEnterRelatedAction(row._id);
+        }
+
+        function submitEnter(row) {
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default'
+            }).then(function () {
+                //A0001->A0003 入院状态从[登记入院信息]到[提交财务审核]
+                var data = {current_register_step: 'A0003'};
+                var promise = vmh.fetch(vm.modelService.update(row._id, data)).then(function () {
+                    row.current_register_step = data.current_register_step;
+                });
+
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), promise]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                });
+            });
+        }
+
+        function completeEnter(row){
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default',
+                scope: $scope
+            }).then(function () {
+                var promise = vmh.extensionService.completeEnter(row._id).then(function (ret) {
+                    row = _.extend(row, ret);
+                });;
+
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), promise]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                });
+            });
         }
     }
 
@@ -43,12 +85,14 @@
 
         function init() {
 
-            vm.init();
+            vm.init({removeDialog: ngDialog});
 
-            vm.doSubmit = doSubmit;
+            vm.serverSideCheck = serverSideCheck;
             vm.setBoardSummary = setBoardSummary;
             vm.setNursingSummary = setNursingSummary;
             vm.isSelected = isSelected;
+            vm.isDisabled = isDisabled;
+            vm.getOccupyElderlyName = getOccupyElderlyName;
             vm.sumPeriodPrice = sumPeriodPrice;
             vm.addElderlyFamilyMember = addElderlyFamilyMember;
             vm.editElderlyFamilyMember = editElderlyFamilyMember;
@@ -56,6 +100,13 @@
             vm.cancelElderlyFamilyMember = cancelElderlyFamilyMember;
             vm.removeElderlyFamilyMember = removeElderlyFamilyMember;
             vm.checkElderlyFamilyMemberAll = checkElderlyFamilyMemberAll;
+            vm.doSubmit = doSubmit;
+            vm.submitEnterFinancialAudit=submitEnterFinancialAudit;
+            vm.undoEnterFinancialAudit = undoEnterFinancialAudit;
+            vm.comfirmEnterReceipt = comfirmEnterReceipt;
+            vm.disableEnterRelatedAction = disableEnterRelatedAction;
+
+
             vm.tab1 = {cid: 'contentTab1'};
             vm.tab2 = {cid: 'contentTab2'};
             vm.tab3 = {cid: 'contentTab3'};
@@ -73,7 +124,12 @@
                 vmh.shareService.d('D1015'),
                 vmh.extensionService.tenantInfo(vm.tenantId, 'charge_standard,charge_items'),
                 vmh.clientData.getJson('charge-item-organization-pfta'),
-                vm.load()
+                vmh.shareService.tmp('T3003', 'name', {
+                    tenantId: vm.tenantId,
+                    floorSuffix: 'F',
+                    bedNoSuffix: '#床'
+                }),
+                vmh.extensionService.roomStatusInfo(vm.tenantId)
             ]).then(function (results) {
                 vm.selectBinding.sex = results[0];
                 vm.selectBinding.marriages = results[1];
@@ -123,19 +179,26 @@
                 }
 
 
-            })
-            ;
-
-
-            console.log(vm.model);
-            if('$promise' in vm.model)
-                console.log('2q3')
-
-            vm.treeDataPromiseOfRoom = vmh.shareService.tmp('T3003', 'name', {
-                tenantId: vm.tenantId,
-                floorSuffix: 'F',
-                bedNoSuffix: '#床'
+                //vm.treeData = vmh.q.when(results[10]);
+                vm.treeData = results[10];
+                //vm.treeDataPromiseOfRoom = vmh.shareService.tmp('T3003', 'name', {
+                //    tenantId: vm.tenantId,
+                //    floorSuffix: 'F',
+                //    bedNoSuffix: '#床'
+                //});
+                vm.roomStatusInfo = {};
+                _.each(results[11], function (roomStatus) {
+                    _.each(roomStatus.occupied, function (occupy) {
+                        if (occupy.elderlyId) {
+                            vm.roomStatusInfo[roomStatus.roomId + '$' + occupy.bed_no] = {
+                                elderly_name: occupy.elderlyId.name,
+                                bed_status: occupy.bed_status
+                            };
+                        }
+                    });
+                });
             });
+
 
             vm.hobbiesPromise = vmh.shareService.d('D1013').then(function (hobbies) {
                 vmh.utils.v.changeProperyName(hobbies, [{o: 'value', n: '_id'}]);
@@ -157,12 +220,12 @@
                     vm.elderlyModel.family_members = [];
                 }
 
-                if(vm.model.elderlyId) {
+                if (vm.model.elderlyId) {
                     vmh.fetch(elderlyService.get({_id: vm.model.elderlyId})).then(function (ret) {
                         vm.elderlyModel = ret;
 
                         //手工选中
-                        _.each(vm.elderlyModel.charge_items,function(item) {
+                        _.each(vm.elderlyModel.charge_items, function (item) {
                             vm.selectionOfManualSelectable[item.item_id] = true;
                         });
 
@@ -174,8 +237,7 @@
 
             //vm.selectedBedNo = '5715e885b8a6a9fd24582211$101$2';
 
-            $scope.$on('tree:node:select', function ($event, node,treeObject) {
-
+            $scope.$on('tree:node:select', function ($event, node, treeObject) {
                 if (node.capacity) {
                     vm.roomCapacity = node.capacity;//房间类型选择
                     var arr = node._id.split('$');
@@ -190,11 +252,11 @@
                     var arrIndex = node.attrs.index.split(treeObject.levelSplitChar);
                     var data = treeObject.treeData;
                     vm.elderlyModel.room_summary = '';
-                    for(var i=0;i<arrIndex.length;i++){
+                    for (var i = 0; i < arrIndex.length; i++) {
                         var currentNode = data[arrIndex[i]];
-                        if(currentNode) {
+                        if (currentNode) {
                             vm.elderlyModel.room_summary += currentNode.name;
-                            if(currentNode.children) {
+                            if (currentNode.children) {
                                 vm.elderlyModel.room_summary += treeObject.levelSplitChar;
                                 data = currentNode.children;
                             }
@@ -209,6 +271,31 @@
 
         }
 
+
+
+        function serverSideCheck(id_no) {
+            if ((vm._action_ == 'add' && vm._id_ == 'new' && id_no.length == 18)
+            || vm._action == 'edit' && vm.elderlyModel.id_no != id_no) {
+                return vmh.q(function (resolve, reject) {
+                    return vmh.extensionService.checkBeforeAddEnter(id_no, vm.model.tenantId).then(function (ret) {
+                        if (ret.elderly) {
+                            if(vm._action_ == 'add'){
+                                vm.elderlyModel = ret.elderly;
+                                vm.model.elderlyId = vm.elderlyModel._id;
+                            }
+                            else {
+                                _.defaults(vm.elderlyModel,ret.elderly);
+                            }
+                        }
+                        resolve();
+                    }, function (err) {
+                        vm.CheckBeforeAddEnterError = err;
+                        reject();
+                    });
+                });
+            }
+            return true;
+        };
 
         function isSelected(charge_item) {
             var selected = false;
@@ -242,70 +329,26 @@
             return selected;
         }
 
+        function isDisabled(node) {
+            var key = node._id.split('$').slice(1).join('$');
+            var bed_status = vm.roomStatusInfo[key] && vm.roomStatusInfo[key].bed_status;
+            if (!bed_status)
+                bed_status = 'A0001';//空闲
+            return bed_status != 'A0001';
+        }
+
+        function getOccupyElderlyName(node) {
+            var key = node._id.split('$').slice(1).join('$');
+            var elderlyName = vm.roomStatusInfo[key] && vm.roomStatusInfo[key].elderly_name;
+            return elderlyName;
+        }
+
         function setBoardSummary(board_info){
             vm.elderlyModel.board_summary = board_info.item_name;
         }
 
         function setNursingSummary(nursing_info){
             vm.elderlyModel.nursing_summary = nursing_info.item_name;
-        }
-
-        function doSubmit() {
-
-            //获取charge_items
-
-
-            if ($scope.theForm.$valid) {
-
-                vm.elderlyModel.tenantId = vm.model.tenantId;
-                vm.elderlyModel.charge_items = [];
-                for(var charge_item_id in vm.selected_charge_item_object) {
-                    vm.elderlyModel.charge_items.push(_.omit(vm.selected_charge_item_object[charge_item_id], '_id'));
-                }
-
-                var promise_elderly;
-                if(!vm.model.elderlyId){
-                    //老人信息没有保存，增加老人信息
-                    console.log('create elderly...')
-                    promise_elderly = vmh.fetch(elderlyService.save(vm.elderlyModel)).then(function(ret){
-                        vm.model.elderlyId = ret._id;
-                    });
-                }
-                else {
-                    console.log('update elderly...')
-                    promise_elderly = vmh.fetch(elderlyService.update(vm.model.elderlyId, vm.elderlyModel));
-                }
-
-                promise_elderly.then(function(ret){
-
-
-
-                    if(!vm.model.agent_info && vm.elderlyModel.family_members.length>0) {
-                        vm.model.agent_info = _.omit(vm.elderlyModel.family_members[0], '_id');
-                    }
-
-                    vm.model.current_register_step = 'A0001';//登记入院信息
-                    vm.model.elderly_summary = vm.elderlyModel.name;
-                    vm.model.sum_period_price = vm.sumPeriodPrice();//期间费用汇总计算列
-
-                    console.log('save enter...');
-                    vm.save();
-                });
-            }
-            else {
-                if ($scope.utils.vtab(vm.tab1.cid)) {
-                    vm.tab1.active = true;
-                }
-                else if ($scope.utils.vtab(vm.tab2.cid)) {
-                    vm.tab2.active = true;
-                }
-                else if ($scope.utils.vtab(vm.tab3.cid)) {
-                    vm.tab3.active = true;
-                }
-                else if ($scope.utils.vtab(vm.tab4.cid)) {
-                    vm.tab4.active = true;
-                }
-            }
         }
 
         function sumPeriodPrice() {
@@ -386,6 +429,135 @@
             for(var i=0;i<vm.elderlyModel.family_members.length;i++) {
                 vm.elderlyModel.family_members[i].checked = rowCheckState;
             }
+        }
+
+        function doSubmit() {
+
+            //获取charge_items
+
+
+            if ($scope.theForm.$valid) {
+
+                vm.elderlyModel.tenantId = vm.model.tenantId;
+                vm.elderlyModel.charge_items = [];
+                for (var charge_item_id in vm.selected_charge_item_object) {
+                    vm.elderlyModel.charge_items.push(_.omit(vm.selected_charge_item_object[charge_item_id], '_id'));
+                }
+
+                var promise_elderly;
+                if (!vm.model.elderlyId) {
+                    //老人信息没有保存，增加老人信息
+                    console.log('create elderly...')
+                    promise_elderly = vmh.fetch(elderlyService.save(vm.elderlyModel)).then(function (ret) {
+                        vm.model.elderlyId = ret._id;
+                    });
+                }
+                else {
+                    console.log('update elderly...')
+                    promise_elderly = vmh.fetch(elderlyService.update(vm.model.elderlyId, vm.elderlyModel));
+                }
+
+                promise_elderly.then(function (ret) {
+
+                    var promise_roomStatus = vmh.extensionService.updateRoomStatusInfo(vm.model.tenantId, vm.elderlyModel.room_value.roomId, vm.elderlyModel.room_value.bed_no, vm.model.elderlyId);
+
+                    promise_roomStatus.then(function (ret) {
+                        console.dir(ret);
+                        if (!vm.model.agent_info && vm.elderlyModel.family_members.length > 0) {
+                            vm.model.agent_info = _.omit(vm.elderlyModel.family_members[0], '_id');
+                        }
+
+                        vm.model.current_register_step = 'A0001';//登记入院信息
+                        vm.model.elderly_summary = vm.elderlyModel.name;
+                        vm.model.sum_period_price = vm.sumPeriodPrice();//期间费用汇总计算列
+
+                        console.log('save enter...');
+                        vm.save();
+                    });
+                });
+            }
+            else {
+                if ($scope.utils.vtab(vm.tab1.cid)) {
+                    vm.tab1.active = true;
+                }
+                else if ($scope.utils.vtab(vm.tab2.cid)) {
+                    vm.tab2.active = true;
+                }
+                else if ($scope.utils.vtab(vm.tab3.cid)) {
+                    vm.tab3.active = true;
+                }
+                else if ($scope.utils.vtab(vm.tab4.cid)) {
+                    vm.tab4.active = true;
+                }
+            }
+        }
+
+        function submitEnterFinancialAudit() {
+            console.log($scope.$fromState);
+            console.log($scope.$fromParams);
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default'
+            }).then(function () {
+                //A0001->A0003 入院状态从[登记入院信息]到[提交财务审核]
+                var data = {current_register_step: 'A0003'};
+                var promise = vmh.fetch(vm.modelService.update(vm.model._id, data));
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), promise]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                    vm.toListView();
+                });
+            });
+        }
+
+        function undoEnterFinancialAudit(){
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default'
+            }).then(function () {
+                //A0003->A0001 入院状态从[提交财务审核]到[登记入院信息]
+                var data = {current_register_step: 'A0001'};
+                var promise = vmh.fetch(vm.modelService.update(vm.model._id, data));
+
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), promise]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+
+                    if($scope.$fromState){
+                        $scope.$state.go($scope.$fromState, $scope.$fromParams);
+                    }
+                    else{
+                        vm.toListView();
+                    }
+                });
+            });
+        }
+
+        function comfirmEnterReceipt(){
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default'
+            }).then(function () {
+                //A0003->A0001 入院状态从[提交财务审核]到[财务确认收款]
+                var data = {current_register_step: 'A0005'};
+                var promise = vmh.fetch(vm.modelService.update(vm.model._id, data));
+
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), promise]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+
+                    if($scope.$fromState){
+                        $scope.$state.go($scope.$fromState, $scope.$fromParams);
+                    }
+                    else{
+                        vm.toListView();
+                    }
+                });
+            });
+        }
+
+
+        function disableEnterRelatedAction(model){
+            return vmh.extensionService.disableEnterRelatedAction(model._id).then(function(){
+                return true;
+            });
         }
     }
 

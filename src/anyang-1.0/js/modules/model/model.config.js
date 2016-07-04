@@ -8,11 +8,12 @@
         .module('app.model')
         .config(modelConfig);
 
-    modelConfig.$inject = ['modelNodeProvider', 'shareNodeProvider','extensionNodeProvider', 'clientDataProvider'];
-    function modelConfig(modelNodeProvider, shareNodeProvider,extensionNodeProvider, clientDataProvider) {
+    modelConfig.$inject = ['modelNodeProvider', 'shareNodeProvider','extensionNodeProvider','debugNodeProvider', 'clientDataProvider'];
+    function modelConfig(modelNodeProvider, shareNodeProvider,extensionNodeProvider, debugNodeProvider,clientDataProvider) {
         modelNodeProvider.setBaseUrl('services/model/manage/');
         shareNodeProvider.setBaseUrl('services/share/');
         extensionNodeProvider.setBaseUrl('services/extension/');
+        debugNodeProvider.setBaseUrl('debug-services/debug/');
         clientDataProvider.setBaseUrl('server/');
     }
 })();

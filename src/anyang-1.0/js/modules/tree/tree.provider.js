@@ -139,7 +139,7 @@
                     this.treeData = treeData;
                     option = option || {};
 
-
+                    this.readonly = option.readonly || false;
                     this.mode = option.mode || 'default'; //default,check,
                     this.selectNodeFormat = option.selectNodeFormat || '_id';// '_id,name' 或者 'object'
                     this.levelSplitChar = option.levelSplitChar || '-';
@@ -453,7 +453,9 @@
                     }
 
                     this.select = function (node, $event) {
-                        console.log(node.name);
+                        if(this.readonly && $event.currentTarget)
+                            return;
+
                         if (this.compare(node, this.selectedNode || {})) {
                             $event && $event.currentTarget && $event.stopPropagation();
                             return;
@@ -488,6 +490,8 @@
                     }
 
                     this.toggleCheck = function ($index, $event) {
+                        if(this.readonly && !$event.source)
+                            return;
                         $index += '';
                         if (angular.isDefined(this._checkedIndexes[$index])) {
                             var toState, inputToCheck;
@@ -520,6 +524,8 @@
                     }
 
                     this.check = function ($index,$event) {
+                        if(this.readonly && !$event.source)
+                            return;
                         $index += '';
                         if (angular.isDefined(this._checkedIndexes[$index])) {
 
@@ -536,6 +542,8 @@
                     }
 
                     this.unCheck = function ($index,$event) {
+                        if(this.readonly && !$event.source)
+                            return;
                         $index += '';
                         if (angular.isDefined(this._checkedIndexes[$index])) {
 
@@ -571,10 +579,15 @@
 
                     //dropdown
                     this.toggleDropdown = function () {
+                        if(this.readonly && !$event.source )
+                            return;
                         this.dropdownOpened ? this.closeDropdown() : this.openDropdown();
                     }
 
                     this.openDropdown = function () {
+                        if(this.readonly && !$event.source)
+                            return;
+
                         if (this.dropdownOpened)
                             return;
                         //if (self.height != self.joulc.height()) {
@@ -600,6 +613,8 @@
                     }
 
                     this.closeDropdown = function () {
+                        if(this.readonly && !$event.source)
+                            return;
                         if (!this.dropdownOpened)
                             return;
                         this.el_ulc.addClass('tree-hidden');

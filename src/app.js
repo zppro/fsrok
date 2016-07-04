@@ -34,6 +34,8 @@ app.conf = {
         data: path.join(__dirname, 'data'),
         service: path.join(__dirname, 'services'),
         debugServices: path.join(__dirname, 'debug-services'),
+        scheduleJobs: path.join(__dirname, 'schedule-jobs'),
+        sequenceDefs: path.join(__dirname, 'sequence-defs'),
         static_develop: '../pub-client-develop/',
         static_production: '../pub-client-production/'
     },
@@ -103,6 +105,7 @@ app.wrapper = {
 //load dictionary
 app.dictionary = rfcore.factory('dictionary');
 
+
 //load pre-defined except dictionary.json
 app.modelVariables = require('./pre-defined/model-variables.json');
 
@@ -115,12 +118,15 @@ app._ = _;
 //crypto
 app.crypto = require('crypto');
 
+app.clone = require('clone');
+
 
 //moment
 app.moment = moment;
 
 //rfcore.util
-app.rfcore = rfcore;
+app.util = rfcore.util;
+
 
 //mongoose default date function
 app.utcNow  = function() {
@@ -170,9 +176,27 @@ co(function*() {
         console.log('mongodb error:');
         console.error(err);
     });
-    app.modelFactory = require('./libs/ModelFactory').bind(app);
 
 
+    console.log('configure models...');
+    app.modelsDirStructure = yield app.util.readDictionaryStructure(path.resolve('models'),'.js');
+    var ModelFactory = require('./libs/ModelFactory');
+    ModelFactory.loadModel.bind(app)(app.modelsDirStructure);
+    app.models = ModelFactory.models;
+    app.modelFactory = ModelFactory.bind(app);
+
+
+    console.log('configure schedule jobs...');
+    app.conf.scheduleJobNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.scheduleJobs)), function (o) {
+        return o.substr(0, o.indexOf('.'))
+    });
+
+    console.log('configure schedule sequence defs...');
+    app.conf.sequenceDefNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.sequenceDefs)), function (o) {
+        return o.substr(0, o.indexOf('.'))
+    });
+
+    console.log('configure services...');
     app.conf.serviceNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.service)), function (o) {
         return o.substr(0, o.indexOf('.'))
     });
@@ -182,7 +206,6 @@ co(function*() {
             return o.substr(0, o.indexOf('.'))
         });
     }
-
 
     console.log('configure logs...');
     var configAppenders = [];
@@ -211,6 +234,22 @@ co(function*() {
     //配置日志
     log4js.configure({
         appenders: configAppenders
+    });
+
+    console.log('create jobs...');
+    app.jobManger = rfcore.factory('jobManager');
+    _.each(app.conf.scheduleJobNames, function (o) {
+        var jobDef = require('./schedule-jobs/' + o);
+        if(jobDef.needRegister ){
+            console.log('create job use ' + o + '...');
+            jobDef.register(app);
+        }
+    });
+
+    console.log('create sequences...');
+    app.sequenceFactory = require('./libs/SequenceFactory').init(app.modelFactory(),app.models['pub_sequence']);
+    _.each(app.conf.sequenceDefNames, function (o) {
+        app.sequenceFactory.factory(o);
     });
 
     console.log('register router...');
@@ -279,6 +318,8 @@ co(function*() {
 
     app.use(router.routes())
         .use(router.allowedMethods());
+
+
 
     app.listen(3000);
 

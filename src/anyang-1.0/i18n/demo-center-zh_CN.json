@@ -45,6 +45,9 @@
       "ID_NO": "身份证号",
       "SEX": "性别",
       "BIRTHDAY": "出生日期"
+    },
+    "promise":{
+      "TITLE": "演示中心-测试promise"
     }
   }
 }

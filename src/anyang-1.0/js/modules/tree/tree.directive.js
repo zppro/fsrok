@@ -23,7 +23,7 @@
                 var methodNames = ['addIndex', 'compare', 'isExpanded', 'isChecked', 'isUndetermined', 'isNone', 'toggle', 'expand',
                     'collapseAllBut', 'select', 'getCheckedNodes', 'findNode', 'findNodeById',
                     'findNodeIndexById', 'toggleDropdown', 'openDropdown', 'closeDropdown', 'getSelectedNode'];
-                var properyNames = ['treeData', 'mode', 'layout', 'selectNodeFormat','checkCascade', 'levelSplitChar', 'inputCheckedIndex'];
+                var properyNames = ['treeData', 'mode', 'layout', 'readonly', 'selectNodeFormat', 'checkCascade', 'levelSplitChar', 'inputCheckedIndex'];
 
                 this._bindTree = function () {
                     //绑定方法
@@ -38,11 +38,27 @@
 
                     this.linked = 0;
                     this.totals = ctx.totalNodeCounts;
-                }
+                };
+
+                this.isDisabled = function (node) {
+                    var ret = false;
+                    if ($scope.isDisabled) {
+                        ret = $scope.isDisabled({node: node});
+                    }
+                    return ret;
+                };
+
+                this.treeNodeFunc = function (node) {
+                    var ret;
+                    if ($scope.treeNodeFunc) {
+                        ret = $scope.treeNodeFunc({node: node});
+                    }
+                    return ret;
+                };
 
                 this._markNodeLinked = function (promise) {
                     var self = this;
-                    promise.then(function(){
+                    promise.then(function () {
                         self.linked++;
                         if (self.linked == self.totals) {
                             if (self.layout == 'dropdown' && self.mode == 'check') {
@@ -54,14 +70,14 @@
                                 $scope._setContentHeight();
                             }
 
-                            if(self.mode =='check'){
+                            if (self.mode == 'check') {
                                 //保证ngModel一致性
                                 self._syncModelForCheck();
                             }
                             console.log('tree load finished');
                             self.treeLoadFinished = true;
                         }
-                        else{
+                        else {
                             self.treeLoadFinished = false;
                         }
                     });
@@ -111,25 +127,14 @@
                     var checkedNodes = [];
                     var self = this;
                     angular.forEach($scope._tree.checkedNodes, function (node) {
-                        if(self.selectNodeFormat == '_id'){
-                            checkedNodes.push(node._id);
-                        }
-                        else if(self.selectNodeFormat == 'object'){
-
+                        if (self.selectNodeFormat == 'object') {
                             checkedNodes.push(node);
                         }
                         else {
-                            var arr = self.selectNodeFormat.split(',');
-                            var model = {};
-                            for (var i = 0; i < arr.length; i++) {
-                                var key = arr[i];
-                                if (node[key]) {
-                                    model[key] = node[key];
-                                }
-                            }
-                            checkedNodes.push(model);
+                            checkedNodes.push(node._id);
                         }
                     });
+
                     $scope.ngModel = checkedNodes;
                 };
 
@@ -142,12 +147,13 @@
             templateUrl: function (elem, attrs) {
                 return attrs.sTreeTemplateUrl || 'tree-directive-default-renderer.html'
             },
-            scope: {treeData: '=sTreeData', treeHeight: '=sTreeHeight', ngModel: '='}
+            scope: {treeData: '=sTreeData', treeHeight: '=sTreeHeight', ngModel: '=', isDisabled:'&sTreeNodeIsDisabled', treeNodeFunc: '&sTreeNodeFunc'}
         };
         return directive;
 
         function compile(element, attrs) {
-            var option = $parse(attrs.sTreeOption)();
+
+            var option = $parse((attrs.sTreeOption||'').replace('{{','"%7B%7B').replace('}}','%7D%7D"'))();
             if(option && option.layout == 'dropdown') {
                 //增加input-group等
                 angular.element($templateCache.get('tree/dropdown.tpl.html')).prependTo(element);
@@ -160,21 +166,11 @@
         function link(scope, element, attrs,ctls) {
             var $tree = ctls[0];
             var ngModel = ctls[1];
-            var data = scope.treeData;
 
-            if (!data) {
-                return;
-            }
-
-            if (attrs.ngIf) {
-                scope.$watch("treeData",function(newValue,oldValue) {
-
-                    if(newValue!=oldValue) {
+            scope.$watch("treeData",function(newValue,oldValue) {
+                if (newValue != oldValue) {
+                    if(attrs.ngIf){
                         var exp = attrs.ngIf.replace('!', '');
-                        //console.log('recreate Tree');
-                        //console.log(exp)
-                        //console.log($parse(exp)(scope.$parent));
-                        //scope.treeRefresh();
 
                         var setter = $parse(exp).assign;
                         setter(scope.$parent, true);
@@ -183,9 +179,8 @@
                         }, 0);
                         console.log('recreate end')
                     }
-                });
-            }
-
+                }
+            });
 
             var option = scope.$eval(attrs.sTreeOption) || {};
             var height = Number(scope.treeHeight);
@@ -194,24 +189,28 @@
 
             // Bring in changes from outside:
             scope.$watch('ngModel', function(newValue,oldValue) {
-                $tree.mode != 'check' && console.log('watch-ngModel-in tree');
+
                 if(!$tree.treeLoadFinished)
                     return;
 
                 if($tree.mode == 'check'){
                     //for promise ngModel
                     if (newValue != oldValue && oldValue!=undefined) {
-
                         if(!angular.isArray(newValue))
                             return;
 
                         scope._tree.checkedNodes = [];
                         for(var i=0;i<newValue.length;i++) {
-                            scope._tree.checkedNodes.push($tree.findNodeById(newValue[i]));
+                            if(angular.isString(newValue[i])){
+                                scope._tree.checkedNodes.push($tree.findNodeById(newValue[i]));
+                            }
+                            else{
+                                scope._tree.checkedNodes.push(newValue[i]);
+                            }
                         }
-
                         angular.forEach(scope._tree.checkedNodes,function(node){
-                            $tree._check(node, {currentTarget: true, stopPropagation: angular.noop});
+
+                            $tree._check(node, {currentTarget: true, stopPropagation: angular.noop,source:'directive'});
                             $tree.expand(node.attrs.index);
                         });
 
@@ -237,65 +236,75 @@
 
             });
 
-            function createTree(){
+
+
+            function createTree(data){
                 $q.when(data).then(function (treeNodes) {
-                    if (treeNodes == data) {
-                        console.log('raw data')
-                        //取数据构建树对象
-                    }
-                    else {
-                        console.log('promise data')
-                        scope._tree = new treeFactory.sTree(element, treeNodes, option);
-                    }
+                    scope._tree = new treeFactory.sTree(element, treeNodes, option);
 
                 }).then(function(){
                     $tree._bindTree();
 
                     if(option.layout == 'dropdown') {
-                        element.children('.input-group').children('input').on('focus', function () {
-                            $tree.openDropdown();
-                        });
 
-                        element.children('.input-group').find('button').on('click', function ($event) {
-                            $tree.openDropdown();
-                            $event.stopPropagation();
-                        });
+                        var dropdownInput = element.children('.input-group').children('input');
+                        var dropdownButton = element.children('.input-group').find('button');
+
+                        if($tree.readonly){
+                            dropdownInput.addClass('tree-input-readable').prop('readonly',true);
+                            dropdownButton.prop('disabled',true);
+                        }
+                        else{
+                            dropdownInput.on('focus', function () {
+                                $tree.openDropdown();
+                            });
+
+                            dropdownButton.on('click', function ($event) {
+                                $tree.openDropdown();
+                                $event.stopPropagation();
+                            });
+
+                        }
+
 
                         scope._onDropdownSelect = function (node) {
-                            element.children('.input-group').children('input').val(node[dropdownValue]);
+                            dropdownInput.val(node[dropdownValue]);
                         };
 
                         scope._onDropdownCheck = function () {
                             var dropDownValues = [];
-                            //console.log('_onDropdownCheck...');
-                            //console.log(scope._tree.checkedNodes);
+                            console.log('_onDropdownCheck...');
+                            console.log(scope._tree.checkedNodes);
                             angular.forEach(scope._tree.checkedNodes,function(checkNode){
                                 dropDownValues.push(checkNode[dropdownValue]);
                             });
-                            element.children('.input-group').children('input').val(dropDownValues.join());
+                            dropdownInput.val(dropDownValues.join());
 
 
                         };
-                        $document.on('click', function (event) {
-                            var isClickedElementChildOfPopup = element.find(event.target).size() > 0;
-                            //console.log('isClickedElementChildOfPopup:' + isClickedElementChildOfPopup);
-                            if (element.find(event.target).size() == 0) {
-                                $tree.closeDropdown();
-                            }
-                        });
+                        if(!$tree.readonly){
+                            $document.on('click', function (event) {
+                                var isClickedElementChildOfPopup = element.find(event.target).size() > 0;
+                                //console.log('isClickedElementChildOfPopup:' + isClickedElementChildOfPopup);
+                                if (element.find(event.target).size() == 0) {
+                                    $tree.closeDropdown();
+                                }
+                            });
+                        }
+
                     }
                     else if(option.layout == 'nav' || option.layout == 'tile') {
                         scope._setContentHeight = function () {
-                            //console.log(element.find('.tree-group-content').height());
                             element.find('.tree-group-content').height(height);
-                            //console.log(element.find('.tree-group-content').height());
                         };
                     }
                 });
             }
 
+            if (scope.treeData) {
+                createTree(scope.treeData);
+            }
 
-            createTree();
         }
     }
 
@@ -324,6 +333,8 @@
 
             //行为 view-> model
             var nodeSingleClick = function($event) {
+
+
                 if (sTreeCtl.mode != 'check') {
                     sTreeCtl._setModelForSelect(node);
                 }
@@ -379,12 +390,13 @@
                 ;
             }
 
-            if(!element.hasClass('no-select')){
-                ele_to_select.on('click',nodeSingleClick);
+            node.props = node.props||{};
+
+            node.props.disabled = sTreeCtl.isDisabled(node);
+
+            if(!element.hasClass('no-select') && !sTreeCtl.readonly && !node.props.disabled) {
+                ele_to_select.on('click', nodeSingleClick);
             }
-
-
-
 
             //var nodeExpandToggle = function($event){
             //    console.log('toggle')
@@ -435,6 +447,7 @@
                         var checkNode;
                         if(angular.isString(checkedNodes[i])) {
                             checkNode = sTreeCtl.findNodeById(checkedNodes[i]);
+                            //console.log(checkNode);
                         }
                         else{
 
@@ -450,7 +463,7 @@
                             if (sTreeCtl.compare(checkNode, node)) {
                                 //设置check //模拟$event，使checkNodes重新计算
 
-                                sTreeCtl._check(node, {currentTarget: true, stopPropagation: angular.noop});
+                                sTreeCtl._check(node, {currentTarget: true, stopPropagation: angular.noop,source:'directive'});
                                 //保证展开
                                 sTreeCtl.expand(nIndex);
 

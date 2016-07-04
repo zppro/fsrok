@@ -22,6 +22,10 @@
                     'vendor/angularjs-slider/dist/rzslider.css']
                 },
                 {
+                    name: 'angucomplete-alt', files: ['vendor/angucomplete-alt/angucomplete-alt.js',
+                    'vendor/angucomplete-alt/angucomplete-alt.css']
+                },
+                {
                     name: 'ngDialog', files: ['vendor/ng-dialog/js/ngDialog.min.js',
                     'vendor/ng-dialog/css/ngDialog.min.css',
                     'vendor/ng-dialog/css/ngDialog-theme-default.min.css']

@@ -117,17 +117,204 @@
                     })
                 }
             })
-            .state('app.organization-pfta.oldman-in-manage', {
-                url: '/oldman-in-manage',
-                title: '老人在院管理',
-                templateUrl: helper.basepath('organization-pfta/oldman-in-manage.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
+            .state('app.organization-pfta.in-manage', {
+                url: '/in-manage',
+                title: '在院管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.IN-MANAGE'//业务系统使用
+                }
             })
-            .state('app.organization-pfta.oldman-exit-manage', {
-                url: '/oldman-exit-manage',
-                title: '老人入院管理',
-                templateUrl: helper.basepath('organization-pfta/oldman-exit-manage.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
+            .state('app.organization-pfta.in-manage.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/in-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'InManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.in-manage.list', {
+                        modelName: 'pub-elderly',
+                        searchForm: {"status": 1,"live_in_flag":true},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '老人',
+                                name: 'name',
+                                type: 'string',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '入院登记号',
+                                name: 'enter_code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '性别',
+                                name: 'sex',
+                                type: 'string',
+                                width: 40,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D1006/object')
+                            },
+                            {
+                                label: '年龄',
+                                name: 'birthday',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '饮食套餐',
+                                name: 'board_summary',
+                                type: 'string',
+                                width: 80
+                            },
+                            {
+                                label: '房间床位',
+                                name: 'room_summary',
+                                type: 'string',
+                                width: 120
+                            },
+                            {
+                                label: '护理信息',
+                                name: 'nursing_summary',
+                                type: 'string',
+                                width: 80
+                            },
+                            {
+                                label: '状态',
+                                name: 'begin_exit_flow',
+                                type: 'string',
+                                width: 80,
+                                formatter: function () {
+                                    return {"true": "正在出院", "false": "在院", "undefined": "在院"}
+                                }
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 40
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.in-manage.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('organization-pfta/in-manage-details.html'),
+                controller: 'InManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.in-manage.details', {
+                        modelName: 'pub-elderly',
+                        blockUI: true
+                    })
+                }
+            })
+            .state('app.organization-pfta.exit-manage', {
+                url: '/exit-manage',
+                title: '出院管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.EXIT-MANAGE'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.exit-manage.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/exit-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'ExitManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.exit-manage.list', {
+                        modelName: 'pfta-exit',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '老人',
+                                name: 'elderly_name',
+                                type: 'string',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '入院登记号',
+                                name: 'code',
+                                type: 'string',
+                                width: 100,
+                                sortable: true
+                            },
+                            {
+                                label: '入院日期',
+                                name: 'enter_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '申请出院日期',
+                                name: 'application_date',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '当前步骤',
+                                name: 'current_step',
+                                type: 'string',
+                                width: 80,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3004/object')
+                            },
+                            {
+                                label: '出院日期',
+                                name: 'exit_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 40
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.exit-manage.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('organization-pfta/exit-manage-details.html'),
+                controller: 'ExitManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                params:{autoSetTab:null},
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.exit-manage.details', {
+                        modelName: 'pfta-exit',
+                        model: {},
+                        blockUI: true
+                    })
+                }
             })
             .state('app.organization-pfta.oldman-reception-manage', {
                 url: '/oldman-reception-manage',
@@ -143,33 +330,413 @@
             })
             .state('app.organization-pfta.financial-enter-payment', {
                 url: '/financial-enter-payment',
-                title: '入院缴费',
-                templateUrl: helper.basepath('organization-pfta/financial-enter-payment.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
+                title: '老人入院缴费',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.ENTER-PAYMENT'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.financial-enter-payment.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/financial-enter-payment-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'FinancialEnterPaymentGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.financial-enter-payment.list', {
+                        modelName: 'pfta-enter',
+                        searchForm: {"status": 1,"current_register_step": {"$in": ['A0003', 'A0005', 'A0007']}},
+                        transTo: 'app.organization-pfta.enter-manage.details',
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '入院登记号',
+                                name: 'code',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '老人',
+                                name: 'elderly_summary',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '入院日期',
+                                name: 'enter_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '预付款',
+                                name: 'deposit',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '当前步骤',
+                                name: 'current_register_step',
+                                type: 'string',
+                                width: 80,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3000/object')
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 40
+                            }
+                        ]
+                    })
+                }
             })
             .state('app.organization-pfta.financial-recharge', {
                 url: '/financial-recharge',
-                title: '账户充值',
-                templateUrl: helper.basepath('organization-pfta/financial-recharge.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
+                title: '老人账户充值',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.RECHARGE'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.financial-recharge.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/financial-recharge-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'FinancialRechargeGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.financial-recharge.list', {
+                        modelName: 'pfta-recharge',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '充值日期',
+                                name: 'check_in_time',
+                                type: 'date',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '充值对象',
+                                name: 'elderly_name',
+                                type: 'string',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '充值金额',
+                                name: 'amount',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '充值方式',
+                                name: 'type',
+                                type: 'string',
+                                width: 60,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3005/object')
+                            },
+                            {
+                                label: '备注',
+                                name: 'remark',
+                                type: 'string',
+                                width: 180
+                            },
+                            {
+                                label: '记账凭证号',
+                                name: 'voucher_no',
+                                type: 'string',
+                                width: 60
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.financial-recharge.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('organization-pfta/financial-recharge-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'FinancialRechargeDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.financial-recharge.details', {
+                        modelName: 'pfta-recharge'
+                        , blockUI: true
+                    })
+                    , deps: helper.resolveFor2('angucomplete-alt')
+                }
             })
             .state('app.organization-pfta.financial-arrearage-manage', {
                 url: '/financial-arrearage-manage',
-                title: '欠费管理',
+                title: '老人欠费管理',
                 templateUrl: helper.basepath('organization-pfta/financial-arrearage-manage.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
-            })
-            .state('app.organization-pfta.financial-payment-details', {
-                url: '/financial-payment-details',
-                title: '交费明细',
-                templateUrl: helper.basepath('organization-pfta/financial-payment-details.html'),
                 access_level: AUTH_ACCESS_LEVELS.USER
             })
             .state('app.organization-pfta.financial-exit-settlement', {
                 url: '/financial-exit-settlement',
-                title: '出院结算',
-                templateUrl: helper.basepath('organization-pfta/financial-exit-settlement.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
+                title: '老人出院结算',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.EXIT-SETTLEMENT'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.financial-exit-settlement.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/financial-exit-settlement-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'FinancialExitSettlementGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.financial-exit-settlement.list', {
+                        modelName: 'pfta-exit',
+                        searchForm: {"status": 1,"current_step": {"$in": ['A0005', 'A0007','A0009']}},
+                        transTo: 'app.organization-pfta.exit-manage.details',
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '老人',
+                                name: 'elderly_name',
+                                type: 'string',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '入院登记号',
+                                name: 'code',
+                                type: 'string',
+                                width: 100,
+                                sortable: true
+                            },
+                            {
+                                label: '入院日期',
+                                name: 'enter_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '申请出院日期',
+                                name: 'application_date',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '当前步骤',
+                                name: 'current_step',
+                                type: 'string',
+                                width: 80,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3004/object')
+                            },
+                            {
+                                label: '出院日期',
+                                name: 'exit_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 40
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.financial-org-receipts-and-disbursements-details', {
+                url: '/financial-org-receipts-and-disbursements-details',
+                title: '机构收支明细',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.ORG-RECEIPTS-AND-DISBURSEMENTS-DETAILS'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.financial-org-receipts-and-disbursements-details.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/financial-org-receipts-and-disbursements-details-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'FinancialORGReceiptsAndDisbursementsDetailsGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.financial-org-receipts-and-disbursements-details.list', {
+                        modelName: 'pub-tenantJournalAccount',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '记账日期',
+                                name: 'check_in_time',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '记账凭证号',
+                                name: 'voucher_no',
+                                type: 'string',
+                                width: 60
+                            },
+                            {
+                                label: '科目',
+                                name: 'revenue_and_expenditure_type',
+                                type: 'string',
+                                width: 60,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3001/object')
+                            },
+                            {
+                                label: '摘要',
+                                name: 'digest',
+                                type: 'string',
+                                width: 120
+                            },
+                            {
+                                label: '记账金额',
+                                name: 'amount',
+                                type: 'number',
+                                width: 40,
+                                sortable: true
+                            },
+                            {
+                                label: '结转',
+                                name: 'carry_over_flag',
+                                type: 'bool',
+                                width: 30
+                            },
+                            {
+                                label: '冲红',
+                                name: 'red_flag',
+                                type: 'bool',
+                                width: 30
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.material-exit-item-return', {
+                url: '/material-exit-item-return',
+                title: '出院物品归还',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.EXIT-ITEM-RETURN'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.material-exit-item-return.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/material-exit-item-return-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'MaterialExitItemReturnGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.material-exit-item-return.list', {
+                        modelName: 'pfta-exit',
+                        searchForm: {"status": 1,"current_step": {"$in": ['A0003', 'A0005', 'A0007','A0009']}},
+                        transTo: 'app.organization-pfta.exit-manage.details',
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '老人',
+                                name: 'elderly_name',
+                                type: 'string',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '入院登记号',
+                                name: 'code',
+                                type: 'string',
+                                width: 100,
+                                sortable: true
+                            },
+                            {
+                                label: '入院日期',
+                                name: 'enter_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '申请出院日期',
+                                name: 'application_date',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '当前步骤',
+                                name: 'current_step',
+                                type: 'string',
+                                width: 80,
+                                formatter: 'dictionary-remote:' + helper.remoteServiceUrl('share/dictionary/D3004/object')
+                            },
+                            {
+                                label: '出院日期',
+                                name: 'exit_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 40
+                            }
+                        ]
+                    })
+                }
             })
             .state('app.organization-pfta.material-inventory-manage', {
                 url: '/material-inventory-manage',
