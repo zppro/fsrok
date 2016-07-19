@@ -41,6 +41,7 @@ module.exports = function(ctx,name) {
             token: {type: String, required: true, minlength: 8, maxlength: 8},//租户标识(8位)
             token_expired: {type: Date},//租户标识过期时间
             validate_util: {type: Date, required: true},
+            limit_to:{type: Number, min: 0},//0不限额
             //定价模块
             price_funcs: [{
                 check_in_time: {type: Date, default: Date.now},//最新定价时间

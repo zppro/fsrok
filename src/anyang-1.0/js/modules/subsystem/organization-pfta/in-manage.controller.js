@@ -59,6 +59,7 @@
             vm.changeBoard = changeBoard;
             vm.changeNursing = changeNursing;
             vm.changeRoom = changeRoom;
+            vm.changeOtherAndCustomized = changeOtherAndCustomized;
 
 
             vm.tab1 = {cid: 'contentTab1'};
@@ -127,6 +128,15 @@
                 selectedRoom && (vm.selectedRoom = angular.copy(selectedRoom));
 
                 vm.selectedRoomInfo = vm.model.room_value.districtId + '$' + vm.model.room_value.roomId + '$' + vm.model.room_value.bed_no;
+
+
+                //独立成方法单独调用
+                vm.selectedOtherAndCustomized = _.filter(vm.model.charge_items, function (item) {
+                    return item.item_id.indexOf((ORG_PFTA_CHARGE_ITEM.OTHER + '-' + vm.model.charge_standard).toLowerCase()) != -1 ||
+                        item.item_id.indexOf((ORG_PFTA_CHARGE_ITEM.CUSTOMIZED + '-' + vm.model.charge_standard).toLowerCase()) != -1
+                        ;
+                });
+                setOtherAndCustomized();
 
             });
 
@@ -271,6 +281,40 @@
             });
         }
 
+        function setOtherAndCustomized(){
+
+            if(vm.selectedOtherAndCustomized.length>0){
+                var keys = _.map(vm.selectedOtherAndCustomized,function(o){
+                    return o.item_id;
+                });
+
+                var pairs = {};
+                _.each(vm.selectedOtherAndCustomized,function(o){
+                    pairs[o.item_id] = o.item_name;
+                });
+
+                //合并名称
+                vmh.translate(keys).then(function (ret) {
+                    var vals = [];
+                    for(var v in ret){
+                        if(ret[v] ==  v) {
+                            vals.push(pairs[v]);
+                        }
+                        else{
+                            vals.push(ret[v]);
+                        }
+                    }
+                    vm.other_and_customized = vals.join();
+                });
+            }
+            else {
+                vmh.translate(["label.NONE"]).then(function (ret) {
+                    vm.other_and_customized = ret['label.NONE'];
+                });
+            }
+
+        }
+
         function submitApplicationToExit() {
             ngDialog.openConfirm({
                 template: 'customConfirmDialog.html',
@@ -374,6 +418,30 @@
                         vm.model.room_summary = ret.value.room_summary;
                         vm.refreshJournalAccount();
                         vm.refreshRoomOccupancyChangeHistory();
+                    }
+                });
+        }
+
+        function changeOtherAndCustomized(){
+            ngDialog.open({
+                template: 'change-elderly-charge-item-for-other-and-customized.html',
+                controller: 'DialogChangeElderlyChargeItemForOtherAndCustomizedController',
+                className: 'ngdialog-theme-default ngdialog-change-elderly-charge-item-for-other-and-customized',
+                data: {
+                    vmh: vmh,
+                    viewTranslatePathRoot:vm.viewTranslatePath(),
+                    titleTranslatePath: vm.viewTranslatePath('TAB1-OTHER-AND-CUSTOMIZED-INFO'),
+                    tenantId: vm.model.tenantId,
+                    elderlyId: vm.model._id,
+                    charge_item_catalog_id: ORG_PFTA_CHARGE_ITEM.OTHER + '-' + vm.model.charge_standard
+                }
+            }).closePromise.then(function (ret) {
+                    console.log(ret);
+                    if (ret.value != '$document' && ret.value != '$closeButton' && ret.value != '$escape') {
+
+                        vm.selectedOtherAndCustomized = ret.value.otherAndCustomized;
+                        setOtherAndCustomized();
+                        vm.refreshJournalAccount();
                     }
                 });
         }

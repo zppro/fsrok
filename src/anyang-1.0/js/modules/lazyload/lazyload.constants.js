@@ -8,8 +8,9 @@
             scripts: {
                 'modernizr': ['vendor/modernizr/modernizr.js'],
                 'icons': ['vendor/fontawesome/css/font-awesome.min.css',
-                    'vendor/simple-line-icons/css/simple-line-icons.css'],
-                'moment': ['vendor/moment/min/moment-with-locales.min.js']
+                    'vendor/simple-line-icons/css/simple-line-icons.css']
+                , 'eonasdan-bootstrap-datetimepicker': ['vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
+                    'vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js']
             },
             // Angular based script (use the right module name)
             modules: [

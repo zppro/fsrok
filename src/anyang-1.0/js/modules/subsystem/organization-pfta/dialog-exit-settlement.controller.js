@@ -1,5 +1,5 @@
 /**
- * change-board.controller Created by zppro on 16-6-20.
+ * dialog-exit-settlement.controller Created by zppro on 16-6-20.
  * Target:出院结算
  */
 

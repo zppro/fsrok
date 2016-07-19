@@ -27,6 +27,7 @@ module.exports = function(ctx,name) {
             home_address:{type:String, required: true, maxlength: 100},
             family_members: [{
                 name:{type:String,required: true,maxlength:20},
+                id_no: {type: String, minlength: 18, maxlength: 18},
                 sex:{type: String, required: true, minlength: 1, maxlength: 1, enum: ctx._.rest(ctx.dictionary.keys["D1006"])},
                 relation_with:{type:String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1012"])},
                 phone: {type: String, required: true,maxlength: 20 },
@@ -56,6 +57,7 @@ module.exports = function(ctx,name) {
             live_in_flag: {type: Boolean, default: false},//在院标志,只有该标志为true才是有效的入住老人,正式入院后改为true,出院后又改为false
             enter_code:{type: String, minlength: 6, maxlength: 6},//入院登记号,正式入院后从入院单中复制过来
             enter_on: {type: Date},//入院时间
+            charging_on_of_monthly_prepay:{type:Date},//月租预付计费日期，一旦有变化将立即更新,新的月租收上来以后也要更新
             begin_exit_flow:{type: Boolean},//开始出院流程，申请出院后设置为true,真正出院后设置为false
             exit_on: {type: Date},//出院时间
             remark: {type: String,maxLength:400},//如果为空则正式入院后从入院单中复制过来
@@ -76,15 +78,16 @@ module.exports = function(ctx,name) {
             charge_item_change_history:[{
                 check_in_time: {type: Date, default: Date.now},
                 charge_item_catalog_id:{type:String,required: true},
-                old_item_id: {type: String, required: true},
-                old_item_name: {type: String, required: true},
+                old_item_id: {type: String},
+                old_item_name: {type: String},
                 old_period_price: {type: Number, default: 0.00},
-                old_period: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])},
-                new_item_id: {type: String, required: true},
-                new_item_name: {type: String, required: true},
-                new_period_price: {type: Number, default: 0.00},
-                new_period: {type: String, required: true, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])}
-            }],
+                old_period: {type: String,minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])},
+                new_item_id: {type: String},
+                new_item_name: {type: String},
+                new_period_price: {type: Number},
+                new_period: {type: String, minlength: 5, maxlength: 5, enum: ctx._.rest(ctx.dictionary.keys["D1015"])}
+            }],//2种情况：1对于吃、住、护理类别，必须old_item和new_item都有数据，表明无论如何会选择类别中的一项收费；2、对于其他和自定义项目可以old_item为空也可以new_item为空分别表示新增收费和删除收费
+            py: {type: String},
             tenantId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pub_tenant'}
         });
 

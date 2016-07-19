@@ -22,5 +22,6 @@
   "src/{{target}}/bower_components/angular-loading-bar/build/loading-bar.js",
   "src/{{target}}/bower_components/jquery.browser/dist/jquery.browser.js",
   "src/{{target}}/bower_components/underscore/underscore.js",
-  "src/{{target}}/bower_components/object-hash/dist/object_hash.js"
+  "src/{{target}}/bower_components/object-hash/dist/object_hash.js",
+  "src/{{target}}/bower_components/moment/min/moment-with-locales.min.js"
 ]

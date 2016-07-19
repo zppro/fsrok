@@ -9,6 +9,7 @@
         .provider('modelNode', ModelNode)
         .provider('shareNode', ShareNode)
         .provider('extensionNode', ExtensionNode)
+        .provider('extensionOfOrganzationOfPFTANode',extensionOfOrganzationOfPFTANode)
         .provider('debugNode',DebugNode)
         .provider('clientData',ClientData)
     ;
@@ -195,6 +196,7 @@
 
                 return {
                     tenantInfo: tenantInfo,
+                    tenantChargeItemCustomizedAsTree: tenantChargeItemCustomizedAsTree,
                     roomStatusInfo: roomStatusInfo,
                     updateRoomStatusInfo: updateRoomStatusInfo,
                     submitApplicationToExit: submitApplicationToExit,
@@ -213,10 +215,17 @@
                     elderlyInfo: elderlyInfo,
                     changeElderlyRoomBed: changeElderlyRoomBed,
                     changeElderlyChargeItem: changeElderlyChargeItem,
+                    changeElderlyChargeItemForOtherAndCustomized: changeElderlyChargeItemForOtherAndCustomized,
                     checkCanChangeBookingOrUnbookingRecharge: checkCanChangeBookingOrUnbookingRecharge,
                     bookingRecharge: bookingRecharge,
                     disableRechargeAndUnbooking: disableRechargeAndUnbooking,
                     changeRechargeBookingAmount: changeRechargeBookingAmount,
+                    queryVoucherNo: queryVoucherNo,
+                    checkCanBookingRed: checkCanBookingRed,
+                    bookingRed: bookingRed,
+                    checkCanChangeBookingOrUnbookingRed: checkCanChangeBookingOrUnbookingRed,
+                    disableRedAndUnbooking: disableRedAndUnbooking,
+                    changeRedBookingAmount: changeRedBookingAmount,
                     completeOrder: completeOrder,
                     refundOrder: refundOrder,
                     userChangePassword: userChangePassword,
@@ -225,6 +234,10 @@
 
                 function tenantInfo(tenantId,select) {
                     return $http.get(baseUrl + 'tenantInfo/' + tenantId + '/' + select);
+                }
+
+                function tenantChargeItemCustomizedAsTree(tenantId){
+                    return $http.get(baseUrl + 'tenantChargeItemCustomizedAsTree/' + tenantId);
                 }
 
                 function roomStatusInfo(tenantId) {
@@ -276,8 +289,8 @@
                     return $http.post(baseUrl + 'completeExit/' + exitId, data);
                 }
 
-                function completeEnter(enterId) {
-                    return $http.post(baseUrl + 'completeEnter/' + enterId);
+                function completeEnter(enterId, data) {
+                    return $http.post(baseUrl + 'completeEnter/' + enterId, data);
                 }
 
                 function disableEnterRelatedAction(enterId){
@@ -319,6 +332,15 @@
                     });
                 }
 
+                function changeElderlyChargeItemForOtherAndCustomized(tenantId,elderlyId,charge_item_catalog_id,selectedOtherAndCustomized){
+                    return $http.post(baseUrl + 'changeElderlyChargeItemForOtherAndCustomized', {
+                        tenantId: tenantId,
+                        elderlyId: elderlyId,
+                        charge_item_catalog_id: charge_item_catalog_id,
+                        selectedOtherAndCustomized: selectedOtherAndCustomized
+                    });
+                }
+
                 function checkCanChangeBookingOrUnbookingRecharge(rechargeId){
                     return $http.get(baseUrl + 'checkCanChangeBookingOrUnbookingRecharge/' + rechargeId);
                 }
@@ -333,6 +355,34 @@
 
                 function changeRechargeBookingAmount(rechargeId,data){
                     return $http.post(baseUrl + 'changeRechargeBookingAmount/' + rechargeId, data);
+                }
+
+                function queryVoucherNo(tenantId,keyword,where,select,sort){
+                    return $http.post(baseUrl + 'q/voucher_no', {tenantId: tenantId, keyword: keyword,  data: {
+                        where: where,
+                        select: select,
+                        sort: sort
+                    }});
+                }
+
+                function checkCanBookingRed(data) {
+                    return $http.post(baseUrl + 'checkCanBookingRed', data);
+                }
+
+                function bookingRed(data){
+                    return $http.post(baseUrl + 'bookingRed', data);
+                }
+
+                function checkCanChangeBookingOrUnbookingRed(redId){
+                    return $http.get(baseUrl + 'checkCanChangeBookingOrUnbookingRed/' + redId);
+                }
+
+                function disableRedAndUnbooking(redId,data){
+                    return $http.post(baseUrl + 'disableRedAndUnbooking/' + redId, data);
+                }
+
+                function changeRedBookingAmount(redId,data){
+                    return $http.post(baseUrl + 'changeRedBookingAmount/' + redId, data);
                 }
 
                 function completeOrder(orderId) {
@@ -350,6 +400,37 @@
                 function resetUserPassword(userId) {
                     return $http.post(baseUrl + 'resetUserPassword/' + userId);
                 }
+            }]
+        };
+
+        function setBaseUrl(url) {
+            baseUrl = url;
+        }
+    }
+
+    function extensionOfOrganzationOfPFTANode(){
+        var baseUrl;
+        return {
+            // provider access level
+            setBaseUrl: setBaseUrl,
+
+            // controller access level
+            $get: ['$rootScope', '$q', '$http', function ($rootScope, $q, $http) {
+
+                return {
+                    receptionVisiterSyncElderlyFamilyMembers: receptionVisiterSyncElderlyFamilyMembers,
+                    leaveAccompanierSyncElderlyFamilyMembers: leaveAccompanierSyncElderlyFamilyMembers
+                };
+
+                function receptionVisiterSyncElderlyFamilyMembers(receptionId) {
+                    return $http.post(baseUrl + 'receptionVisiterSyncElderlyFamilyMembers/' + receptionId);
+                }
+
+                function leaveAccompanierSyncElderlyFamilyMembers(leaveId){
+                    return $http.post(baseUrl + 'leaveAccompanierSyncElderlyFamilyMembers/' + leaveId);
+                }
+
+
             }]
         };
 

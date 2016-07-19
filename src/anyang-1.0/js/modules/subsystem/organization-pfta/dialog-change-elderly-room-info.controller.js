@@ -1,5 +1,5 @@
 /**
- * change-board.controller Created by zppro on 16-6-2.
+ * dialog-change-elderly-room-info.controller Created by zppro on 16-6-2.
  * Target:修改房间床位
  */
 

@@ -143,7 +143,7 @@
 
         function buildVMHelper() {
 
-            return ['$timeout', '$q', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'shareNode', 'extensionNode', 'debugNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', function ($timeout, $q, $translate, $http, Browser, blockUI, cfpLoadingBar, shareNode, extensionNode, debugNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
+            return ['$timeout', '$q', '$translate', '$http', 'Browser', 'blockUI', 'cfpLoadingBar', 'shareNode', 'extensionNode','extensionOfOrganzationOfPFTANode', 'debugNode', 'clientData', 'treeFactory', 'Notify', 'GridUtils', 'ViewUtils', function ($timeout, $q, $translate, $http, Browser, blockUI, cfpLoadingBar, shareNode, extensionNode,extensionOfOrganzationOfPFTANode, debugNode, clientData, treeFactory, Notify, GridUtils, ViewUtils) {
 
                 function promiseWrapper() {
                     if (arguments.length > 0) {
@@ -190,7 +190,7 @@
                     }));
                 }
 
-                function alertWarning(message,needTranslate) {
+                function alertWarning(message, needTranslate) {
                     if (needTranslate) {
                         $translate(message).then(function (ret) {
                             Notify.alert('<div class="text-center"><em class="fa fa-warning"></em> ' + ret + '</div>', 'warning');
@@ -201,7 +201,7 @@
                     }
                 }
 
-                function alertSuccess(message,needTranslate) {
+                function alertSuccess(message, needTranslate) {
                     if (message) {
                         if (needTranslate) {
                             $translate(message).then(function (ret) {
@@ -232,6 +232,7 @@
                     parallel: parallel,
                     shareService: shareNode,
                     extensionService: extensionNode,
+                    pftaOrgService: extensionOfOrganzationOfPFTANode,
                     debugService: debugNode,
                     clientData: clientData,
                     treeFactory: treeFactory,
@@ -279,7 +280,7 @@
                         this.operated_by_name = user.name;
                         var tenant = user.tenant;
                         if (tenant) {
-                            this.searchForm['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                            this.tenantId = this.searchForm['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
                         }
                     }
 
@@ -652,7 +653,7 @@
                     //$state.go(this.moduleRoute('list'), this.toListParams);
                     console.log($rootScope.$fromState);
 
-                    if($rootScope.$fromState){
+                    if($rootScope.$fromState && !$rootScope.$fromState.abstract){
                         $state.go($rootScope.$fromState, $rootScope.$fromParams);
                     }
                     else{
@@ -664,7 +665,7 @@
                     //$state.go(this.moduleRoute('list'), this.toListParams);
                     console.log($rootScope.$fromState);
 
-                    if($rootScope.$fromState){
+                    if($rootScope.$fromState && !$rootScope.$fromState.abstract){
                         console.log('returnBack to fromState');
                         $state.go($rootScope.$fromState, $rootScope.$fromParams);
                     }

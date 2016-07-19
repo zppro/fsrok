@@ -56,6 +56,8 @@
         var vm = $scope.vm = vm;
         $scope.utils = vmh.utils.v;
 
+        var redService = vm.modelNode.services['pub-red'];
+
 
         init();
 
@@ -65,6 +67,7 @@
 
             vm.queryElderly = queryElderly;
             vm.selectElerly = selectElerly;
+            vm.redRecharge = redRecharge;
             vm.disableRechargeAndUnbooking = disableRechargeAndUnbooking;
             vm.doSubmit = doSubmit;
             vm.tab1 = {cid: 'contentTab1'};
@@ -75,7 +78,7 @@
                 vm.selectBinding.rechargeTypes = results[0];
             });
 
-            vm.itCanDisableOrChange = true;
+            vm.waiting = true;
             vm.rawRechargeAmount = 0;
 
             vm.load().then(function() {
@@ -86,10 +89,23 @@
                     vmh.extensionService.checkCanChangeBookingOrUnbookingRecharge(vm.model._id).then(function (ret) {
                         console.log(ret);
                         vm.itCanDisableOrChange = ret.itCan;
+
+                        refreshRededToRecharge();
+
+                    }).catch(function(){
+                        vm.elderlyDisabled = true;
+                    }).finally(function(){
+                        vm.waiting = false;
                     });
+
+                }
+                else{
+                    vm.itCanDisableOrChange = true;
+                    vm.waiting = false;
                 }
 
                 vm.rawRechargeAmount = vm.model.amount;
+
             });
 
         }
@@ -109,9 +125,42 @@
             }
         }
 
+        function refreshRededToRecharge() {
+            redService.query({
+                status: 1,
+                voucher_no_to_red: vm.model.voucher_no,
+                tenantId: vm.model.tenantId
+            }).$promise.then(function (rows) {
+                    vm.rededToRecharge = rows;
+                    vm.rededToRecharge.length > 0 && (vm.hadRededToRecharge = true);
+                });
+
+        }
+
+        function redRecharge(){
+            ngDialog.open({
+                template: 'do-red-for-recharge.html',
+                controller: 'DialogDoRedController',
+                className: 'ngdialog-theme-default ngdialog-do-red-for-recharge',
+                data: {
+                    vmh: vmh,
+                    viewTranslatePathRoot: vm.viewTranslatePath(),
+                    titleTranslatePath: vm.viewTranslatePath('DO-RED-FOR-RECHARGE'),
+                    voucher_no_to_red: vm.model.voucher_no,
+                    amount_booking: vm.model.amount,
+                    tenantId: vm.tenantId,
+                    operated_by: vm.operated_by,
+                    operated_by_name: vm.operated_by_name
+                }
+            }).closePromise.then(function (ret) {
+                    if(ret.value!='$document' && ret.value!='$closeButton' && ret.value!='$escape' ) {
+                        refreshRededToRecharge();
+                    }
+                });
+        }
+
         function disableRechargeAndUnbooking(){
             if(vm.model._id){
-
                 ngDialog.openConfirm({
                     template: 'customConfirmDialog.html',
                     className: 'ngdialog-theme-default',
@@ -127,8 +176,6 @@
                         vm.toListView();
                     });
                 });
-
-
             }
         }
 

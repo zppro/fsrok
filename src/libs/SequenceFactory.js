@@ -2,7 +2,6 @@
  * Created by zppro on 15-12-14.
  */
 
-var mongoose = require('mongoose');
 var co = require('co');
 var moment = require("moment");
 var paddingStr = require('rfcore').util.paddingStr;
@@ -36,8 +35,8 @@ module.exports = {
                 return null;
             }
 
-            console.log(seq_id);
-            console.log(sequenceDef);
+            //console.log(seq_id);
+            //console.log(sequenceDef);
 
             var sequenceDefInstance = _.defaults({
                 date_period: moment().format(sequenceDef.date_period_format),

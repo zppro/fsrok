@@ -20,6 +20,8 @@
         $scope.vm = vm;
         $scope.utils = vmh.utils.g;
 
+        var elderlyService = vm.modelNode.services['pub-elderly'];
+
         init();
 
         function init() {
@@ -28,8 +30,25 @@
             vm.disableEnterRelatedAction = disableEnterRelatedAction;
             vm.submitEnter = submitEnter;
             vm.completeEnter = completeEnter;
+            vm.addEx = addEx;
+
+            vmh.parallel([
+                vmh.extensionService.tenantInfo(vm.tenantId,'limit_to'),
+                elderlyService.totals({tenantId:vm.tenantId,status:1,live_in_flag:true})
+            ]).then(function (results) {
+                vm.canAddEnter = results[0].limit_to == 0 ||  results[1].totals < results[0].limit_to;
+            });
 
             vm.query();
+        }
+
+        function addEx(){
+            if(vm.canAddEnter){
+                vm.add();
+            }
+            else{
+                vmh.alertWarning(vm.viewTranslatePath('CAN-NOT-ADD-AS-LIMIT'), true);
+            }
         }
 
         function disableEnterRelatedAction(row){
@@ -59,7 +78,10 @@
                 className: 'ngdialog-theme-default',
                 scope: $scope
             }).then(function () {
-                var promise = vmh.extensionService.completeEnter(row._id).then(function (ret) {
+                var promise = vmh.extensionService.completeEnter(row._id, {
+                    operated_by: vm.operated_by,
+                    operated_by_name: vm.operated_by_name
+                }).then(function (ret) {
                     row = _.extend(row, ret);
                 });;
 
@@ -105,6 +127,7 @@
             vm.undoEnterFinancialAudit = undoEnterFinancialAudit;
             vm.comfirmEnterReceipt = comfirmEnterReceipt;
             vm.disableEnterRelatedAction = disableEnterRelatedAction;
+            vm.completeEnter = completeEnter;
 
 
             vm.tab1 = {cid: 'contentTab1'};
@@ -124,6 +147,7 @@
                 vmh.shareService.d('D1015'),
                 vmh.extensionService.tenantInfo(vm.tenantId, 'charge_standard,charge_items'),
                 vmh.clientData.getJson('charge-item-organization-pfta'),
+                vmh.extensionService.tenantChargeItemCustomizedAsTree(vm.tenantId),
                 vmh.shareService.tmp('T3003', 'name', {
                     tenantId: vm.tenantId,
                     floorSuffix: 'F',
@@ -148,6 +172,10 @@
                 vm.selectedStandard = _.findWhere(results[9], {_id: vm.elderlyModel.charge_standard});
                 if (vm.selectedStandard) {
 
+                    //增加特色服务
+                    if(results[10].children.length>0) {
+                        vm.selectedStandard.children.push(results[10]);
+                    }
                     //将预订义收费标准模板替换为当前租户的收费标准
                     _.each(vm.selectedStandard.children, function (item) {
                         item.children = _.chain(item.children).map(function (o) {
@@ -180,14 +208,14 @@
 
 
                 //vm.treeData = vmh.q.when(results[10]);
-                vm.treeData = results[10];
+                vm.treeData = results[11];
                 //vm.treeDataPromiseOfRoom = vmh.shareService.tmp('T3003', 'name', {
                 //    tenantId: vm.tenantId,
                 //    floorSuffix: 'F',
                 //    bedNoSuffix: '#床'
                 //});
                 vm.roomStatusInfo = {};
-                _.each(results[11], function (roomStatus) {
+                _.each(results[12], function (roomStatus) {
                     _.each(roomStatus.occupied, function (occupy) {
                         if (occupy.elderlyId) {
                             vm.roomStatusInfo[roomStatus.roomId + '$' + occupy.bed_no] = {
@@ -270,7 +298,6 @@
             vm.selectedChargeItem = {};
 
         }
-
 
 
         function serverSideCheck(id_no) {
@@ -557,6 +584,24 @@
         function disableEnterRelatedAction(model){
             return vmh.extensionService.disableEnterRelatedAction(model._id).then(function(){
                 return true;
+            });
+        }
+
+        function completeEnter(){
+            ngDialog.openConfirm({
+                template: 'normalConfirmDialog.html',
+                className: 'ngdialog-theme-default',
+                scope: $scope
+            }).then(function () {
+                var promise = vmh.extensionService.completeEnter(vm.model._id, {
+                    operated_by: vm.operated_by,
+                    operated_by_name: vm.operated_by_name
+                });
+
+                vmh.q.all([vmh.translate('notification.NORMAL-SUCCESS'), promise]).then(function (ret) {
+                    vmh.notify.alert('<div class="text-center"><em class="fa fa-check"></em> ' + ret[0] + '</div>', 'success');
+                    vm.returnBack();
+                });
             });
         }
     }

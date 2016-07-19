@@ -21,7 +21,9 @@
         "TAB1-LABEL-ACTIVE_FLAG": "开通",
         "TAB1-LABEL-CERTIFICATE_FLAG": "认证",
         "TAB1-LABEL-VALIDATE_UTIL": "有效期至",
-        "TAB1-PLACEHOLDER-VALIDATE_UTIL": "日期.."
+        "TAB1-PLACEHOLDER-VALIDATE_UTIL": "日期..",
+        "TAB1-LABEL-LIMIT_TO": "入住限额",
+        "TAB1-PLACEHOLDER-LIMIT_TO": "可以入住的最大老人数量(0为不限额).."
       }
     },
     "pension-agency-user-manage": {
@@ -98,7 +100,9 @@
         "TAB1-LABEL-ACTIVE_FLAG": "开通",
         "TAB1-LABEL-CERTIFICATE_FLAG": "认证",
         "TAB1-LABEL-VALIDATE_UTIL": "有效期至",
-        "TAB1-PLACEHOLDER-VALIDATE_UTIL": "日期.."
+        "TAB1-PLACEHOLDER-VALIDATE_UTIL": "日期..",
+        "TAB1-LABEL-LIMIT_TO": "入住限额",
+        "TAB1-PLACEHOLDER-LIMIT_TO": "可以入住的最大老人数量(0为不限额).."
       }
     },
     "agent-user-manage": {

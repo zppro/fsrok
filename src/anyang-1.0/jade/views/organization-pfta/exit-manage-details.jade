@@ -67,7 +67,9 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                         <!--申请代理人/陪同出院人 联系电话-->
                         label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-LABEL-AGENT_INFO-PHONE') | translate}}:
                         .col-md-10(ng-if="!vm.readonly && vm.model.current_step=='A0001' ")
-                            input.form-control(type='text', name='agent_info$phone',ng-model='vm.model.agent_info.phone',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-AGENT_INFO-PHONE")|translate}}')
+                            input.form-control(type='text', name='agent_info$phone',ng-model='vm.model.agent_info.phone',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-AGENT_INFO-PHONE")|translate}}',required='',ui-validate="{phone: 'utils.isPhone($value)'}" )
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'agent_info$phone','required')") {{ "validator.REQUIRED" | translate}}
+                            span.text-danger(ng-show="utils.vinput(this.theForm,'agent_info$phone','phone')") {{ "validator.FORMAT" | translate:{item:"手机号码"} }}
                         .col-md-10(ng-if="vm.readonly || vm.model.current_step!='A0001' ")
                             .form-readable {{vm.model.agent_info.phone}}
                     fieldset: .form-group

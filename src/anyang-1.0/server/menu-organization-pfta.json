@@ -24,12 +24,12 @@
       {
         "_id": "menu.organization-pfta.RECEPTION-MANAGE",
         "name": "接待管理",
-        "sref": "app.organization-pfta.oldman-reception-manage"
+        "sref": "app.organization-pfta.reception-manage.list"
       },
       {
         "_id": "menu.organization-pfta.LEAVE-MANAGE",
-        "name": "请假管理",
-        "sref": "app.organization-pfta.oldman-leave-manage"
+        "name": "外出管理",
+        "sref": "app.organization-pfta.leave-manage.list"
       }
     ]
   },
@@ -58,6 +58,11 @@
         "_id": "menu.organization-pfta.EXIT-SETTLEMENT",
         "name": "老人出院结算",
         "sref": "app.organization-pfta.financial-exit-settlement.list"
+      },
+      {
+        "_id": "menu.organization-pfta.RED",
+        "name": "机构冲红明细",
+        "sref": "app.organization-pfta.financial-red.list"
       },
       {
         "_id": "menu.organization-pfta.ORG-RECEIPTS-AND-DISBURSEMENTS-DETAILS",
@@ -153,7 +158,7 @@
       },
       {
         "_id": "menu.organization-pfta.CHARGE-ITEM-CUSTOMIZED",
-        "name": "自定义收费项目",
+        "name": "特色服务",
         "sref": "app.organization-pfta.charge-item-customized.list"
       },
       {

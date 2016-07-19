@@ -22,6 +22,9 @@ module.exports = function(ctx,name) {
             carry_over_flag:{type: Boolean,default: false},//结转标志 true-已结转 false-未结转
             red_flag:{type: Boolean,default: false},//冲红标志 true-冲红流水 false-正常流水
             amount:{type: Number, default: 0.00},//金额
+            source_type:{type: String},//来源表 i.e. pub_elderly
+            source_id:{type: mongoose.Schema.Types.ObjectId},//来源表_id
+            source_key:{type: String},//来源键 $代表数组 $journal_account.voucher_no/voucher_no
             tenantId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'pub_tenant'}
         }, {
             toObject: {

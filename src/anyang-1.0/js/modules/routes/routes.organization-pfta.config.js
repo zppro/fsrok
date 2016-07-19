@@ -316,17 +316,185 @@
                     })
                 }
             })
-            .state('app.organization-pfta.oldman-reception-manage', {
-                url: '/oldman-reception-manage',
-                title: '老人接待管理',
-                templateUrl: helper.basepath('organization-pfta/oldman-reception-manage.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
+            .state('app.organization-pfta.reception-manage', {
+                url: '/reception-manage',
+                title: '接待管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.RECEPTION-MANAGE'//业务系统使用
+                }
             })
-            .state('app.organization-pfta.oldman-leave-manage', {
-                url: '/oldman-leave-manage',
-                title: '老人请假管理',
-                templateUrl: helper.basepath('organization-pfta/oldman-leave-manage.html'),
-                access_level: AUTH_ACCESS_LEVELS.USER
+            .state('app.organization-pfta.reception-manage.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/reception-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'ReceptionManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.reception-manage.list', {
+                        modelName: 'pfta-reception',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '接待登记号',
+                                name: 'code',
+                                type: 'string',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '探望老人',
+                                name: 'elderly_name',
+                                type: 'string',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '探望日期',
+                                name: 'begin_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '探望时段',
+                                name: 'end_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '访客',
+                                name: 'visit_summary',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 40
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.reception-manage.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('organization-pfta/reception-manage-details.html'),
+                controller: 'ReceptionManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.reception-manage.details', {
+                        modelName: 'pfta-reception',
+                        model: {
+                            code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN,
+                            begin_on: new Date()
+                        },
+                        blockUI: true
+                    })
+                    , deps: helper.resolveFor2('angucomplete-alt')
+                }
+            })
+            .state('app.organization-pfta.leave-manage', {
+                url: '/leave-manage',
+                title: '外出管理',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.LEAVE-MANAGE'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.leave-manage.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/leave-manage-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'LeaveManageGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.leave-manage.list', {
+                        modelName: 'pfta-leave',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '外出登记号',
+                                name: 'code',
+                                type: 'string',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '外出老人',
+                                name: 'elderly_name',
+                                type: 'string',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '外出时间',
+                                name: 'begin_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '归还时间',
+                                name: 'end_on',
+                                type: 'date',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '陪同人',
+                                name: 'accompany_summary',
+                                type: 'string',
+                                width: 120,
+                                sortable: true
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 40
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.leave-manage.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('organization-pfta/leave-manage-details.html'),
+                controller: 'LeaveManageDetailsController',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.leave-manage.details', {
+                        modelName: 'pfta-leave',
+                        model: {
+                            code: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN,
+                            begin_on: new Date()
+                        },
+                        blockUI: true
+                    })
+                    , deps: helper.resolveFor2('angucomplete-alt')
+                }
             })
             .state('app.organization-pfta.financial-enter-payment', {
                 url: '/financial-enter-payment',
@@ -426,7 +594,7 @@
                 controller: 'FinancialRechargeGridController',
                 resolve: {
                     entryVM: helper.buildEntryVM('app.organization-pfta.financial-recharge.list', {
-                        modelName: 'pfta-recharge',
+                        modelName: 'pub-recharge',
                         searchForm: {"status": 1},
                         serverPaging: true,
                         columns: [
@@ -487,7 +655,7 @@
                 controller: 'FinancialRechargeDetailsController',
                 resolve: {
                     entityVM: helper.buildEntityVM('app.organization-pfta.financial-recharge.details', {
-                        modelName: 'pfta-recharge'
+                        modelName: 'pub-recharge'
                         , blockUI: true
                     })
                     , deps: helper.resolveFor2('angucomplete-alt')
@@ -578,6 +746,89 @@
                             }
                         ]
                     })
+                }
+            })
+            .state('app.organization-pfta.financial-red', {
+                url: '/financial-red',
+                title: '机构冲红明细',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data:{
+                    func_id:'menu.organization-pfta.RED'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.financial-red.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/financial-red-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'FinancialRedGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.financial-red.list', {
+                        modelName: 'pub-red',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '冲红日期',
+                                name: 'check_in_time',
+                                type: 'date',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '记账凭证号',
+                                name: 'voucher_no',
+                                type: 'string',
+                                width: 60
+                            },
+                            {
+                                label: '冲红凭证号',
+                                name: 'voucher_no_to_red',
+                                type: 'string',
+                                width: 60
+                            },
+                            {
+                                label: '冲红金额',
+                                name: 'amount',
+                                type: 'string',
+                                width: 80,
+                                sortable: true
+                            },
+                            {
+                                label: '备注',
+                                name: 'remark',
+                                type: 'string',
+                                width: 180
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.financial-red.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('organization-pfta/financial-red-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'FinancialRedDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.financial-red.details', {
+                        modelName: 'pub-red'
+                        , blockUI: true
+                    })
+                    , deps: helper.resolveFor2('angucomplete-alt')
                 }
             })
             .state('app.organization-pfta.financial-org-receipts-and-disbursements-details', {
@@ -1054,6 +1305,81 @@
                 },
                 data:{
                     func_id:'menu.organization-pfta.CHARGE-STANDARD'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.charge-item-customized', {
+                url: '/charge-item-customized',
+                title: '特色服务',
+                abstract: true,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        template: '<div class="data-ui-view"></div>'
+                    }
+                },
+                data: {
+                    func_id:'menu.organization-pfta.CHARGE-ITEM-CUSTOMIZED'//业务系统使用
+                }
+            })
+            .state('app.organization-pfta.charge-item-customized.list', {
+                url: '/list/:action',
+                templateUrl: helper.basepath('organization-pfta/charge-item-customized-list.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'ChargeItemCustomizedGridController',
+                resolve: {
+                    entryVM: helper.buildEntryVM('app.organization-pfta.charge-item-customized.list', {
+                        modelName: 'pub-tenantChargeItemCustomized',
+                        searchForm: {"status": 1},
+                        serverPaging: true,
+                        columns: [
+                            {
+                                label: '服务名称',
+                                name: 'name',
+                                type: 'string',
+                                width: 200,
+                                sortable: true
+                            },
+                            {
+                                label: '服务老人数量',
+                                name: 'served_quantity',
+                                type: 'number',
+                                width: 60,
+                                sortable: true
+                            },
+                            {
+                                label: '备注',
+                                name: 'remark',
+                                type: 'string',
+                                width: 180
+                            },
+                            {
+                                label: '',
+                                name: 'actions',
+                                sortable: false,
+                                width: 60
+                            }
+                        ]
+                    })
+                }
+            })
+            .state('app.organization-pfta.charge-item-customized.details', {
+                url: '/details/:action/:_id',
+                templateUrl: helper.basepath('organization-pfta/charge-item-customized-details.html'),
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                controller: 'ChargeItemCustomizedDetailsController',
+                resolve: {
+                    entityVM: helper.buildEntityVM('app.organization-pfta.charge-item-customized.details', {
+                        modelName: 'pub-tenantChargeItemCustomized',
+                        model: {
+                            catagory: MODEL_VARIABLES.PRE_DEFINED.SERVER_GEN,
+                            served_quantity: 0
+                        }
+                        , blockUI: true
+                    })
+                    //, deps: helper.resolveFor2('ui.select')
                 }
             })
             .state('app.organization-pfta.system-log', {

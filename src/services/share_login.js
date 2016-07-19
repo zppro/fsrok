@@ -61,7 +61,7 @@ module.exports = {
                                     tenant = yield app.modelFactory().one('pub_tenant', '../models/pub/tenant', {
                                         where: {
                                             _id: user.tenantId
-                                        }, select: "_id name type active_flag certificate_flag validate_util open_funcs"
+                                        }, select: "_id name type active_flag certificate_flag validate_util limit_to open_funcs"
                                     });
 
                                     //检查租户是否激活

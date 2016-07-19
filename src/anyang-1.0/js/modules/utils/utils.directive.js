@@ -14,6 +14,7 @@
         .directive('extractSex',extractSex)
         .directive('extractBirthday',extractBirthday)
         .directive('boxInput',boxInput)
+        .directive('datetimePicker',datetimePicker)
     ;
 
     onFinishRender.$inject = ['$timeout'];
@@ -63,7 +64,11 @@
 
         function link(scope, element, attrs, ngModel) {
             ngModel.$validators.IDNo = function (value) {
+                if(!value){
+                    return true;
+                }
                 var ret = false;
+
                 ret = IDNo2Utils.isIDNo(value);
 
                 var option = scope.$eval(attrs.idNo2) || {};
@@ -266,5 +271,47 @@
         }
     }
 
+    //datetimePicker.$inject = [];
+    function datetimePicker() {
+        var directive = {
+            link: link,
+            restrict: 'A',
+            require: '?ngModel',
+            scope: {ngModel: '='}
+        };
+        return directive;
+
+        function link(scope, element, attrs, ngModelCtl) {
+            var options = scope.$eval(attrs.options);
+            if (!options.locale) {
+                options.locale = moment.locale('locale');
+            }
+
+            var $el = angular.element(element);
+            $el.datetimepicker(options);
+            var $elo = $el.data('DateTimePicker');
+
+            $el.on("dp.show", function (e) {
+                if(scope.ngModel == undefined) {
+                    $elo.date(moment());
+                }
+            });
+
+            $el.on("dp.change", function (e) {
+                if(e.date && e.oldDate) {
+                    scope.$apply(function(){
+                        scope.ngModel =  e.date.toDate();
+                    });
+                }
+            });
+
+            scope.$watch('ngModel', function (newValue, oldValue) {
+                if (newValue != oldValue) {
+                    $elo.date(moment(newValue));
+                    scope.$eval(attrs.ngModel + ' = ngModel');
+                }
+            });
+        }
+    }
 
 })();

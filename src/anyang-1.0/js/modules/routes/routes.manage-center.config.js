@@ -124,7 +124,10 @@
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
                 resolve: {
                     entityVM: helper.buildEntityVM('app.manage-center.pension-agency-account-manage.details', {
-                        modelName: 'pub-tenant'
+                        modelName: 'pub-tenant',
+                        model: {
+                            limit_to: 0
+                        }
                         , blockUI: true
                     })
                     //, deps: helper.resolveFor2('ui.select')
@@ -468,7 +471,10 @@
                 access_level: AUTH_ACCESS_LEVELS.ADMIN,
                 resolve: {
                     entityVM: helper.buildEntityVM('app.manage-center.agent-account-manage.details', {
-                        modelName: 'pub-tenant'
+                        modelName: 'pub-tenant',
+                        model: {
+                            limit_to: 0
+                        }
                         , blockUI: true
                     })
                     //, deps: helper.resolveFor2('ui.select')

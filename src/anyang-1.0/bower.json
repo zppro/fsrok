@@ -56,7 +56,8 @@
     "angularjs-slider": "~2.13.0",
     "bowser": "browser#~1.0.0",
     "object-hash": "git@github.com:puleos/object-hash#~1.1.2",
-    "angucomplete-alt": "~2.4.1"
+    "angucomplete-alt": "~2.4.1",
+    "eonasdan-bootstrap-datetimepicker": "~4.17.37"
   },
   "resolutions": {
     "angular": "1.4.2",

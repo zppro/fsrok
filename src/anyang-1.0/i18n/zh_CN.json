@@ -1,5 +1,6 @@
 {
   "button": {
+    "SUBMIT":"提交",
     "CANCEL": "取消",
     "RETURN": "返回",
     "SAVE": "保存",
@@ -14,6 +15,7 @@
     "AUDIT-TRUE": "审核通过",
     "AUDIT-FALSE": "审核不通过",
     "REMOVE": "删除",
+    "CLEAR": "清空",
     "CONFIRM": "确定",
     "USER": "管理用户",
     "RESET-USER-PASSWORD":"重设密码",
@@ -28,13 +30,24 @@
     "EXIT-ENTRY":"申请出院",
     "EXIT-SETTLEMENT":"出院结算",
     "CHARGE-LIST":"费用清单",
-    "BOOKING":"记账"
+    "BOOKING":"记账",
+    "RED":"冲红"
   },
-  "label":{
-    "AUTO-GEN":"自动生成",
-    "TOTAL1":"合计",
-    "TEXT-SEARCHING":"查找匹配项...",
-    "TEXT-NO-RESULTS":"未找到匹配项"
+  "label": {
+    "NONE": "无",
+    "AUTO-GEN": "自动生成",
+    "TOTAL1": "合计",
+    "TEXT-SEARCHING": "查找匹配项...",
+    "TEXT-NO-RESULTS": "未找到匹配项",
+    "VOUCHER_NO-TO-RED": "冲红凭证号",
+    "AMOUNT-BOOKING": "记账金额",
+    "AMOUNT-TO-RED": "冲红金额",
+    "REMARK": "备注"
+  },
+  "placeholder":{
+    "VOUCHER_NO-TO-RED":"需要冲红流水的记账凭证号码..",
+    "AMOUNT-TO-RED":"100.00..",
+    "REMARK":"补充说明一些情况"
   },
   "grid": {
     "LABEL-SEARACH": "关键字",
@@ -76,12 +89,16 @@
     "BATCH-ADD-NONE-WARNING": "选中的批量添加记录都已经存在，请重新选择",
     "NO-CHANGE": "当前数据没有变化",
     "BOOKING-SUCCESS": "记账成功",
+    "RED-SUCCESS": "冲红成功",
     "DISABLE-RECHARGE-SUCCESS": "撤销充值成功",
-    "CHANGE-RECHARGE-BOOKING-AMOUNT-SUCCESS": "修改充值记账金额成功"
+    "CHANGE-RECHARGE-BOOKING-AMOUNT-SUCCESS": "修改充值记账金额成功",
+    "DISABLE-RED-SUCCESS": "撤销冲红成功",
+    "CHANGE-RED-BOOKING-AMOUNT-SUCCESS": "修改冲红金额成功"
   },
   "confirm": {
     "SUBMIT": "确定要提交么？",
-    "BOOKING": "确定要记账么？"
+    "BOOKING": "确定要记账么？",
+    "RED":"确定要冲红么？"
   },
   "dashboard": {
     "WELCOME": "欢迎来到{{appName}}"
@@ -116,14 +133,15 @@
       "ENTER-MANAGE": "入院管理",
       "IN-MANAGE": "在院管理",
       "EXIT-MANAGE": "出院管理",
-      "RECEPTION-MANAGE": "接待管理(暂缓)",
-      "LEAVE-MANAGE": "请假管理(暂缓)",
+      "RECEPTION-MANAGE": "接待管理",
+      "LEAVE-MANAGE": "外出管理",
       "------------": "",
       "FINANCIAL-MANAGE": "财务管理",
       "ENTER-PAYMENT": "老人入院缴费",
       "RECHARGE": "老人账户充值",
       "ARREARAGE-MANAGE": "老人欠费管理",
       "EXIT-SETTLEMENT": "老人出院结算",
+      "RED": "机构冲红明细",
       "ORG-RECEIPTS-AND-DISBURSEMENTS-DETAILS": "机构收支明细",
       "------------": "",
       "MATERIAL-MANAGE": "物资管理",
@@ -139,7 +157,7 @@
       "ROOM-MANAGE": "房间管理",
       "DISTRICT-MANAGE": "片区管理",
       "CHARGE-STANDARD": "收费标准",
-      "CHARGE-ITEM-CUSTOMIZED": "收费项目自定义",
+      "CHARGE-ITEM-CUSTOMIZED": "特色服务",
       "LOG": "系统日志(暂缓)"
     },
     "manage-center": {

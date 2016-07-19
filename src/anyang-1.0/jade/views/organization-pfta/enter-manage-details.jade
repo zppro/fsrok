@@ -267,7 +267,7 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                     input(type='checkbox',ng-model="vm.selectionOfManualSelectable[charge_item_level_two.item_id]" )
                                                     span.fa.fa-check
                                         .col-md-5
-                                            span {{charge_item_level_two.item_id | translate}}
+                                            span {{ (charge_item_level_two.item_id | translate) == charge_item_level_two.item_id ? charge_item_level_two.item_name: (charge_item_level_two.item_id | translate) }}
                                         .col-md-6
                                             span {{charge_item_level_two.period_price|currency}} / {{vm.period_map[charge_item_level_two.period]}}
                     fieldset: .form-group

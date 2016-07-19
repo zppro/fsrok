@@ -15,6 +15,8 @@
     function ChargeStandardController($parse,$scope, vmh, vm) {
         $scope.vm = vm;
         var tenantService = vm.modelNode.services['pub-tenant'];
+        var tenantChargeItemCustomizedService = vm.modelNode.services['pub-tenantChargeItemCustomized'];
+
         init();
 
 
@@ -36,16 +38,25 @@
             vm.chargeItemDataPromise = vmh.clientData.getJson('charge-item-organization-pfta').then(function (items) {
                 vm.selectBinding.standards = items;
                 if (vm.selectBinding.standards.length > 0) {
-                    return vmh.fetch(tenantService.query({_id: vm.model['tenantId']}, 'charge_standard charge_items')).then(function (ret) {
-
+                    return vmh.parallel([
+                        vmh.extensionService.tenantChargeItemCustomizedAsTree(vm.model['tenantId']),
+                        vmh.fetch(tenantService.query({_id: vm.model['tenantId']}, 'charge_standard charge_items'))
+                    ]).then(function (results) {
+                        //console.log(results[0]);
+                        var ret = results[1];
                         var selectedStandard = _.findWhere(vm.selectBinding.standards, {_id: ret[0].charge_standard});
                         if (!selectedStandard) {
                             selectedStandard = vm.selectBinding.standards[0];
                         }
 
-                        if(selectedStandard){
+                        if (selectedStandard) {
                             vm.selectedStandardId = selectedStandard._id;
                         }
+
+                        if(results[0].children.length>0) {
+                            selectedStandard.children.push(results[0]);
+                        }
+
 
                         vm.chargeItems = ret[0].charge_items;
                         setCheckedChargeItems();
@@ -87,7 +98,6 @@
 
 
             function createChargeItem(node) {
-                console.log(vm.charges);
                 var theOne = vm.charges[node._id];
                 if (!theOne) {
                     console.log(node);

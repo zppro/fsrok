@@ -40,8 +40,14 @@
                     var func = _.find(_user.tenant.open_funcs, function (o) {
                         return o.func_id == func_id;
                     });
-                    if (func && angular.isDefined(moment)) {
-                        return moment(func.expired_on).diff(moment()) >= 0;
+
+                    if (func) {
+                        if (_user.tenant.limit_to > 0) {
+                            return true;
+                        }
+                        else {
+                            return angular.isDefined(moment) && moment(func.expired_on).diff(moment()) >= 0;
+                        }
                     }
                     else {
                         return false;

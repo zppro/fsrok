@@ -1,5 +1,5 @@
 /**
- * change-board.controller Created by zppro on 16-6-23.
+ * dialog-in-charge-list.controller Created by zppro on 16-6-23.
  * Target:老人在院费用清单
  */
 

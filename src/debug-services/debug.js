@@ -104,6 +104,28 @@ module.exports = {
                 }
             },
             {
+                method: 'rechargeWithPopulate',
+                verb: 'get',
+                url: this.service_url_prefix + "/rechargeWithPopulate",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+
+                            console.log(334);
+                            var recharges = yield app.modelFactory().model_query(app.models['pub_recharge'])
+                            .populate('elderlyId','name');
+                            console.log(334);
+                            //console.log(recharges.toObject());
+                            this.body = app.wrapper.res.rows(recharges);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
                 method: 'roomStatusInfoWithPopulate',
                 verb: 'get',
                 url: this.service_url_prefix + "/roomStatusInfoWithPopulate/:tenantId",
@@ -437,6 +459,116 @@ module.exports = {
                 }
             },
             {
+                method: 'transferPftaToPub',
+                verb: 'post',
+                url: this.service_url_prefix + "/transferPftaToPub",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var recharges = yield app.modelFactory().model_query(app.models["pfta_recharge"]);
+                            for (var i = 0; i < recharges.length; i++) {
+
+                                var data = recharges[i].toObject();
+                                //data._id = undefined;
+
+                                console.log(data);
+
+                                yield app.modelFactory().model_create(app.models["pub_recharge"],data);
+                            }
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'checkCanBookingRed',//检查是否是系统内部记账，如果是则需要在前台做好提醒不需要冲红，但不强制禁止冲红
+                verb: 'post',
+                url: this.service_url_prefix + "/checkCanBookingRed/:voucher_no_to_red",
+                handler: function (app, options) {
+                    return function * (next) {
+                        var steps;
+                        var recharge_to_red,tenantJournalAccount_to_red, tenant;
+
+                        try {
+                            var tenantId = this.request.body.tenantId;
+                            var voucher_no_to_red = this.params.voucher_no_to_red;
+
+                            tenant = yield app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+                            console.log('前置检查完成');
+
+                            recharge_to_red = yield app.modelFactory().model_one(app.models['pub_recharge'], {
+                                where: {
+                                    status: 1,
+                                    voucher_no: voucher_no_to_red,
+                                    tenantId: tenantId
+                                }
+                            });
+
+                            tenantJournalAccount_to_red = yield app.modelFactory().model_one(app.models['pub_tenantJournalAccount'], {
+                                where: {
+                                    status: 1,
+                                    voucher_no: voucher_no_to_red,
+                                    tenantId: tenantId
+                                }
+                            });
+
+
+                            var can_not_find_recharge_to_red = !recharge_to_red || recharge_to_red.status == 0;
+                            var can_not_find_tenantJournalAccount_to_red = !tenantJournalAccount_to_red || tenantJournalAccount_to_red.status == 0;
+
+                            if (can_not_find_recharge_to_red && can_not_find_tenantJournalAccount_to_red) {
+
+                                this.body = app.wrapper.res.error({message: '无法找到需要冲红的流水记录!'});
+                                yield next;
+                                return;
+                            }
+
+                            if(!can_not_find_recharge_to_red){
+                                elderly = yield app.modelFactory().model_read(app.models['pub_elderly'], recharge_to_red.elderlyId);
+                                if (!elderly || elderly.status == 0) {
+                                    this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                    yield next;
+                                    return;
+                                }
+
+                                if (!elderly.live_in_flag || elderly.begin_exit_flow) {
+                                    this.body = app.wrapper.res.error({message: '当前老人不在院或正在办理出院手续，无法记账!'});
+                                    yield next;
+                                    return;
+                                }
+
+                                var journal_account = elderly.journal_account;
+                                for(var i=0;i<journal_account.length;i++){
+                                    if(journal_account[i].voucher_no == voucher_no_to_red && !journal_account[i].carry_over_flag)
+                                    {
+                                        this.body = app.wrapper.res.error({message: '当前充值流水没有结转，无法冲红，可以修改或删除!'});
+                                        yield next;
+                                        return;
+                                    }
+                                }
+                            }
+
+                            this.body = app.wrapper.res.ret({itCan: true, isSystemInnerBooking: !can_not_find_tenantJournalAccount_to_red});
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
                 method: 'initTenantBIZData',
                 verb: 'post',
                 url: this.service_url_prefix + "/initTenantBIZData/:_id",
@@ -463,7 +595,7 @@ module.exports = {
 
                             yield app.modelFactory().model_bulkDelete(app.models['pfta_roomOccupancyChangeHistory'], {tenantId: tenant._id});
 
-                            yield app.modelFactory().model_bulkDelete(app.models['pfta_recharge'], {tenantId: tenant._id});
+                            yield app.modelFactory().model_bulkDelete(app.models['pub_recharge'], {tenantId: tenant._id});
 
                             yield app.modelFactory().model_bulkDelete(app.models['pfta_exit'], {tenantId: tenant._id});
 
@@ -478,8 +610,55 @@ module.exports = {
                         yield next;
                     };
                 }
-            }
+            },
+            {
+                method: 'restoreElderlyChargeItems',
+                verb: 'post',
+                url: this.service_url_prefix + "/restoreElderlyChargeItems",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var elderlyId = '578880020ce2869913ea2de3';
+                            var elderly = yield app.modelFactory().read(elderlyModelOption.model_name, elderlyModelOption.model_path, elderlyId);
+                            if (!elderly) {
+                                this.body = app.wrapper.res.error({message: '无法找到老人资料!'});
+                                yield next;
+                                return;
+                            }
 
+                            //恢复的收费项目
+                            elderly.charge_items.push({
+                                item_id: 'charge-item.organization-pfta.board-s1.NUTRITION',
+                                item_name: '营养餐',
+                                period_price: 200,
+                                period: 'A0005'
+                            });
+
+                            elderly.charge_items.push({
+                                item_id: 'charge-item.organization-pfta.room-s1.DOMITORY-ROOM',
+                                item_name: '多人间',
+                                period_price: 300,
+                                period: 'A0005'
+                            });
+
+                            elderly.charge_items.push({
+                                item_id: 'charge-item.organization-pfta.nursing-s1.SELF-CARE',
+                                item_name: '自理老人',
+                                period_price: 0,
+                                period: 'A0005'
+                            });
+
+                            yield elderly.save();
+
+                            this.body = app.wrapper.res.default();
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            }
         ];
 
 

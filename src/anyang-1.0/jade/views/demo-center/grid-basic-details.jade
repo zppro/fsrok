@@ -57,6 +57,5 @@ form.form-validate.mb-lg(role='form', name="demoForm", novalidate='', ng-submit=
     .text-right.mt-lg
         button.btn.btn-warning(type="button",ng-click="vm.cancel()") {{'button.CANCEL'|translate}}
         button.btn.btn-success(type="submit") {{'button.SAVE'|translate}}
-        &nbsp;&nbsp;
         button.btn.btn-primary(type="button",ng-click="vm.tab1.active = true") {{vm.viewTranslatePath('BUTTON-TOGGLE-TAB') | translate:{num:1} }}
         button.btn.btn-primary(type="button",ng-click="vm.tab2.active = true") {{vm.viewTranslatePath('BUTTON-TOGGLE-TAB') | translate:{num:2} }}

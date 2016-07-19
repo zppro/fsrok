@@ -19,7 +19,7 @@ var fs = require('fs-extra');
 var co = require('co');
 var thunkify = require('thunkify');
 var rfcore = require('rfcore');
-var monoogse = require('mongoose');
+var mongoose = require('mongoose');
 
 
 var auth = require('./middlewares/auth.js');
@@ -120,6 +120,8 @@ app.crypto = require('crypto');
 
 app.clone = require('clone');
 
+//pinyin
+//app.pinyin = require('pinyin');
 
 //moment
 app.moment = moment;
@@ -171,11 +173,12 @@ co(function*() {
     console.log('configure mongoose...');
     //app.db.mongoose = monoogse;
     var connectStr = 'mongodb://{0}:{1}@{2}:{3}/{4}'.format(app.conf.db.mongodb.user, app.conf.db.mongodb.password, app.conf.db.mongodb.server, app.conf.db.mongodb.port, app.conf.db.mongodb.database)
-    monoogse.connect(connectStr);
-    app.db = monoogse.connection.on('error', function (err) {
+    mongoose.connect(connectStr);
+    app.db = mongoose.connection.on('error', function (err) {
         console.log('mongodb error:');
         console.error(err);
     });
+    mongoose.Promise =  global.Promise;
 
 
     console.log('configure models...');
@@ -236,20 +239,26 @@ co(function*() {
         appenders: configAppenders
     });
 
-    console.log('create jobs...');
-    app.jobManger = rfcore.factory('jobManager');
-    _.each(app.conf.scheduleJobNames, function (o) {
-        var jobDef = require('./schedule-jobs/' + o);
-        if(jobDef.needRegister ){
-            console.log('create job use ' + o + '...');
-            jobDef.register(app);
-        }
-    });
 
-    console.log('create sequences...');
+    console.log('configure sequences...');
     app.sequenceFactory = require('./libs/SequenceFactory').init(app.modelFactory(),app.models['pub_sequence']);
     _.each(app.conf.sequenceDefNames, function (o) {
         app.sequenceFactory.factory(o);
+    });
+
+    console.log('configure business-components... ');
+    console.log('configure carryOverManager... ');
+    app.carryOverManager = require('./business-components/CarryOverManager').init(app);
+
+
+    console.log('configure jobs...');
+    app.jobManger = rfcore.factory('jobManager');
+    _.each(app.conf.scheduleJobNames, function (o) {
+        var jobDef = require('./schedule-jobs/' + o);
+        if (jobDef.needRegister) {
+            console.log('create job use ' + o + '...');
+            jobDef.register(app);
+        }
     });
 
     console.log('register router...');

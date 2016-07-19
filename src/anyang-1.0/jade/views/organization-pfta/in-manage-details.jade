@@ -145,6 +145,13 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             .form-readable {{vm.model.room_summary}}
                         .col-md-4
                             button.btn.btn-primary.pull-left(ng-if="vm.readonly && !vm.model.begin_exit_flow",type="button",ng-click="vm.changeRoom()") {{'button.CHANGE'|translate}}
+                    fieldset: .form-group
+                        <!--其他费用与特色服务-->
+                        label.col-md-2.control-label {{ vm.viewTranslatePath('TAB1-OTHER-AND-CUSTOMIZED-INFO') | translate}}:
+                        .col-md-6
+                            .form-readable {{vm.other_and_customized}}
+                        .col-md-4
+                            button.btn.btn-primary.pull-left(ng-if="vm.readonly && !vm.model.begin_exit_flow",type="button",ng-click="vm.changeOtherAndCustomized()") {{'button.CHANGE'|translate}}
                     .panel.panel-default.panel-grid(ng-if="vm.readonly")
                         .panel-heading-normal
                             a {{ vm.viewTranslatePath('TAB1-ROOM-OCCUPANCY-CHANGE-HISTORY') | translate}}
@@ -180,9 +187,11 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                                 span.fa.fa-check
                                     th.text-center(width="60")
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-MEMBER-NAME') | translate}}
+                                    th.text-center(width="100")
+                                        | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-MEMBER-ID_NO') | translate}}
                                     th.text-center(width="50")
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-MEMBER-SEX') | translate}}
-                                    th.text-center(width="100")
+                                    th.text-center(width="80")
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-MEMBER-RELATION_WITH') | translate}}
                                     th.text-center(width="80")
                                         | {{ vm.viewTranslatePath('TAB1-LABEL-FAMILY-MEMBER-PHONE') | translate}}
@@ -200,6 +209,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                                         span(ng-if="!row.$editing") {{::row.name}}
                                         input.form-control(name="row$name",type="text",ng-if="row.$editing",ng-model='row.name',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-FAMILY-MEMBER-NAME")|translate}}' ,required='')
                                         span.text-danger(ng-if="row.$editing",ng-show="utils.vinput(this.theForm,'row$name','required')") {{ "validator.REQUIRED" | translate}}
+                                    td.text-left
+                                        span(ng-if="!row.$editing") {{::row.id_no}}
+                                        input.form-control(name="row$id_no",type="text",ng-if="row.$editing",ng-model='row.id_no',placeholder='{{vm.viewTranslatePath("TAB1-PLACEHOLDER-FAMILY-MEMBER-ID_NO")|translate}}',id-no2)
+                                        span.text-danger(ng-if="row.$editing",ng-show="utils.vinput(this.theForm,'row$id_no','IDNo')") {{ "validator.ID-NO" | translate}}
                                     td.text-center
                                         span(ng-if="!row.$editing") {{::row.sex|diFilter:vm.selectBinding.sex}}
                                         .dropdown(ng-if="row.$editing",s-dropdown,is-button,ng-model="row.sex",s-dropdown-data="vm.selectBinding.sex")
@@ -286,11 +299,10 @@ form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="
                             tbody
                                 tr(ng-repeat="row in vm.subGrid['journal_account'].rows|orderBy:vm.subGrid['journal_account'].sort.column:vm.subGrid['journal_account'].sort.direction===-1|paging:vm.subGrid['journal_account']",ng-init="revenue_and_expenditure_type_Prefix=row.revenue_and_expenditure_type.substr(0,1)")
                                     td.text-center {{::row.check_in_time|date:'yyyy-MM-dd HH:mm:ss'}}
-                                    td.text-center {{::row.voucher_no}}
+                                    td.text-center(ng-class='{"financial-voucher_no-for-red":row.red_flag}') {{::row.voucher_no}}
                                     td.text-center {{::row.revenue_and_expenditure_type|diFilter:vm.selectBinding.revenue_and_expenditure_types}}
                                     td {{::row.digest}}
-                                    td.text-right.text-primary(ng-if="revenue_and_expenditure_type_Prefix=='A'") {{::row.amount|currency}}
-                                    td.text-right.text-danger(ng-if="revenue_and_expenditure_type_Prefix=='B'") {{::row.amount|currency}}
+                                    td.text-right(ng-class='{"financial-receipts":(!row.red_flag && revenue_and_expenditure_type_Prefix=="A"),"financial-disbursements":(!row.red_flag && revenue_and_expenditure_type_Prefix=="B"),"financial-set-red":row.red_flag}') {{::row.amount|currency}}
                         .panel-footer
                             .row
                                 .col-md-4.text-left
@@ -334,6 +346,33 @@ script(type="text/ng-template", id="change-elderly-room-info.html")
                 span.text-120.text-danger(ng-if="vm.new_charge_item && vm.new_charge_item.item_id != vm.selected_charge_item.item_id") -> {{vm.new_charge_item.period_price|currency}} / {{ vm.viewTranslatePath('TAB2-PERIOD-MONTH') | translate }}
         .ngdialog-input
             .tree.tree-tile(ng-if='!vm.treeHidden',s-tree,s-tree-data="vm.treeData",s-tree-node-is-disabled="vm.isDisabled(node)",s-tree-node-func="vm.getOccupyElderlyName(node)",s-tree-height="300", s-tree-template-url='tree-room-tile-renderer.html',s-tree-option="{layout:'tile'}", ng-model="vm.room_info",required='')
+        .ngdialog-buttons
+            .row
+                .col-md-10
+                    .alert-danger.text-center(ng-show='vm.authMsg') {{vm.authMsg}}
+                .col-md-2
+                    button.btn.btn-success(type='submit') {{ "button.SAVE" | translate}}
+script(type="text/ng-template", id="change-elderly-charge-item-for-other-and-customized.html")
+    form.form-validate.mb-lg(role='form', name="theForm", novalidate='', ng-submit="vm.doSubmit()")
+        .ngdialog-message
+            h3.mt0 {{ vm.title | translate}}
+                span.text-120.text-primary.ml-lg {{vm.rawSumedPeriodPrice |currency}} / {{ vm.viewTranslatePath('TAB2-PERIOD-MONTH') | translate }}
+                span.text-120.text-danger(ng-if="vm.isChanged()") -> {{vm.sumPeriodPrice()|currency}} / {{ vm.viewTranslatePath('TAB2-PERIOD-MONTH') | translate }}
+        .ngdialog-input
+            ul.charge-item-of-other-and-customized(ng-repeat='charge_item_level_one in vm.selectedChargeItemCatalogs')
+                li.charge-item-level-one
+                    span {{charge_item_level_one._id | translate}}
+                li.charge-item-level-two( ng-class='{"selected":vm.isSelected(charge_item_level_two) }', ng-repeat='charge_item_level_two in charge_item_level_one.children')
+                    .row
+                        .col-md-1
+                            .checkbox.c-checkbox(ng-if="!vm.readonly && charge_item_level_two.data && charge_item_level_two.data.manual_seletable")
+                                label
+                                    input(type='checkbox',ng-model="vm.selectionOfManualSelectable[charge_item_level_two.item_id]" )
+                                    span.fa.fa-check
+                        .col-md-5
+                            span {{ (charge_item_level_two.item_id | translate) == charge_item_level_two.item_id ? charge_item_level_two.item_name: (charge_item_level_two.item_id | translate) }}
+                        .col-md-6
+                            span {{charge_item_level_two.period_price|currency}} / {{vm.period_map[charge_item_level_two.period]}}
         .ngdialog-buttons
             .row
                 .col-md-10

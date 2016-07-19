@@ -26,7 +26,7 @@
                            input(type='checkbox' data="trBubble" ng-model="row.checked" )
                            span.fa.fa-check(data="trBubble")
                   td {{::row.check_in_time|date}}
-                  td {{::row.voucher_no}}
+                  td(ng-class='{"financial-voucher_no-for-red":row.red_flag}') {{::row.voucher_no}}
                   td {{::row.revenue_and_expenditure_type|formatter:'revenue_and_expenditure_type':vm.columns}}
                   td.text-left {{::row.digest}}
                   td.text-right(ng-class='{"financial-receipts":(!row.red_flag && row.revenue_flag),"financial-disbursements":(!row.red_flag && !row.revenue_flag),"financial-set-red":row.red_flag}') {{::row.amount|currency}}
