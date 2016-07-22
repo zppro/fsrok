@@ -1,5 +1,14 @@
 {
   "organization-pfta": {
+    "dashboard": {
+      "TITLE": "机构养老云-数据面板",
+      "LIVE-IN":"入住总人数",
+      "LIVE-IN-ON-CURRENTMONTH":"本月新增",
+      "LIVE-IN-MAN-TIME":"入住总人次",
+      "SUBSIDIARY_LEDGER-SELF":"主账户",
+      "SUBSIDIARY_LEDGER-GOV_SUBSIDY":"政府补助账户",
+      "SUBSIDIARY_LEDGER-SOCIAL_DONATION":"社会捐赠账户"
+    },
     "enter-manage": {
       "list": {
         "TITLE": "机构养老云-老人管理-入院-列表",

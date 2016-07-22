@@ -50,7 +50,7 @@
             .state('app.dashboard', {
                 url: '/dashboard',
                 title: '数据面板',
-                templateUrl: helper.basepath('dashboard.html'),
+                templateUrl: helper.basepath('dashboard-dispatcher.html'),
                 access_level: AUTH_ACCESS_LEVELS.USER
             })
             .state('app.submenu', {

@@ -26,21 +26,26 @@
             if(toState.access_level) {
 
                 if (Auth.isAuthenticated()) {
-                    if (toState.name === 'app.dashboard') {
+                    if (toState.name === 'app.dashboard' || toState.name === fromState.name) {
                         return;
                     }
-                    // 用户登录了，但没有访问当前视图的权限
-                    if (!Auth.isAuthorized(toState.access_level) || !Auth.isPermit(toState.func_id || (toState.data && toState.data.func_id) || toState.name)) {
-                        event.preventDefault();
 
-                        $state.go('app.dashboard');
+                    if(toState.name.indexOf('.dashboard') == -1) {
+                        // 用户登录了，但没有访问当前视图的权限
+                        if (!Auth.isAuthorized(toState.access_level) || !Auth.isPermit(toState.func_id || (toState.data && toState.data.func_id) || toState.name)) {
+                            event.preventDefault();
 
-                        $timeout(function () {
-                            cfpLoadingBar.complete();
-                        }, 100);
+                            $state.go('app.dashboard');
 
-                        return;
+                            $timeout(function () {
+                                cfpLoadingBar.complete();
+                            }, 100);
+
+                            return;
+                        }
                     }
+
+
                     $rootScope.$fromState = fromState;
                     $rootScope.$fromParams = fromParams;
 

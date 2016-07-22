@@ -1,0 +1,61 @@
+// START widgets box
+.row
+   .col-lg-3.col-sm-6
+      // START widget
+      .panel.widget.bg-primary
+         .row.row-table
+            .col-xs-4.text-center.bg-primary-dark.pv-lg
+               em.icon-user.fa-3x
+            .col-xs-8.pv-lg
+               .h2.mt0 1700
+               | {{ vm.moduleTranslatePath('LIVE-IN') | translate}}
+   .col-lg-3.col-sm-6
+      // START widget
+      .panel.widget.bg-purple
+         .row.row-table
+            .col-xs-4.text-center.bg-purple-dark.pv-lg
+               em.icon-user-follow.fa-3x
+            .col-xs-8.pv-lg
+               .h2.mt0 700
+               | {{ vm.moduleTranslatePath('LIVE-IN-ON-CURRENTMONTH') | translate}}
+   .col-lg-3.col-md-6.col-sm-12
+      // START widget
+      .panel.widget.bg-green
+         .row.row-table
+            .col-xs-4.text-center.bg-green-dark.pv-lg
+               em.icon-users.fa-3x
+            .col-xs-8.pv-lg
+               .h2.mt0 3500
+               | {{ vm.moduleTranslatePath('LIVE-IN-MAN-TIME') | translate}}
+   .col-lg-3.col-md-6.col-sm-12
+      // START date widget
+      .panel.widget
+         .row.row-table
+            .col-xs-4.text-center.bg-green.pv-lg
+               // See formats: https://docs.angularjs.org/api/ng/filter/date
+               now.text-sm(format='MMMM')
+               br
+               now.h2.mt0(format="d")
+            .col-xs-8.pv-lg
+               now(format='EEEE')
+               br
+               now.h2.mt0(format='h:mm')
+               now.text-muted.text-sm(format='a')
+      // END date widget
+// END widgets box
+.row
+   .col-lg-12
+      .panel.widget
+         .row.row-table.text-center
+            .col-md-2.col-sm-3.col-xs-6.bg-info.pv-xl
+               em.fa-rmb.fa.fa-4x
+            .col-md-2.col-sm-3.col-xs-6.pv.br
+               .h1.m0.text-bold.text-primary 25,000
+               | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-SELF') | translate}}
+            .col-md-2.col-sm-3.col-xs-6.pv.br
+               .h1.m0.text-bold.text-primary 0
+               | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-GOV_SUBSIDY') | translate}}
+            .col-md-2.col-sm-3.col-xs-6.pv.br
+               .h1.m0.text-bold.text-primary 0
+               | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-SOCIAL_DONATION') | translate}}
+            .col-md-4.col-sm-6.col-xs-12.pv.br

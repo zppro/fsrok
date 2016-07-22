@@ -27,6 +27,24 @@
                     , deps: helper.resolveFor2('subsystem.organization-pfta')
                 }
             })
+            .state('app.organization-pfta.dashboard', {
+                url: '/dashboard',
+                title: '数据面板',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/organization-pfta/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('organization-pfta/dashboard.html'),
+                        controller: 'DashboardControllerOfOrganizationOfPFTAController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.organization-pfta.dashboard')
+                        }
+                    }
+                }
+            })
             .state('app.organization-pfta.enter-manage', {
                 url: '/enter-manage',
                 title: '入院管理',

@@ -8,6 +8,7 @@
         .module('app.core')
         .controller('AppController', AppController)
         .controller('TopbarController', TopbarController)
+        .controller('DashboardDispatcherController',DashboardDispatcherController)
         .controller('ModuleHeaderController', ModuleHeaderController)
         .controller('ModuleHeaderForTenantController', ModuleHeaderForTenantController)
     ;
@@ -40,6 +41,22 @@
                 $event.stopPropagation();
             };
 
+        }
+    }
+
+    DashboardDispatcherController.$inject = ['$rootScope'];
+    function DashboardDispatcherController($rootScope) {
+
+        $rootScope.$on('sidebar:subsystem:change', function ($event, sref) {
+            $rootScope.currentSubsystemSref = sref;
+            $rootScope.$state.go($rootScope.currentSubsystemSref + '.dashboard');
+        });
+
+        if ($rootScope.currentSubsystemSref) {
+            $rootScope.$state.go($rootScope.currentSubsystemSref + '.dashboard');
+        }
+        else{
+            console.log('no currentSubsystemSref');
         }
     }
 

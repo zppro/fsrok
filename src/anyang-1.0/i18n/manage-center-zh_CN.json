@@ -1,6 +1,9 @@
 {
   "manage-center": {
     "HEAD-ORG-NAME": "安养管理",
+    "dashboard": {
+      "TITLE": "管理中心-数据面板"
+    },
     "pension-agency-account-manage": {
       "list": {
         "TITLE": "管理中心-养老机构-帐号-列表"

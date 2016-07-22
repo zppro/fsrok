@@ -49,12 +49,15 @@
                         if ($scope.subsystem.selected) {
                             // Load menu from json file
                             SidebarLoader.getMenu($scope.subsystem.selected, sidebarReady);
+
+                            $scope.subsystem.selected.mtype != 'demo' && $rootScope.$emit('sidebar:subsystem:change', $scope.subsystem.selected.sref);
                         }
                     });
                 },
                 switchSubsystem: function (item) {
                     $scope.subsystem.selected = item;
                     SidebarLoader.getMenu($scope.subsystem.selected, sidebarReady);
+                    $scope.subsystem.selected.mtype != 'demo' && $rootScope.$emit('sidebar:subsystem:change', $scope.subsystem.selected.sref);
                 },
                 isActive: function (item) {
                     if (!item) return;

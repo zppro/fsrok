@@ -28,6 +28,24 @@
                     , deps: helper.resolveFor2('subsystem.manage-center')
                 }
             })
+            .state('app.manage-center.dashboard', {
+                url: '/dashboard',
+                title: '数据面板',
+                access_level: AUTH_ACCESS_LEVELS.USER,
+                views: {
+                    "module-header": {
+                        templateUrl: helper.basepath('partials/manage-center/module-header.html'),
+                        controller: 'ModuleHeaderForTenantController'
+                    },
+                    "module-content": {
+                        templateUrl: helper.basepath('manage-center/dashboard.html'),
+                        controller: 'DashboardControllerOfManageCenterController',
+                        resolve: {
+                            instanceVM: helper.buildInstanceVM('app.manage-center.dashboard')
+                        }
+                    }
+                }
+            })
             .state('app.manage-center.pension-agency-account-manage', {
                 url: '/pension-agency-account-manage',
                 abstract: true,
