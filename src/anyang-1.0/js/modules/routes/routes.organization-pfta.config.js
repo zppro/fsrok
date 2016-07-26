@@ -44,6 +44,7 @@
                         }
                     }
                 }
+                , resolve: helper.resolveFor('echarts.common','echarts-ng','classyloader')
             })
             .state('app.organization-pfta.enter-manage', {
                 url: '/enter-manage',

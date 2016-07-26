@@ -47,6 +47,7 @@
     "simple-line-icons": "0.1.1",
     "angular-touch": "1.4.2",
     "jquery.browser": "master",
+    "jquery-classyloader": "http://vox.space/files/jquery-classyloader.zip",
     "angular-block-ui": "~0.2.2",
     "underscore": "~1.8.3",
     "angular-i18n": "1.4.2",
@@ -57,7 +58,9 @@
     "bowser": "browser#~1.0.0",
     "object-hash": "git@github.com:puleos/object-hash#~1.1.2",
     "angucomplete-alt": "~2.4.1",
-    "eonasdan-bootstrap-datetimepicker": "~4.17.37"
+    "eonasdan-bootstrap-datetimepicker": "~4.17.37",
+    "echarts-ng": "~0.3.13",
+    "echarts": "~3.2.2"
   },
   "resolutions": {
     "angular": "1.4.2",

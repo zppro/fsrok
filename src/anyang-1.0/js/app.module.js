@@ -31,6 +31,7 @@
             'app.interceptor',
             'app.auth',
             'app.model',
+            'app.charts',
             'app.grid',
             'app.tree',
             'app.dropdown',

@@ -43,19 +43,56 @@
                now.text-muted.text-sm(format='a')
       // END date widget
 // END widgets box
+
+// START widgets 2
 .row
-   .col-lg-12
+   .col-lg-6
       .panel.widget
          .row.row-table.text-center
             .col-md-2.col-sm-3.col-xs-6.bg-info.pv-xl
                em.fa-rmb.fa.fa-4x
-            .col-md-2.col-sm-3.col-xs-6.pv.br
+            .col-md-4.col-sm-3.col-xs-6.pv.br
                .h1.m0.text-bold.text-primary 25,000
                | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-SELF') | translate}}
-            .col-md-2.col-sm-3.col-xs-6.pv.br
+            .col-md-3.col-sm-3.col-xs-6.pv.br
                .h1.m0.text-bold.text-primary 0
                | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-GOV_SUBSIDY') | translate}}
-            .col-md-2.col-sm-3.col-xs-6.pv.br
+            .col-md-3.col-sm-3.col-xs-6.pv.br
                .h1.m0.text-bold.text-primary 0
                | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-SOCIAL_DONATION') | translate}}
-            .col-md-4.col-sm-6.col-xs-12.pv.br
+   .col-lg-6
+      .panel.widget
+         .row.row-table.text-center
+            .col-md-2.col-sm-3.col-xs-6.bg-info.pv-xl
+               em.fa-bed.fa.fa-4x
+            .col-md-4.col-sm-3.col-xs-6.pv.br
+               .h1.m0.text-bold.text-primary 5,00
+               | {{ vm.moduleTranslatePath('BED-INFO-TOTALS') | translate}}
+            .col-md-3.col-sm-3.col-xs-6.pv.br
+               .h1.m0.text-bold.text-primary 200
+               | {{ vm.moduleTranslatePath('BED-INFO-LIVEINS') | translate}}
+            .col-md-3.col-sm-3.col-xs-6.pv.br
+               .h1.m0.text-bold.text-primary 60%
+               | {{ vm.moduleTranslatePath('BED-INFO-VACANCY_RATE') | translate}}
+
+// END widgets 2
+
+// START widgets 3
+.row
+   .col-lg-4
+      .panel.widget
+         div(id="{{pie_id}}",echarts="pie_id",config="pie_config",echarts-dimension="'1:1'",style="width:100%;")
+   //END widgets 3
+   .col-lg-3
+      // START loader widget
+      //.panel.panel-default
+      //   .panel-body
+      //      a.text-muted.pull-right(ng-if="false",href="#"): em.fa.fa-arrow-right
+      //      .text-info Average Monthly Uploads
+      //      canvas.center-block(classyloader="", data-percentage="70", data-speed="20", data-font-size="40px", data-diameter="70", data-line-color="{{colorByName('info')}}", data-remaining-line-color="rgba(200,200,200,0.4)", data-line-width="10", data-rounded-line="true")
+      //   .panel-footer
+      //      p.text-muted
+      //         em.fa.fa-upload.fa-fw
+      //         span This Month
+      //         span.text-dark 1000 Gb
+      // END loader widget

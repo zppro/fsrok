@@ -7,7 +7,10 @@
       "LIVE-IN-MAN-TIME":"入住总人次",
       "SUBSIDIARY_LEDGER-SELF":"主账户",
       "SUBSIDIARY_LEDGER-GOV_SUBSIDY":"政府补助账户",
-      "SUBSIDIARY_LEDGER-SOCIAL_DONATION":"社会捐赠账户"
+      "SUBSIDIARY_LEDGER-SOCIAL_DONATION":"社会捐赠账户",
+      "BED-INFO-TOTALS":"床位总数",
+      "BED-INFO-LIVEINS":"占用数",
+      "BED-INFO-VACANCY_RATE":"床位空置率"
     },
     "enter-manage": {
       "list": {

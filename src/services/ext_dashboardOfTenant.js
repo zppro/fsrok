@@ -108,13 +108,13 @@ module.exports = {
                             var endAge = startAge + step * (step == 10 ? 2 : 4);
 
                             var ageGroups = [];
-                            var startGroup = {title: "&lte" + startAge};
+                            var startGroup = {title: "&lt" + startAge};
                             ageGroups.push(startGroup);
                             for (var i = startAge; i < endGroup; i = i + step) {
                                 ageGroups.push(startGroup);
                             }
-                            var endGroup = {title: "&gt" + endAge};//
-                            ageGroups.push({title: (i + 1) + '-' + (i + step)});
+                            var endGroup = {title: "&gte" + endAge};//
+                            ageGroups.push({title: i + '-' + (i + step)});
 
                             var elderlys = yield app.modelFactory().model_query(app.models['pub_elderly'], {
                                 where: {
@@ -128,15 +128,15 @@ module.exports = {
                             for (var i = 0; i < ageGroups.length; i++) {
                                 ageGroups[i].value = app._.filter(elderlys, function (o) {
                                     var age = app.moment().diff(o.birthday, 'years');
-                                    if (ageGroups[i].title.startsWith('&lte')) {
-                                        return age <= startAge;
+                                    if (ageGroups[i].title.startsWith('&lt')) {
+                                        return age < startAge;
                                     }
-                                    else if (ageGroups[i].title.startsWith('&gt')) {
-                                        return age > endAge;
+                                    else if (ageGroups[i].title.startsWith('&gte')) {
+                                        return age >= endAge;
                                     }
                                     else {
                                         var arr = ageGroups[i].title.split('-');
-                                        return age >= arr[0] && age <= arr[1];
+                                        return age >= arr[0] && age < arr[1];
                                     }
                                 }).length;
                             }
