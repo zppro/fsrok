@@ -36,6 +36,7 @@ app.conf = {
         debugServices: path.join(__dirname, 'debug-services'),
         scheduleJobs: path.join(__dirname, 'schedule-jobs'),
         sequenceDefs: path.join(__dirname, 'sequence-defs'),
+        businessComponents: path.join(__dirname, 'business-components'),
         static_develop: '../pub-client-develop/',
         static_production: '../pub-client-production/'
     },
@@ -135,6 +136,9 @@ app.utcNow  = function() {
     return moment().add(8, 'h');
 };
 
+//mongoose string to objectId function
+app.ObjectId = mongoose.Types.ObjectId;
+
 //解析参数model
 app.getModelOption =  function (ctx) {
     var modelName = ctx.params.model.split('-').join('_');//将 A-B改为A_B
@@ -188,6 +192,10 @@ co(function*() {
     app.models = ModelFactory.models;
     app.modelFactory = ModelFactory.bind(app);
 
+    console.log('configure business-components...');
+    app.conf.businessComponentNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.businessComponents)), function (o) {
+        return o.substr(0, o.indexOf('.'))
+    });
 
     console.log('configure schedule jobs...');
     app.conf.scheduleJobNames = _.map((yield app.wrapper.cb(fs.readdir)(app.conf.dir.scheduleJobs)), function (o) {
@@ -247,9 +255,11 @@ co(function*() {
     });
 
     console.log('configure business-components... ');
-    console.log('configure carryOverManager... ');
-    app.carryOverManager = require('./business-components/CarryOverManager').init(app);
-
+    //app.CarryOverManager = require('./business-components/CarryOverManager').init(app);
+    //初始化业务组件
+    _.each(app.conf.businessComponentNames, function (o) {
+        app[o] = require('./business-components/' + o).init(app);
+    });
 
     console.log('configure jobs...');
     app.jobManger = rfcore.factory('jobManager');

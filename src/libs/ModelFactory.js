@@ -34,11 +34,11 @@ var ModelFactory = function(conn) {
         model_delete: function (model, id) {
             return ModelFactory._delete(model, id);
         },
-        query: function (name, path, data) {
-            return ModelFactory._query(ModelFactory.getModel(conn, name, path), data);
+        query: function (name, path, data,options) {
+            return ModelFactory._query(ModelFactory.getModel(conn, name, path), data, options);
         },
-        model_query: function (model, data) {
-            return ModelFactory._query(model, data);
+        model_query: function (model, data,options) {
+            return ModelFactory._query(model, data, options);
         },
         totals: function (name, path, data) {
             return ModelFactory._query(ModelFactory.getModel(conn, name, path), {where: data, select: '_id'});
@@ -75,6 +75,12 @@ var ModelFactory = function(conn) {
         },
         model_distinct: function (model, data) {
             return ModelFactory._distinct(model, data);
+        },
+        aggregate:function (name,path,pipes){
+            return ModelFactory._aggregate(ModelFactory.getModel(conn, name, path),pipes);
+        },
+        model_aggregate: function (model, pipes) {
+            return ModelFactory._aggregate(model, pipes);
         }
     };
 };
@@ -122,15 +128,15 @@ ModelFactory._delete =function (model,id) {
     return model.remove({_id: id});
 };
 
-ModelFactory._query =function (model,data) {
+ModelFactory._query =function (model,data,options) {
     var rows;
     if (data) {
-        var options = {};
+        options = options || {};
         if (data.page && data.page.size) {
-            options.limit = data.page.size;
+            !options.limit && (options.limit = data.page.size)
         }
         if (data.page && data.page.no) {
-            options.skip = (data.page.no - 1) * data.page.size;
+            !options.skip && (options.skip = (data.page.no - 1) * data.page.size);
         }
 
         //此处因为mongodb不允许[挑选]、[排除]字段同时存在（_id）不受限
@@ -198,6 +204,11 @@ ModelFactory._bulkDelete = function (model,where) {
 ModelFactory._distinct = function(model,data) {
     return model.distinct(data.select, data.where);
 };
+
+ModelFactory._aggregate =function (model,pipes) {
+    return model.aggregate(pipes);
+};
+
 
 //对数组类型子文档的增加和删除
 //model.findByIdAndUpdate(23, {

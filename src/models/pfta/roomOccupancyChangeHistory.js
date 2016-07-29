@@ -1,5 +1,5 @@
 /**
- * roomOccupancyChangeHistorySchema Created by zppro on 16-6-1.
+ * roomOccupancyChangeHistory Created by zppro on 16-6-1.
  * Target:房间入住情况变动历史
  */
 var mongoose = require('mongoose');

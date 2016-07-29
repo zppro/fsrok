@@ -2,6 +2,7 @@
  * Created by zppro on 15-12-16.
  * 参考字典D1003-预定义树
  */
+var statHelper = require('rfcore').factory('statHelper');
 
 module.exports = {
     init: function (option) {
@@ -74,6 +75,87 @@ module.exports = {
                             var ret = app._.pick(tenant.toObject(),this.params.select.split(','));
                             console.log(ret);
                             this.body = app.wrapper.res.ret(ret);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'makeTenantSettlementMonthly',
+                verb: 'get',
+                url: this.service_url_prefix + "/makeTenantSettlementMonthly",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenant = yield app.modelFactory().read(tenantModelOption.model_name, tenantModelOption.model_path, '56cedebf7768e0eb161e1787');
+                            var ret = yield app.RoomVacancyStatManager.makeTenantSettlementMonthly(tenant,self.logger);
+                            this.body = app.wrapper.res.ret(ret);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'roomVacancyRateMonthly',
+                verb: 'get',
+                url: this.service_url_prefix + "/roomVacancyRateMonthly/:_id/:start/:end",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenantId = this.params._id;
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],tenantId);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+
+                            var arrTotals = yield app.modelFactory().model_aggregate(app.models['pfta_room'], [
+                                {
+                                    $match: {
+                                        stop_flag: false,
+                                        tenantId: tenant._id,
+                                        status: 1
+                                    }
+                                },
+                                {
+                                    $group: {
+                                        _id: null,
+                                        count: {$sum: '$capacity'}
+                                    }
+                                },
+                                {
+                                    $project: {
+                                        count: '$count',
+                                        _id: 0
+                                    }
+                                }
+                            ]);
+
+                            var s = app.moment(this.params.start);
+                            var e = app.moment(this.params.end);
+
+                            console.log(s.format('YYYY-MM-DD'));
+                            console.log(e.format('YYYY-MM-DD'));
+
+                            var rangeMonth = statHelper.rangeDateAsMonth(s,e);
+                            app.RoomVacancyStatManager.makeTenantSettlementMonthly(tenant,self.logger);
+                            var tenantRoomVacancyStat = yield app.modelFactory().model_query(app.models['pfta_roomVacancyStat'], {
+                                where: {
+                                    status: 1,
+                                    period:'A0005',//D1015 -月
+                                    period_value :{$in:rangeMonth},
+                                    tenantId: tenantId
+                                }
+                                , select: '-_id period_value amount_brought_forward amount_check_in amount_check_out amount settlement_flag'
+                            });
+                            this.body = app.wrapper.res.ret(tenantRoomVacancyStat);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

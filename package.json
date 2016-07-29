@@ -57,10 +57,10 @@
     "koa-statelessauth": "^1.0.2",
     "koa-static": "^1.5.2",
     "log4js": "^0.6.25",
-    "moment": "^2.12.0",
+    "moment": "^2.13.0",
     "mongoose": "^4.5.3",
     "node-schedule": "^1.1.1",
-    "rfcore": "^0.1.8",
+    "rfcore": "^0.1.9",
     "thunkify": "^2.1.2",
     "underscore": "^1.8.3"
   }

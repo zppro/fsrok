@@ -11,6 +11,7 @@ var assert = require('assert').ok;
 
 module.exports = {
     init: function (ctx) {
+        console.log('init CarryOverManager... ');
         this.ctx = ctx;
         return this;
     },

@@ -2,6 +2,8 @@
  * ext_dashboardOfTenant Created by zppro on 16-7-19.
  * Target:机构扩展
  */
+var statHelper = require('rfcore').factory('statHelper');
+
 module.exports = {
     init: function (option) {
         var self = this;
@@ -29,14 +31,14 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var tenantId = this.params._id;
-                            var elderly_counts = yield  app.modelFactory().model_totals(app.models['pub_elderly'], {
-                                tenantId: tenantId,
-                                status: 1,
-                                live_in_flag: true
-                            });
-
-                            this.body = app.wrapper.res.ret(elderly_counts);
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+                            var result = yield app.TenantStatManager.getAmountOfElderlyLiveIn(tenant,self.logger);
+                            this.body = app.wrapper.res.ret(result);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -52,18 +54,14 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var tenantId = this.params._id;
-                            var begin = app.moment(app.moment().startOf('month').format('YYYY-MM-DD')+" 00:00:00");
-                            var end = app.moment(app.moment().endOf('month').format('YYYY-MM-DD')+" 23:59:59");
-
-                            var elderly_totals = yield  app.modelFactory().model_totals(app.models['pub_elderly'], {
-                                tenantId: tenantId,
-                                status: 1,
-                                live_in_flag: true,
-                                enter_on: {"$gte": begin, "$lte": end}
-                            });
-
-                            this.body = app.wrapper.res.ret(elderly_totals);
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+                            var result = yield app.TenantStatManager.getAmountOfElderlyLiveInOnCurrentMonth(tenant,self.logger);
+                            this.body = app.wrapper.res.ret(result);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -79,14 +77,90 @@ module.exports = {
                 handler: function (app, options) {
                     return function * (next) {
                         try {
-                            var tenantId = this.params._id;
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
 
-                            var enter_totals = yield  app.modelFactory().model_totals(app.models['pfta_enter'], {
-                                tenantId: tenantId,
-                                status: 1
-                            });
+                            var result = yield app.TenantStatManager.getAmountOfElderlyLiveInManTime(tenant,self.logger);
+                            this.body = app.wrapper.res.ret(result);
 
-                            this.body = app.wrapper.res.ret(enter_totals);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'tenantAccountInfo',
+                verb: 'get',
+                url: this.service_url_prefix + "/tenantAccountInfo/:_id",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+                            this.body = app.wrapper.res.ret(tenant.subsidiary_ledger);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'bedInfo',
+                verb: 'get',
+                url: this.service_url_prefix + "/bedInfo/:_id",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+                            var bedInfo = yield app.TenantStatManager.getBedInfo(tenant,self.logger);
+                            this.body = app.wrapper.res.ret(bedInfo);
+                        } catch (e) {
+                            self.logger.error(e.message);
+                            this.body = app.wrapper.res.error(e);
+                        }
+                        yield next;
+                    };
+                }
+            },
+            {
+                method: 'liveinAndAccountAndBedInfo',
+                verb: 'get',
+                url: this.service_url_prefix + "/liveinAndAccountAndBedInfo/:_id",
+                handler: function (app, options) {
+                    return function * (next) {
+                        try {
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],this.params._id);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
+                            }
+                            var result = {
+                                liveIn: yield app.TenantStatManager.getAmountOfElderlyLiveIn(tenant, self.logger),
+                                liveInOnCurrentMonth: yield app.TenantStatManager.getAmountOfElderlyLiveInOnCurrentMonth(tenant, self.logger),
+                                liveInManTime: yield app.TenantStatManager.getAmountOfElderlyLiveInManTime(tenant, self.logger),
+                                account: tenant.subsidiary_ledger,
+                                bed: yield app.TenantStatManager.getBedInfo(tenant, self.logger)
+                            }
+                            this.body = app.wrapper.res.ret(result);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -103,18 +177,20 @@ module.exports = {
                     return function * (next) {
                         try {
                             var tenantId = this.params._id;
-                            var startAge = this.params.start;
-                            var step = this.params.step;
+                            var startAge = Number(this.params.start);
+                            var step = Number(this.params.step);
                             var endAge = startAge + step * (step == 10 ? 2 : 4);
 
                             var ageGroups = [];
                             var startGroup = {title: "&lt" + startAge};
                             ageGroups.push(startGroup);
-                            for (var i = startAge; i < endGroup; i = i + step) {
-                                ageGroups.push(startGroup);
+
+                            for (var i = startAge; i < endAge; i = i + step) {
+                                ageGroups.push({title: i + '-' + (i + step - 1)});
                             }
                             var endGroup = {title: "&gte" + endAge};//
-                            ageGroups.push({title: i + '-' + (i + step)});
+                            ageGroups.push(endGroup);
+
 
                             var elderlys = yield app.modelFactory().model_query(app.models['pub_elderly'], {
                                 where: {
@@ -151,111 +227,68 @@ module.exports = {
                 }
             },
             {
-                method: 'bedInfo',
+                method: 'roomVacancyRateMonthly',
                 verb: 'get',
-                url: this.service_url_prefix + "/bedInfo/:_id",
+                url: this.service_url_prefix + "/roomVacancyRateMonthly/:_id/:start/:end",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
                             var tenantId = this.params._id;
-
-                            var rooms = yield  app.modelFactory().model_query(app.models['pfta_room'], {
-                                where: {
-                                    tenantId: tenantId,
-                                    status: 1
-                                },
-                                select: 'capacity'
-                            });
-
-                            var totals = 0;
-                            for (var i = 0; i < rooms.length; i++) {
-                                totals += rooms[i].capacity;
-                            }
-
-                            var liveins = yield  app.modelFactory().model_totals(app.models['pfta_roomOccupancyChangeHistory'], {
-                                tenantId: tenantId,
-                                in_flag: true,
-                                status: 1
-                            });
-
-                            var bedInfo = {
-                                totals: totals,
-                                liveins: liveins,
-                                frees: totals - liveins,
-                                vacancy_rate: (100 * (totals - liveins) / totals).toFixed(2)
-                            };
-
-                            this.body = app.wrapper.res.ret(bedInfo);
-                        } catch (e) {
-                            self.logger.error(e.message);
-                            this.body = app.wrapper.res.error(e);
-                        }
-                        yield next;
-                    };
-                }
-            },
-            {
-                method: 'vacancyRateMonthly?',
-                verb: 'get',
-                url: this.service_url_prefix + "/vacancyRateMonthly/:_id/:start/:end",
-                handler: function (app, options) {
-                    return function * (next) {
-                        try {
-                            var tenantId = this.params._id;
-
-                            var rooms = yield  app.modelFactory().model_query(app.models['pfta_room'], {
-                                where: {
-                                    tenantId: tenantId,
-                                    status: 1
-                                },
-                                select: 'capacity'
-                            });
-
-                            //（入住房间天数/月度天数）*
-
-                            var totals = 0;
-                            for (var i = 0; i < rooms.length; i++) {
-                                totals += rooms[i].capacity;
-                            }
-
-                            var liveins = yield  app.modelFactory().model_totals(app.models['pfta_roomOccupancyChangeHistory'], {
-                                tenantId: tenantId,
-                                in_flag: true,
-                                status: 1
-                            });
-
-                            var bedInfo = {
-                                totals: totals,
-                                liveins: liveins,
-                                frees: totals - liveins,
-                                vacancy_rate: (100 * (totals - liveins) / totals).toFixed(2)
-                            };
-
-                            this.body = app.wrapper.res.ret(bedInfo);
-                        } catch (e) {
-                            self.logger.error(e.message);
-                            this.body = app.wrapper.res.error(e);
-                        }
-                        yield next;
-                    };
-                }
-            },
-            {
-                method: 'tenantAccountInfo?',
-                verb: 'get',
-                url: this.service_url_prefix + "/tenantAccountInfo/:_id",
-                handler: function (app, options) {
-                    return function * (next) {
-                        try {
-                            var tenantId = this.params._id;
-
-                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'],tenantId);
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
                             if (!tenant || tenant.status == 0) {
                                 this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
                                 yield next;
                                 return;
                             }
-                            this.body = app.wrapper.res.ret(tenant.subsidiary_ledger);
+
+                            var arrTotals = yield app.modelFactory().model_aggregate(app.models['pfta_room'], [
+                                {
+                                    $match: {
+                                        stop_flag: false,
+                                        tenantId: tenant._id,
+                                        status: 1
+                                    }
+                                },
+                                {
+                                    $group: {
+                                        _id: null,
+                                        count: {$sum: '$capacity'}
+                                    }
+                                },
+                                {
+                                    $project: {
+                                        count: '$count',
+                                        _id: 0
+                                    }
+                                }
+                            ]);
+
+                            var s = app.moment(this.params.start);
+                            var e = app.moment(this.params.end);
+
+                            var rangeMonth = statHelper.rangeDateAsMonth(s, e);
+                            console.log(rangeMonth);
+                            yield app.RoomVacancyStatManager.makeTenantSettlementMonthly(tenant, self.logger);
+                            var tenantRoomVacancyStatMonthly = yield app.modelFactory().model_query(app.models['pfta_roomVacancyStat'], {
+                                where: {
+                                    status: 1,
+                                    period: 'A0005',//D1015 -月
+                                    period_value: {$in: rangeMonth},
+                                    tenantId: tenantId
+                                }
+                                ,
+                                select: '-_id period_value amount'
+                            });
+                            var rows = app._.map(rangeMonth,function(o) {
+                                var r = app._.findWhere(tenantRoomVacancyStatMonthly, {period_value: o});
+
+                                return r || {
+                                        period_value: o,
+                                        amount: 0
+                                    };
+                            });
+
+                            this.body = app.wrapper.res.rows(rows);
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);
@@ -265,17 +298,16 @@ module.exports = {
                 }
             },
             {
-                method: 'roomCatagory',
+                method: 'roomCatagoryOfLivein',
                 verb: 'get',
-                url: this.service_url_prefix + "/roomCatagory/:_id",
+                url: this.service_url_prefix + "/roomCatagoryOfLivein/:_id",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
                             var tenantId = this.params._id;
                             var liveins = yield  app.modelFactory().model_totals(app.models['pfta_roomOccupancyChangeHistory'], {
                                 tenantId: tenantId,
-                                in_flag: true,
-                                status: 1
+                                in_flag: true
                             }).populate('roomId','capacity');
 
                             var roomCatagoryInfo = [];
@@ -311,28 +343,16 @@ module.exports = {
                 }
             },
             {
-                method: 'roomCatagoryMonthly',
+                method: 'roomCatagoryOfManTime',
                 verb: 'get',
-                url: this.service_url_prefix + "/roomCatagoryMonthly/:_id/:start/:end",
+                url: this.service_url_prefix + "/roomCatagoryOfManTime/:_id",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
                             var tenantId = this.params._id;
-
-                            var begin = app.moment(app.moment(this.params.start).format('YYYY-MM-DD')+" 00:00:00");
-                            var end = app.moment(app.moment(this.params.end).format('YYYY-MM-DD')+" 23:59:59");
-
-                            var liveins = yield  app.modelFactory().model_query(app.models['pfta_roomOccupancyChangeHistory'], {
-                                where: {
-                                    tenantId: tenantId,
-                                    status: 1,
-                                    $and: [
-                                        {$or: [{in_flag: true}, {check_in_time: {"$lte": end}}]},
-                                        {$or: [{in_flag: false}, {check_out_time: {"$gte": begin}}]}
-                                    ]
-                                },
-                                select: 'capacity'
-                            });
+                            var liveins = yield  app.modelFactory().model_totals(app.models['pfta_roomOccupancyChangeHistory'], {
+                                tenantId: tenantId
+                            }).populate('roomId','capacity');
 
                             var roomCatagoryInfo = [];
                             var room_catagories = app.modelVariables.ROOM_CATEGORIES;
@@ -367,16 +387,27 @@ module.exports = {
                 }
             },
             {
-                method: 'roomCatagoryManTime',
+                method: 'roomCatagoryOfManTimeMonthly',
                 verb: 'get',
-                url: this.service_url_prefix + "/roomCatagoryManTime/:_id",
+                url: this.service_url_prefix + "/roomCatagoryOfManTimeMonthly/:_id/:start/:end",
                 handler: function (app, options) {
                     return function * (next) {
                         try {
                             var tenantId = this.params._id;
-                            var liveins = yield  app.modelFactory().model_totals(app.models['pfta_roomOccupancyChangeHistory'], {
-                                tenantId: tenantId,
-                                status: 1
+
+                            var begin = app.moment(app.moment(this.params.start).format('YYYY-MM-DD')+" 00:00:00");
+                            var end = app.moment(app.moment(this.params.end).format('YYYY-MM-DD')+" 23:59:59");
+
+                            var liveins = yield  app.modelFactory().model_query(app.models['pfta_roomOccupancyChangeHistory'], {
+                                where: {
+                                    tenantId: tenantId,
+                                    status: 1,
+                                    $and: [
+                                        {$or: [{in_flag: true}, {check_in_time: {"$lte": end}}]},
+                                        {$or: [{in_flag: false}, {check_out_time: {"$gte": begin}}]}
+                                    ]
+                                },
+                                select: 'roomId'
                             }).populate('roomId','capacity');
 
                             var roomCatagoryInfo = [];

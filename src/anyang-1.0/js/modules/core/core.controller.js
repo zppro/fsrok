@@ -44,19 +44,26 @@
         }
     }
 
-    DashboardDispatcherController.$inject = ['$rootScope'];
-    function DashboardDispatcherController($rootScope) {
+    DashboardDispatcherController.$inject = ['$rootScope','SETTING_KEYS','SettingsManager'];
+    function DashboardDispatcherController($rootScope,SETTING_KEYS,SettingsManager) {
+        //console.log('$rootScope.currentSubsystemSref:'+$rootScope.currentSubsystemSref);
 
         $rootScope.$on('sidebar:subsystem:change', function ($event, sref) {
-            $rootScope.currentSubsystemSref = sref;
-            $rootScope.$state.go($rootScope.currentSubsystemSref + '.dashboard');
+
+            transferToDashboard();
         });
 
-        if ($rootScope.currentSubsystemSref) {
-            $rootScope.$state.go($rootScope.currentSubsystemSref + '.dashboard');
-        }
-        else{
-            console.log('no currentSubsystemSref');
+        transferToDashboard();
+
+        function transferToDashboard(){
+            var settings = SettingsManager.getInstance();
+            var currentSystem = settings && settings.read(SETTING_KEYS.CURRENT_SUBSYSTEM);
+            if (currentSystem) {
+                $rootScope.$state.go(currentSystem.sref + '.dashboard');
+            }
+            else{
+                console.log('no currentSubsystemSref');
+            }
         }
     }
 

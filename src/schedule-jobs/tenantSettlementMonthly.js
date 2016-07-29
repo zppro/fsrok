@@ -18,7 +18,7 @@ module.exports = {
             var job_rule = {hour: 0, minute: 1, date: 1};//每个月第一天的凌晨00：01开始结算
             ctx.jobManger.createJob(job_id, job_name, job_rule, ()=> {
                 console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executing.');
-                ctx.carryOverManager.makeSettlementMonthly().then(function(ret){
+                ctx.CarryOverManager.makeSettlementMonthly().then(function(ret){
                     console.log(ret);
                 });
                 console.log(ctx.moment().format('HH:mm:ss') + ' ' + job_id + '(' + job_name + ') => executed.');

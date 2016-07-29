@@ -7,7 +7,7 @@
             .col-xs-4.text-center.bg-primary-dark.pv-lg
                em.icon-user.fa-3x
             .col-xs-8.pv-lg
-               .h2.mt0 1700
+               .h2.mt0 {{vm.liveinAndAccountAndBedInfo.liveIn}}
                | {{ vm.moduleTranslatePath('LIVE-IN') | translate}}
    .col-lg-3.col-sm-6
       // START widget
@@ -16,7 +16,7 @@
             .col-xs-4.text-center.bg-purple-dark.pv-lg
                em.icon-user-follow.fa-3x
             .col-xs-8.pv-lg
-               .h2.mt0 700
+               .h2.mt0 {{vm.liveinAndAccountAndBedInfo.liveInOnCurrentMonth}}
                | {{ vm.moduleTranslatePath('LIVE-IN-ON-CURRENTMONTH') | translate}}
    .col-lg-3.col-md-6.col-sm-12
       // START widget
@@ -25,7 +25,7 @@
             .col-xs-4.text-center.bg-green-dark.pv-lg
                em.icon-users.fa-3x
             .col-xs-8.pv-lg
-               .h2.mt0 3500
+               .h2.mt0 {{vm.liveinAndAccountAndBedInfo.liveInManTime}}
                | {{ vm.moduleTranslatePath('LIVE-IN-MAN-TIME') | translate}}
    .col-lg-3.col-md-6.col-sm-12
       // START date widget
@@ -52,13 +52,13 @@
             .col-md-2.col-sm-3.col-xs-6.bg-info.pv-xl
                em.fa-rmb.fa.fa-4x
             .col-md-4.col-sm-3.col-xs-6.pv.br
-               .h1.m0.text-bold.text-primary 25,000
+               .h1.m0.text-bold.text-primary {{vm.liveinAndAccountAndBedInfo.account.self}}
                | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-SELF') | translate}}
             .col-md-3.col-sm-3.col-xs-6.pv.br
-               .h1.m0.text-bold.text-primary 0
+               .h1.m0.text-bold.text-primary {{vm.liveinAndAccountAndBedInfo.account.gov_subsidy}}
                | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-GOV_SUBSIDY') | translate}}
             .col-md-3.col-sm-3.col-xs-6.pv.br
-               .h1.m0.text-bold.text-primary 0
+               .h1.m0.text-bold.text-primary {{vm.liveinAndAccountAndBedInfo.account.social_donation}}
                | {{ vm.moduleTranslatePath('SUBSIDIARY_LEDGER-SOCIAL_DONATION') | translate}}
    .col-lg-6
       .panel.widget
@@ -66,24 +66,26 @@
             .col-md-2.col-sm-3.col-xs-6.bg-info.pv-xl
                em.fa-bed.fa.fa-4x
             .col-md-4.col-sm-3.col-xs-6.pv.br
-               .h1.m0.text-bold.text-primary 5,00
+               .h1.m0.text-bold.text-primary {{vm.liveinAndAccountAndBedInfo.bed.totals}}
                | {{ vm.moduleTranslatePath('BED-INFO-TOTALS') | translate}}
             .col-md-3.col-sm-3.col-xs-6.pv.br
-               .h1.m0.text-bold.text-primary 200
+               .h1.m0.text-bold.text-primary {{vm.liveinAndAccountAndBedInfo.bed.liveins}}
                | {{ vm.moduleTranslatePath('BED-INFO-LIVEINS') | translate}}
             .col-md-3.col-sm-3.col-xs-6.pv.br
-               .h1.m0.text-bold.text-primary 60%
+               .h1.m0.text-bold.text-primary {{vm.liveinAndAccountAndBedInfo.bed.vacancy_rate}}%
                | {{ vm.moduleTranslatePath('BED-INFO-VACANCY_RATE') | translate}}
 
 // END widgets 2
 
 // START widgets 3
 .row
-   .col-lg-4
+   .col-lg-6
       .panel.widget
-         div(id="{{pie_id}}",echarts="pie_id",config="pie_config",echarts-dimension="'1:1'",style="width:100%;")
+         div(ng-if="vm.elderlyAgeGroups_loaded",id="{{vm.elderlyAgeGroups_id}}",echarts="vm.elderlyAgeGroups_id",config="vm.elderlyAgeGroups_config",echarts-dimension="'2:1'",style="width:100%;")
    //END widgets 3
-   .col-lg-3
+   .col-lg-6
+      .panel.widget
+         div(ng-if="vm.roomVacancyRateMonthly_loaded",id="{{vm.roomVacancyRateMonthly_id}}",echarts="vm.roomVacancyRateMonthly_id",config="vm.roomVacancyRateMonthly_config",echarts-dimension="'2:1'",style="width:100%;")
       // START loader widget
       //.panel.panel-default
       //   .panel-body

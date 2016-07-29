@@ -5,9 +5,9 @@
         .module('app.settings')
         .run(settingsRun);
 
-    settingsRun.$inject = ['$rootScope', '$localStorage'];
+    settingsRun.$inject = ['$rootScope', '$localStorage','SETTING_KEYS'];
 
-    function settingsRun($rootScope, $localStorage) {
+    function settingsRun($rootScope, $localStorage,SETTING_KEYS) {
 
         // Global Settings
         // -----------------------------------
@@ -29,7 +29,11 @@
             hiddenFooter: false,
             offsidebarOpen: false,
             asideToggled: false,
-            viewAnimation: 'ng-fadeInUp'
+            viewAnimation: 'ng-fadeInUp',
+            subsystem: {
+                organization_pfta: {currentSubsystemSref: SETTING_KEYS.SREF_ORGANIZATION_PFTA},
+                manage_center: {currentSubsystemSref: SETTING_KEYS.SREF_MANAGE_CENTER}
+            }
         };
 
         // Setup the layout mode

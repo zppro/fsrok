@@ -10,8 +10,8 @@
         .module('app.sidebar')
         .controller('SidebarController', SidebarController);
 
-    SidebarController.$inject = ['$rootScope', '$scope', '$state', '$timeout','SidebarLoader', 'Utils', 'Auth'];
-    function SidebarController($rootScope, $scope, $state, $timeout,SidebarLoader, Utils, Auth) {
+    SidebarController.$inject = ['$rootScope', '$scope', '$state', '$timeout','SidebarLoader', 'Utils', 'Auth','SETTING_KEYS','SettingsManager'];
+    function SidebarController($rootScope, $scope, $state, $timeout,SidebarLoader, Utils, Auth,SETTING_KEYS,SettingsManager) {
 
         activate();
         ////////////////
@@ -50,14 +50,24 @@
                             // Load menu from json file
                             SidebarLoader.getMenu($scope.subsystem.selected, sidebarReady);
 
-                            $scope.subsystem.selected.mtype != 'demo' && $rootScope.$emit('sidebar:subsystem:change', $scope.subsystem.selected.sref);
+                            var settings = SettingsManager.getSubsystemInstance($scope.subsystem.selected.sref);
+                            settings &&  SettingsManager.setCurrentInstance(settings);
+                            settings && settings.write(SETTING_KEYS.CURRENT_SUBSYSTEM,$scope.subsystem.selected);
+
+                            $scope.subsystem.selected.mtype != 'demo' && $rootScope.$emit('sidebar:subsystem:change');
+
+
                         }
                     });
                 },
                 switchSubsystem: function (item) {
                     $scope.subsystem.selected = item;
                     SidebarLoader.getMenu($scope.subsystem.selected, sidebarReady);
-                    $scope.subsystem.selected.mtype != 'demo' && $rootScope.$emit('sidebar:subsystem:change', $scope.subsystem.selected.sref);
+                    var settings = SettingsManager.getSubsystemInstance($scope.subsystem.selected.sref);
+                    settings &&  SettingsManager.setCurrentInstance(settings);
+                    settings && settings.write(SETTING_KEYS.CURRENT_SUBSYSTEM,$scope.subsystem.selected);
+
+                    $scope.subsystem.selected.mtype != 'demo' && $rootScope.$emit('sidebar:subsystem:change');
                 },
                 isActive: function (item) {
                     if (!item) return;

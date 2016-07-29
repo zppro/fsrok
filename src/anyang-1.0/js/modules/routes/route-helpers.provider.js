@@ -281,6 +281,7 @@
                         var tenant = user.tenant;
                         if (tenant) {
                             this.tenantId = this.searchForm['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                            this.tenant_name =  tenant.name;
                         }
                     }
 
@@ -613,6 +614,7 @@
                         var tenant = user.tenant;
                         if (tenant) {
                             this.tenantId = this.model['tenantId'] = this.selectFilterObject.common['tenantId'] = this.treeFilterObject['tenantId'] = tenant._id;
+                            this.tenant_name =  tenant.name;
                         }
                     }
 
@@ -993,6 +995,7 @@
 
                         if (tenant) {
                             this.tenantId = this.model['tenantId'] = tenant._id;
+                            this.tenant_name =  tenant.name;
                         }
                     }
 

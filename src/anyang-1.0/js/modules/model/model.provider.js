@@ -10,6 +10,7 @@
         .provider('shareNode', ShareNode)
         .provider('extensionNode', ExtensionNode)
         .provider('extensionOfOrganzationOfPFTANode',extensionOfOrganzationOfPFTANode)
+        .provider('extensionOfDashboardOfTenantNode',extensionOfDashboardOfTenantNode)
         .provider('debugNode',DebugNode)
         .provider('clientData',ClientData)
     ;
@@ -21,7 +22,7 @@
             setBaseUrl: setBaseUrl,
 
             // controller access level
-            $get: ['$rootScope', '$resource', function ($rootScope, $resource) {
+            $get: ['$resource', function ($resource) {
                 return {
                     services: {},
                     factory: function (name) {
@@ -99,7 +100,7 @@
             setBaseUrl: setBaseUrl,
 
             // controller access level
-            $get: ['$rootScope', '$q', '$http', '$resource', 'treeFactory', function ($rootScope, $q, $http, $resource, treeFactory) {
+            $get: ['$q', '$http', 'treeFactory', function ($q, $http, treeFactory) {
 
                 return {
                     shareDictionary: {},
@@ -192,7 +193,7 @@
             setBaseUrl: setBaseUrl,
 
             // controller access level
-            $get: ['$rootScope', '$q', '$http', function ($rootScope, $q, $http) {
+            $get: ['$http', function ($http) {
 
                 return {
                     tenantInfo: tenantInfo,
@@ -415,7 +416,7 @@
             setBaseUrl: setBaseUrl,
 
             // controller access level
-            $get: ['$rootScope', '$q', '$http', function ($rootScope, $q, $http) {
+            $get: ['$http', function ($http) {
 
                 return {
                     receptionVisiterSyncElderlyFamilyMembers: receptionVisiterSyncElderlyFamilyMembers,
@@ -439,6 +440,80 @@
         }
     }
 
+    function extensionOfDashboardOfTenantNode(){
+        var baseUrl;
+        return {
+            // provider access level
+            setBaseUrl: setBaseUrl,
+
+            // controller access level
+            $get: ['$http', function ($http) {
+
+                return {
+                    liveIn: liveIn,
+                    liveInOnCurrentMonth: liveInOnCurrentMonth,
+                    liveInManTime: liveInManTime,
+                    tenantAccountInfo: tenantAccountInfo,
+                    bedInfo: bedInfo,
+                    liveinAndAccountAndBedInfo:liveinAndAccountAndBedInfo,
+                    elderlyAgeGroups: elderlyAgeGroups,
+                    roomVacancyRateMonthly: roomVacancyRateMonthly,
+                    roomCatagoryOfLivein: roomCatagoryOfLivein,
+                    roomCatagoryOfManTime: roomCatagoryOfManTime,
+                    roomCatagoryOfManTimeMonthly: roomCatagoryOfManTimeMonthly
+                };
+
+                function liveIn(tenantId) {
+                    return $http.get(baseUrl + 'liveIn/' + tenantId);
+                }
+
+                function liveInOnCurrentMonth(tenantId){
+                    return $http.get(baseUrl + 'liveInOnCurrentMonth/' + tenantId);
+                }
+
+                function liveInManTime(tenantId){
+                    return $http.get(baseUrl + 'liveInManTime/' + tenantId);
+                }
+
+                function tenantAccountInfo(tenantId){
+                    return $http.get(baseUrl + 'tenantAccountInfo/' + tenantId);
+                }
+
+                function bedInfo(tenantId){
+                    return $http.get(baseUrl + 'bedInfo/' + tenantId);
+                }
+
+                function liveinAndAccountAndBedInfo(tenantId){
+                    return $http.get(baseUrl + 'liveinAndAccountAndBedInfo/' + tenantId);
+                }
+
+                function elderlyAgeGroups(tenantId){
+                    return $http.get(baseUrl + 'elderlyAgeGroups/' + tenantId+'/60/10');
+                }
+
+                function roomVacancyRateMonthly(tenantId,start,end) {
+                    return $http.get(baseUrl + 'roomVacancyRateMonthly/' + tenantId + '/' + start + '/' + end);
+                }
+
+                function roomCatagoryOfLivein(tenantId){
+                    return $http.get(baseUrl + 'roomCatagoryOfLivein/' + tenantId);
+                }
+
+                function roomCatagoryOfManTime(tenantId){
+                    return $http.get(baseUrl + 'roomCatagoryOfManTime/' + tenantId);
+                }
+
+                function roomCatagoryOfManTimeMonthly(tenantId){
+                    return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId);
+                }
+            }]
+        };
+
+        function setBaseUrl(url) {
+            baseUrl = url;
+        }
+    }
+
     function DebugNode() {
         var baseUrl;
         return {
@@ -446,7 +521,7 @@
             setBaseUrl: setBaseUrl,
 
             // controller access level
-            $get: ['$rootScope', '$q', '$http', function ($rootScope, $q, $http) {
+            $get: ['$http', function ($http) {
 
                 return {
                     tenantInfo: tenantInfo
@@ -475,7 +550,7 @@
             setBaseUrl: setBaseUrl,
 
             // controller access level
-            $get: ['$rootScope', '$q', '$http', function ($rootScope, $q, $http) {
+            $get: ['$http', function ($http) {
 
                 return {
                     getJson: function (name) {
