@@ -60,7 +60,7 @@
     "moment": "^2.13.0",
     "mongoose": "^4.5.3",
     "node-schedule": "^1.1.1",
-    "rfcore": "^0.1.9",
+    "rfcore": "^0.1.10",
     "thunkify": "^2.1.2",
     "underscore": "^1.8.3"
   }

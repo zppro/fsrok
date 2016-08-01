@@ -24,6 +24,8 @@
             liveinAndAccountAndBedInfo();
             elderlyAgeGroups();
             roomVacancyRateMonthly();
+            roomCatagoryOfManTime();
+            roomCatagoryOfManTimeMonthly();
         }
 
         function liveinAndAccountAndBedInfo(){
@@ -33,8 +35,6 @@
         }
 
         function elderlyAgeGroups(){
-
-
             extensionOfDashboardOfTenantNode.elderlyAgeGroups(vm.tenantId).then(function(rows){
                 //data: ["60岁以下", "60-69岁", "70-79岁", '80岁及以上']//legend data
                 //data: [
@@ -159,8 +159,130 @@
                     vm.roomVacancyRateMonthly_loaded = true;
                 });
             });
+        }
+
+        function roomCatagoryOfManTime(){
+            extensionOfDashboardOfTenantNode.roomCatagoryOfManTime(vm.tenantId).then(function(rows){
+                var titles = _.map(rows,function(o){return vm.moduleTranslatePath(o.title);});
+                var values = _.pluck(rows,'value');
+
+                var key_chart_title_roomCatagoryOfManTime = vm.moduleTranslatePath('CHART-TITLE-ROOM-CATAGORY-OF-MANTIME');
+                var key_chart_serie_name_roomCatagoryOfManTime = vm.moduleTranslatePath('CHART-SERIE-NAME-ROOM-CATAGORY-OF-MANTIME');
 
 
+                vmh.q.all([vmh.translate([
+                    key_chart_title_roomCatagoryOfManTime,
+                    key_chart_serie_name_roomCatagoryOfManTime
+                ]),vmh.translate(titles)]).then(function(ret){
+
+                    var names = _.values(ret[1]);
+                    var data = [];
+                    for(var i=0;i< values.length;i++) {
+                        data.push({name: names[i], value: values[i]});
+                    }
+
+                    vm.roomCatagoryOfManTime_id = $echarts.generateInstanceIdentity();
+                    vm.roomCatagoryOfManTime_config = {
+                        title: {
+                            text: ret[0][key_chart_title_roomCatagoryOfManTime],
+                            subtext: vm.tenant_name
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b}: {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            x: 'left',
+                            data:names
+                        },
+                        series: [
+                            {
+                                name:ret[0][key_chart_serie_name_roomCatagoryOfManTime],
+                                type:'pie',
+                                radius: ['50%', '70%'],
+                                avoidLabelOverlap: false,
+                                label: {
+                                    normal: {
+                                        show: false,
+                                        position: 'center'
+                                    },
+                                    emphasis: {
+                                        show: true,
+                                        textStyle: {
+                                            fontSize: '30',
+                                            fontWeight: 'bold'
+                                        }
+                                    }
+                                },
+                                labelLine: {
+                                    normal: {
+                                        show: false
+                                    }
+                                },
+                                data:data
+                            }
+                        ]
+                    };
+                    vm.roomCatagoryOfManTime_loaded = true;
+                });
+            });
+        }
+
+        function roomCatagoryOfManTimeMonthly() {
+            extensionOfDashboardOfTenantNode.roomCatagoryOfManTimeMonthly(vm.tenantId, moment().subtract(5, 'months').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')).then(function (result) {
+                var xAxisData = result.xAxisData;
+                var titles = _.map(result.seriesData,function(o){return vm.moduleTranslatePath(o.name);});
+                var key_chart_title_roomCatagoryOfManTimeMonthly = vm.moduleTranslatePath('CHART-TITLE-ROOM-CATAGORY-OF-MANTIME-Monthly');
+
+                vmh.q.all([vmh.translate([
+                    key_chart_title_roomCatagoryOfManTimeMonthly
+                ]),vmh.translate(titles)]).then(function(ret){
+
+                    var names = _.values(ret[1]);
+                    var seriesData = _.map(result.seriesData,function(o,i){return _.extend(o,{name:names[i], type:'bar'})});
+
+                    vm.roomCatagoryOfManTimeMonthly_id = $echarts.generateInstanceIdentity();
+                    vm.roomCatagoryOfManTimeMonthly_config = {
+                        title: {
+                            text: ret[0][key_chart_title_roomCatagoryOfManTimeMonthly],
+                            subtext: vm.tenant_name
+                        },
+                        tooltip : {
+                            trigger: 'axis',
+                            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                            }
+                        },
+                        legend: {
+                            x: 'center',
+                            y:'bottom',
+                            data:names
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '10%',
+                            containLabel: true
+                        },
+                        xAxis : [
+                            {
+                                type : 'category',
+                                data : xAxisData
+                            }
+                        ],
+                        yAxis : [
+                            {
+                                type : 'value'
+                            }
+                        ],
+                        series : seriesData
+                    };
+                    vm.roomCatagoryOfManTimeMonthly_loaded = true;
+                });
+
+
+            });
         }
     }
 

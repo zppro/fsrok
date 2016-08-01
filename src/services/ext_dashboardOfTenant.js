@@ -267,7 +267,6 @@ module.exports = {
                             var e = app.moment(this.params.end);
 
                             var rangeMonth = statHelper.rangeDateAsMonth(s, e);
-                            console.log(rangeMonth);
                             yield app.RoomVacancyStatManager.makeTenantSettlementMonthly(tenant, self.logger);
                             var tenantRoomVacancyStatMonthly = yield app.modelFactory().model_query(app.models['pfta_roomVacancyStat'], {
                                 where: {
@@ -298,51 +297,6 @@ module.exports = {
                 }
             },
             {
-                method: 'roomCatagoryOfLivein',
-                verb: 'get',
-                url: this.service_url_prefix + "/roomCatagoryOfLivein/:_id",
-                handler: function (app, options) {
-                    return function * (next) {
-                        try {
-                            var tenantId = this.params._id;
-                            var liveins = yield  app.modelFactory().model_totals(app.models['pfta_roomOccupancyChangeHistory'], {
-                                tenantId: tenantId,
-                                in_flag: true
-                            }).populate('roomId','capacity');
-
-                            var roomCatagoryInfo = [];
-                            var room_catagories = app.modelVariables.ROOM_CATEGORIES;
-                            for(var key in room_catagories) {
-
-                                var catagory = room_catagories[key];
-                                var val;
-                                if(app._.isArray(catagory)) {
-                                    val = app._.reduce(liveins, function (totals, o) {
-                                        return totals + (app._.contains(catagory, o.roomId.capacity) ? 1 : 0);
-                                    }, 0);
-                                }
-                                else {
-                                    val = app._.reduce(liveins, function (totals, o) {
-                                        return totals + (o.roomId.capacity == catagory ? 1 : 0);
-                                    }, 0);
-                                }
-
-                                roomCatagoryInfo.push({
-                                    title: key,
-                                    value: val
-                                });
-                            }
-
-                            this.body = app.wrapper.res.rows(roomCatagoryInfo);
-                        } catch (e) {
-                            self.logger.error(e.message);
-                            this.body = app.wrapper.res.error(e);
-                        }
-                        yield next;
-                    };
-                }
-            },
-            {
                 method: 'roomCatagoryOfManTime',
                 verb: 'get',
                 url: this.service_url_prefix + "/roomCatagoryOfManTime/:_id",
@@ -350,8 +304,11 @@ module.exports = {
                     return function * (next) {
                         try {
                             var tenantId = this.params._id;
-                            var liveins = yield  app.modelFactory().model_totals(app.models['pfta_roomOccupancyChangeHistory'], {
-                                tenantId: tenantId
+                            var liveins = yield  app.modelFactory().model_query(app.models['pfta_roomOccupancyChangeHistory'], {
+                                where: {
+                                    tenantId: tenantId
+                                },
+                                select : '-_id roomId'
                             }).populate('roomId','capacity');
 
                             var roomCatagoryInfo = [];
@@ -394,46 +351,118 @@ module.exports = {
                     return function * (next) {
                         try {
                             var tenantId = this.params._id;
-
-                            var begin = app.moment(app.moment(this.params.start).format('YYYY-MM-DD')+" 00:00:00");
-                            var end = app.moment(app.moment(this.params.end).format('YYYY-MM-DD')+" 23:59:59");
-
-                            var liveins = yield  app.modelFactory().model_query(app.models['pfta_roomOccupancyChangeHistory'], {
-                                where: {
-                                    tenantId: tenantId,
-                                    status: 1,
-                                    $and: [
-                                        {$or: [{in_flag: true}, {check_in_time: {"$lte": end}}]},
-                                        {$or: [{in_flag: false}, {check_out_time: {"$gte": begin}}]}
-                                    ]
-                                },
-                                select: 'roomId'
-                            }).populate('roomId','capacity');
-
-                            var roomCatagoryInfo = [];
-                            var room_catagories = app.modelVariables.ROOM_CATEGORIES;
-                            for(var key in room_catagories) {
-
-                                var catagory = room_catagories[key];
-                                var val;
-                                if(app._.isArray(catagory)) {
-                                    val = app._.reduce(liveins, function (totals, o) {
-                                        return totals + (app._.contains(catagory, o.roomId.capacity) ? 1 : 0);
-                                    }, 0);
-                                }
-                                else {
-                                    val = app._.reduce(liveins, function (totals, o) {
-                                        return totals + (o.roomId.capacity == catagory ? 1 : 0);
-                                    }, 0);
-                                }
-
-                                roomCatagoryInfo.push({
-                                    title: key,
-                                    value: val
-                                });
+                            var tenant = yield  app.modelFactory().model_read(app.models['pub_tenant'], tenantId);
+                            if (!tenant || tenant.status == 0) {
+                                this.body = app.wrapper.res.error({message: '无法找到租户资料!'});
+                                yield next;
+                                return;
                             }
 
-                            this.body = app.wrapper.res.rows(roomCatagoryInfo);
+                            var begin = app.moment(app.moment(this.params.start).format('YYYY-MM') + "-01 00:00:00");
+                            var end = app.moment(app.moment(this.params.end).format('YYYY-MM') + '-' + app.moment(this.params.end).daysInMonth() + " 23:59:59");
+
+                            var rangeMonth = statHelper.rangeDateAsMonth(begin, end);
+
+                            var liveinGroups = yield app.modelFactory().model_aggregate(app.models['pfta_roomOccupancyChangeHistory'], [
+                                {
+                                    $match: {
+                                        tenantId: tenant._id,
+                                        check_in_time: {$gte: begin.toDate(), $lte: end.toDate()}
+                                    }
+                                },
+                                {
+                                    $group: {
+                                        _id: {
+                                            roomId: '$roomId',
+                                            year: {$year: '$check_in_time'},
+                                            month: {$month: '$check_in_time'}
+                                        },
+                                        count: {$sum: 1}
+                                    }
+                                },
+                                {$sort: {"_id.year": 1, "_id.month": 1}},
+                                {
+                                    $project: {
+                                        roomId: '$_id.roomId',
+                                        period_value: {
+                                            $concat: [
+                                                {$substr: ["$_id.year", 0, 4]},
+                                                "-",
+                                                {
+                                                    $cond: {
+                                                        if: {$gte: ["$_id.month", 10]},
+                                                        then: {$substr: ["$_id.month", 0, 2]},
+                                                        else: {$concat: ["0", {$substr: ["$_id.month", 0, 1]}]}
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        count: '$count',
+                                        _id: 0
+                                    }
+                                }
+                            ]);
+
+                            var roomIds = app._.pluck(liveinGroups,'roomId');
+                            var rooms = yield app.modelFactory().model_query(app.models['pfta_room'], {
+                                where: {
+                                    _id: {
+                                        '$in': roomIds
+                                    }
+                                },
+                                select: 'capacity'
+                            });
+
+                            var roomCapacity = {};
+                            for(var i=0;i<rooms.length;i++) {
+                                roomCapacity[rooms[i]._id.toString()] = rooms[i].capacity;
+                            }
+                            //console.log(liveinGroups);
+
+                            var roomCatalogSeries = [];
+                            var room_catagories = app.modelVariables.ROOM_CATEGORIES;
+                            for (var key in room_catagories) {
+                                var catagory = room_catagories[key];
+                                var roomCatagoryInfo = [];
+                                for (var i = 0; i < rangeMonth.length; i++) {
+                                    var items = app._.filter(liveinGroups,function(o) {
+                                        var capacity = roomCapacity[o.roomId];
+                                        var isThisCatagory = false;
+                                        if (app._.isArray(catagory)) {
+                                            isThisCatagory = app._.contains(catagory, capacity);
+                                        }
+                                        else {
+                                            isThisCatagory = catagory == capacity;
+                                        }
+                                        return o.period_value == rangeMonth[i] && isThisCatagory;
+                                    });
+
+
+                                    if(items.length>0) {
+                                        roomCatagoryInfo.push(app._.reduce(items, function (totals, o) {
+                                                return totals + o.count;
+                                            }, 0)
+                                        );
+                                    }
+                                    else {
+                                        roomCatagoryInfo.push(0);
+                                    }
+                                }
+
+
+                                roomCatalogSeries.push({
+                                    name: key,
+                                    data: roomCatagoryInfo
+                                });
+
+                            }
+
+                            //console.log(roomCatalogSeries);
+
+                            this.body = app.wrapper.res.ret({
+                                xAxisData: rangeMonth,
+                                seriesData: roomCatalogSeries
+                            });
                         } catch (e) {
                             self.logger.error(e.message);
                             this.body = app.wrapper.res.error(e);

@@ -458,7 +458,6 @@
                     liveinAndAccountAndBedInfo:liveinAndAccountAndBedInfo,
                     elderlyAgeGroups: elderlyAgeGroups,
                     roomVacancyRateMonthly: roomVacancyRateMonthly,
-                    roomCatagoryOfLivein: roomCatagoryOfLivein,
                     roomCatagoryOfManTime: roomCatagoryOfManTime,
                     roomCatagoryOfManTimeMonthly: roomCatagoryOfManTimeMonthly
                 };
@@ -495,16 +494,12 @@
                     return $http.get(baseUrl + 'roomVacancyRateMonthly/' + tenantId + '/' + start + '/' + end);
                 }
 
-                function roomCatagoryOfLivein(tenantId){
-                    return $http.get(baseUrl + 'roomCatagoryOfLivein/' + tenantId);
-                }
-
                 function roomCatagoryOfManTime(tenantId){
                     return $http.get(baseUrl + 'roomCatagoryOfManTime/' + tenantId);
                 }
 
-                function roomCatagoryOfManTimeMonthly(tenantId){
-                    return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId);
+                function roomCatagoryOfManTimeMonthly(tenantId,start,end){
+                    return $http.get(baseUrl + 'roomCatagoryOfManTimeMonthly/' + tenantId+ '/' + start + '/' + end);
                 }
             }]
         };

@@ -19,7 +19,14 @@
       "&gte80":"80周岁及以上",
       "CHART-TITLE-ROOM-VACANCY_RATE-MONTHLY":"近期入住情况",
       "CHART-SERIE-NAME-ROOM-VACANCY_RATE-MONTHLY":"入住人数",
-      "CHART-SERIE-DATA-UNIT-ROOM-VACANCY_RATE-MONTHLY":"人"
+      "CHART-SERIE-DATA-UNIT-ROOM-VACANCY_RATE-MONTHLY":"人",
+      "CHART-TITLE-ROOM-CATAGORY-OF-MANTIME":"入住房型情况",
+      "CHART-SERIE-NAME-ROOM-CATAGORY-OF-MANTIME":"房间类型",
+      "SINGLE-ROOM": "单人间",
+      "DOUBLE-ROOM": "双人间",
+      "TRIPLE-ROOM": "三人间",
+      "DOMITORY-ROOM": "多人间",
+      "CHART-TITLE-ROOM-CATAGORY-OF-MANTIME-Monthly":"近期入住房型情况"
     },
     "enter-manage": {
       "list": {
