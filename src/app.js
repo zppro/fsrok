@@ -65,7 +65,8 @@ app.conf = {
     },
     client: {
         bulidtarget: 'default'
-    }
+    },
+    port: 80
 };
 
 console.log('config...');
@@ -340,7 +341,7 @@ co(function*() {
 
 
 
-    app.listen(3000);
+    app.listen(app.conf.port);
 
     console.log('listening...');
     //注释掉数据服务
