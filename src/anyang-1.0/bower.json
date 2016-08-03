@@ -60,7 +60,8 @@
     "angucomplete-alt": "~2.4.1",
     "eonasdan-bootstrap-datetimepicker": "~4.17.37",
     "echarts-ng": "~0.3.13",
-    "echarts": "~3.2.2"
+    "echarts": "~3.2.2",
+    "bootstrap": "~3.3.5"
   },
   "resolutions": {
     "angular": "1.4.2",
