@@ -64,6 +64,7 @@
     "node-schedule": "^1.1.1",
     "rfcore": "^0.1.10",
     "thunkify": "^2.1.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "fs-extra": "0.30.0"
   }
 }
