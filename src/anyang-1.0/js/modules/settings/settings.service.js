@@ -55,6 +55,8 @@
         this.storage = options.storage||{};
         this.write = write;
         this.read = read;
+        this.remove = remove;
+        this.clear = clear;
 
         function write(key,val) {
             this.storage[key] = val;
@@ -63,10 +65,14 @@
         function read(key,defaultVal) {
             return this.storage[key] || defaultVal;
         }
+
+        function remove(key) {
+            this.storage[key] = null;
+            delete this.storage[key];
+        }
+
+        function clear() {
+            this.storage = {};
+        }
     }
-
-
-
-
-
 })();

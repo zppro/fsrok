@@ -43,7 +43,7 @@ module.exports = {
 
                             if (user) {
 
-                                if(user.stop_flag){
+                                if (user.stop_flag) {
                                     this.body = app.wrapper.res.error({message: '该用户已停用!'});
                                     yield next;
                                     return;
@@ -56,23 +56,25 @@ module.exports = {
                                  console.log(nounce);
                                  */
                                 var tenant = null;
-                                if(user.type=='A0002') {
+                                var open_funcs;
+                                if (user.type == 'A0002') {
                                     //普通租户
                                     tenant = yield app.modelFactory().one('pub_tenant', '../models/pub/tenant', {
                                         where: {
                                             _id: user.tenantId
-                                        }, select: "_id name type active_flag certificate_flag validate_util limit_to open_funcs"
+                                        },
+                                        select: "_id name type active_flag certificate_flag validate_util limit_to open_funcs"
                                     });
 
-                                    //检查租户是否激活
-                                    if(!tenant.active_flag){
+                                    //检查租户是否激活open_funcs
+                                    if (!tenant.active_flag) {
                                         this.body = app.wrapper.res.error({message: '该用户所属的【' + tenant.name + '】未激活!'});
                                         yield next;
                                         return;
                                     }
 
                                     //检查租户是否到期
-                                    if(app.moment(tenant.validate_util).diff(app.moment())<0) {
+                                    if (app.moment(tenant.validate_util).diff(app.moment()) < 0) {
                                         //用户所属租户到期
                                         this.body = app.wrapper.res.error({message: '该用户所属的【' + tenant.name + '】已经超过使用有效期!'});
                                         yield next;
@@ -81,17 +83,25 @@ module.exports = {
 
                                     //考虑cookie大小，过滤open_funcs里的字段
                                     tenant = tenant.toObject();//将bson转为json
-                                    tenant.open_funcs = app._.map(tenant.open_funcs,function(o){
-                                        return app._.pick(o,'func_id','expired_on');
+                                    open_funcs = app._.map(tenant.open_funcs, function (o) {
+                                        return app._.pick(o, 'func_id', 'expired_on');
                                     });
+
+
+                                    delete tenant.open_funcs;
                                 }
 
                                 //日期字符 保证token当日有效
                                 // sign with default (HMAC SHA256)
                                 var token = jwt.sign(user, app.conf.secure.authSecret + ':' + (new Date().f('yyyy-MM-dd').toString()));
-                                console.log(token);
 
-                                this.body = app.wrapper.res.ret(_.defaults(_.pick(user,'_id','code','name','type','roles'), {token: token,tenant:tenant}));
+                                this.body = app.wrapper.res.ret({
+                                    user: _.defaults(_.pick(user, '_id', 'code', 'name', 'type', 'roles'), {
+                                        tenant: tenant
+                                    }),
+                                    token: token,
+                                    open_funcs: open_funcs || []
+                                });
                             }
                             else {
                                 this.body = app.wrapper.res.error({message: '无效的的登录名密码!'});

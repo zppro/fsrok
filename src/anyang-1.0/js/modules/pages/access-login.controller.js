@@ -33,11 +33,12 @@
 
                     $http
                         .post('services/share/login/signin', {code: vm.account.email, password: vm.account.password})
-                        .then(function (user) {
+                        .then(function (ret) {
                             // assumes if ok, response is an object with some data, if not, a string with error
                             // customize according to your api
-                            //console.log(user);
-                            Auth.setUser(user,vm.account.remember);
+                            Auth.setUser(ret.user,vm.account.remember);
+                            Auth.setOpenFuncs(ret.open_funcs);
+                            Auth.setToken(ret.token);
                             $state.go('app.dashboard');
                         }, function (err) {
                             vm.authMsg = err;

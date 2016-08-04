@@ -19,9 +19,9 @@
         moment.locale($rootScope.localeId.replace('_','-').toLowerCase());
     }
 
-    TopbarController.$inject = ['$rootScope','Auth'];
+    TopbarController.$inject = ['$rootScope','Auth','SettingsManager'];
 
-    function TopbarController($rootScope, Auth) {
+    function TopbarController($rootScope, Auth,SettingsManager) {
 
         activate();
 
@@ -30,12 +30,14 @@
             //topbar some actions
             $rootScope.app.logout = function ($event) {
                 Auth.logout();
+                var settings = SettingsManager.getInstance();
+                settings && settings.clear();
                 $rootScope.$state.go('page.login');
                 $event.stopPropagation();
             };
 
             $rootScope.app.lock = function ($event) {
-                Auth.setCode();
+                //Auth.setCode();
                 Auth.logout();
                 $rootScope.$state.go('page.lock');
                 $event.stopPropagation();

@@ -14,7 +14,6 @@
 
     function DashboardControllerOfManageCenterController($parse,$scope, vmh, vm) {
         $scope.vm = vm;
-
         init();
 
         function init() {

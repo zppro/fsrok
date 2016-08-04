@@ -17,6 +17,7 @@
 
         init();
 
+
         function init() {
 
             vm.init();
