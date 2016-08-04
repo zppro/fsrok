@@ -11,9 +11,7 @@ var koa = require('koa');
 var Router = require('koa-router');
 var router = Router();
 var koaBody = require('koa-body')();
-var koaStatic = require('koa-static');
-var statelessauth = require('koa-statelessauth');
-var jwt = require('jsonwebtoken');
+var staticCache = require('koa-static-cache');
 var path = require('path');
 var fs = require('fs-extra');
 var co = require('co');
@@ -293,14 +291,16 @@ co(function*() {
 
 
     console.log(app.conf.client.bulidtarget);
+
     //注册静态文件（客户端文件）
     if (app.conf.isProduction) {
-        app.use(koaStatic(app.conf.dir.static_production + app.conf.client.bulidtarget));
+        app.use(staticCache(app.conf.dir.static_production + app.conf.client.bulidtarget, {alias :{'/':'/index.html'}}));
     }
     else {
-        app.use(koaStatic(app.conf.dir.static_develop + app.conf.client.bulidtarget));
+        app.use(staticCache(app.conf.dir.static_develop + app.conf.client.bulidtarget, {alias: {'/': '/index.html'}}));
         app.use(require('koa-livereload')());
     }
+
 
     //注册其他路由
     //router
@@ -315,26 +315,6 @@ co(function*() {
 
     //router.use('/services', auth(app, _.union(app.conf.auth.ignorePaths, [])), require('./middlewares/t1.js')(app));
 
-    //需要登录访问控制
-    //app.use();
-
-    //app.use(statelessauth({
-    //        validate: function (token) {
-    //            //This should go to a DB etc to get your user based on token
-    //            //token to user
-    //            try{
-    //                this.user = jwt.verify(token, app.conf.secure.authSecret);
-    //
-    //            }catch(e){
-    //                this.status = 401;
-    //            }
-    //
-    //            return this.user;
-    //        }},
-    //    {
-    //        ignorePaths: _.union(app.conf.auth.ignorePaths,_.map(app.conf.serviceNames,function(o){ return '/services/'+o.split('_').join('/');}))
-    //    }
-    //));
 
     app.use(router.routes())
         .use(router.allowedMethods());

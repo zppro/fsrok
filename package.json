@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"./start-app.sh",
-    "gulp":"./start-gulp.sh"
+    "start": "./start-app.sh",
+    "gulp": "./start-gulp.sh"
   },
   "repository": {
     "type": "git",
@@ -52,20 +52,20 @@
     "clone": "^1.0.2",
     "co": "^4.5.4",
     "crypto": "0.0.3",
+    "fs-extra": "0.30.0",
     "jsonwebtoken": "^5.0.0",
     "koa": "^1.1.2",
     "koa-body": "^1.2.1",
     "koa-router": "^5.3.0",
     "koa-statelessauth": "^1.0.2",
-    "koa-static": "^1.5.2",
+    "koa-static-cache": "^3.1.7",
     "log4js": "^0.6.25",
     "moment": "^2.13.0",
     "mongoose": "^4.5.3",
     "node-schedule": "^1.1.1",
+    "rand-token": "0.2.1",
     "rfcore": "^0.1.10",
     "thunkify": "^2.1.2",
-    "underscore": "^1.8.3",
-    "fs-extra": "0.30.0",
-    "rand-token": "0.2.1"
+    "underscore": "^1.8.3"
   }
 }
