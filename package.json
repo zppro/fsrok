@@ -1,12 +1,13 @@
 {
   "name": "fsrok",
-  "version": "0.5.1",
+  "version": "0.8.4",
   "description": "fs configuration portal",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./start-app.sh",
-    "gulp": "./start-gulp.sh"
+    "gulp": "./start-gulp.sh anyang-1.0",
+    "gulp-dev": "./start-gulp.sh anyang-1.0 dev"
   },
   "repository": {
     "type": "git",

@@ -2,11 +2,14 @@ var args        = require('yargs').argv,
     gulp        = require('gulp'),
     $plugins    = require('gulp-load-plugins')(),
     gulpsync    = $plugins.sync(gulp),
-    del         = require('del')
+    del         = require('del'),
     _           = require('underscore');
 
 // production mode (see build task)
-var isProduction = false;
+var isProduction = !(args.level === 'develop' || args.level === 'dev');
+var mode = isProduction ? 'production':'develop';
+
+console.log(mode);
 
 var target = args.target;
 if(!target)
@@ -25,17 +28,16 @@ var paths = {
 };
 
 
-
 var bower = {
     // scripts required to start the app
-    source_base_js: _.map(require(paths.build + 'gulp-' + target + '-bower-base-js.json'), function (o) {
+    source_base_js: _.map(require(paths.build + 'gulp-' + target + '-bower-base-js-' + mode + '.json'), function (o) {
         return o.replace(/\{\{(.+?)\}\}/g, target)
     }),
     name_concat_js: 'base.js',
     dest_base_develop: paths.pub_client_app_develop + 'js/',
     dest_base_production: paths.pub_client_app_production + 'js/',
     // vendor scripts to make the app work. Usually via lazy loading
-    source_app: _.map(require(paths.build + 'gulp-' + target + '-bower.json'), function (o) {
+    source_app: _.map(require(paths.build + 'gulp-' + target + '-bower-' + mode + '.json'), function (o) {
         return o.replace(/\{\{(.+?)\}\}/g, target)
     }),
     dest_develop: paths.pub_client_develop + 'vendor/',
@@ -111,7 +113,7 @@ var build = {
         scripts: paths.pub_client_app_production + 'js/',
         jade: {
             index: paths.pub_client_production,
-            pages: paths.pub_client_app_develop + 'pages/',
+            pages: paths.pub_client_app_production + 'pages/',
             views: paths.pub_client_app_production + 'views/'
         }
     }
@@ -211,7 +213,7 @@ gulp.task('styles:less:app',function() {
         .pipe($plugins.less())
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write()))
+        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.styles : build.develop.styles))
         .pipe($plugins.livereload())
         ;
@@ -226,7 +228,7 @@ gulp.task('styles:less:app-rtl', function() {
         .on('error', handleError)
         .pipe($plugins.cssFlipper())
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write()))
+        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
         .pipe($plugins.rename(function(path) {
             path.basename += "-rtl";
             return path;
@@ -244,7 +246,7 @@ gulp.task('styles:less:themes', function() {
         .pipe($plugins.less())
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write()))
+        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.styles : build.develop.styles))
         //.pipe($plugins.livereload())
         ;
@@ -258,7 +260,7 @@ gulp.task('styles:less:subsystem', function() {
         .pipe($plugins.less())
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write()))
+        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.styles : build.develop.styles))
         .pipe($plugins.livereload())
         ;
@@ -284,7 +286,7 @@ gulp.task('scripts:app', function() {
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.uglify({preserveComments: 'some'})))
         .on('error', handleError)
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write()))
+        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.scripts : build.develop.scripts))
         .pipe($plugins.livereload())
         ;
@@ -392,7 +394,6 @@ gulp.task('clean', function(done) {
 
 // build for production (minify)
 gulp.task('production', gulpsync.sync([
-    'prod',
     'bower',
     'server',
     'images',
@@ -402,15 +403,12 @@ gulp.task('production', gulpsync.sync([
     'jade'
 ]), function(){
 
-    log('************');
-    log('* 发布成功 *');
-    log('************');
-
-});
-
-gulp.task('prod', function() {
     log('Starting production build...');
-    isProduction = true;
+    log('************');
+    //log('* All Done * You can start editing your code, LiveReload will update your browser after any change..');
+    log('* '+mode+'执行成功..');
+    log('************');
+
 });
 
 // build for develop (no minify)
@@ -424,15 +422,15 @@ gulp.task('develop', gulpsync.sync([
     'jade',
     'watch'
 ]), function(){
-
+    log('Starting develop build...');
     log('************');
     //log('* All Done * You can start editing your code, LiveReload will update your browser after any change..');
-    log('* 执行成功..');
+    log('* '+mode+'执行成功..');
     log('************');
 
 });
 
-gulp.task('default',['develop']);
+gulp.task('default',[mode]);
 
 
 /////////////////////
