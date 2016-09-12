@@ -323,6 +323,7 @@ co(function*() {
 
     app.listen(app.conf.port);
 
+
     console.log('listening...');
     //注释掉数据服务
     //app.data.init(app.conf.dir.data,{items:app.conf.serviceNames.concat()}).then(function(){
