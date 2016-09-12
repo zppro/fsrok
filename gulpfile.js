@@ -7,9 +7,10 @@ var args        = require('yargs').argv,
 
 // production mode (see build task)
 var isProduction = !(args.level === 'develop' || args.level === 'dev');
+var useSourceMaps = !!args.usm;
 var mode = isProduction ? 'production':'develop';
 
-console.log(mode);
+console.log(useSourceMaps);
 
 var target = args.target;
 if(!target)
@@ -209,11 +210,11 @@ gulp.task('i18n',[
 gulp.task('styles:less:app',function() {
     log('Building less app..');
     return gulp.src(source.less.app)
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.init()))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.init()))
         .pipe($plugins.less())
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.styles : build.develop.styles))
         .pipe($plugins.livereload())
         ;
@@ -223,12 +224,12 @@ gulp.task('styles:less:app',function() {
 gulp.task('styles:less:app-rtl', function() {
     log('Building less app-RTL styles..');
     return gulp.src(source.less.app)
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.init()))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.init()))
         .pipe($plugins.less())
         .on('error', handleError)
         .pipe($plugins.cssFlipper())
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.write('.')))
         .pipe($plugins.rename(function(path) {
             path.basename += "-rtl";
             return path;
@@ -242,11 +243,11 @@ gulp.task('styles:less:app-rtl', function() {
 gulp.task('styles:less:themes', function() {
     log('Building less app theme styles..');
     return gulp.src(source.less.themes)
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.init()))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.init()))
         .pipe($plugins.less())
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.styles : build.develop.styles))
         //.pipe($plugins.livereload())
         ;
@@ -256,11 +257,11 @@ gulp.task('styles:less:themes', function() {
 gulp.task('styles:less:subsystem', function() {
     log('Building less app subsystem styles..');
     return gulp.src(source.less.subsystem)
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.init()))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.init()))
         .pipe($plugins.less())
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.minifyCss()))
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.styles : build.develop.styles))
         .pipe($plugins.livereload())
         ;
@@ -280,13 +281,13 @@ gulp.task('scripts:app', function() {
     return gulp.src(source.scripts.app)
         .pipe($plugins.jsvalidate())
         .on('error', handleError)
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.init()))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.init()))
         .pipe($plugins.concat(source.scripts.name_concat_js))
         .pipe($plugins.ngAnnotate())
         .on('error', handleError)
         .pipe($plugins.if(isProduction, $plugins.uglify({preserveComments: 'some'})))
         .on('error', handleError)
-        .pipe($plugins.if(isProduction, $plugins.sourcemaps.write('.')))
+        .pipe($plugins.if(isProduction && useSourceMaps, $plugins.sourcemaps.write('.')))
         .pipe(gulp.dest(isProduction ? build.production.scripts : build.develop.scripts))
         .pipe($plugins.livereload())
         ;
